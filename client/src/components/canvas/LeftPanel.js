@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Common from '../../constants/common';
 import PanelButton from './PanelButton';
-import ShapeMenu from './topPanel/ShapeMenu';
+import ShapeMenuModal from './topPanel/ShapeMenuModal';
 import SetupCanvas from './SetupCanvas';
+import { Menu, Icon } from 'semantic-ui-react';
 import {setCanvasSize} from '../../actions/canvasActions';
 import TooltipPositions from '../../constants/tooltips';
 
@@ -12,7 +13,8 @@ class LeftPanel extends Component {
         super(props);
         this.state = {
             setup: false,
-            selectShape: false
+            selectShape: false,
+            shapeMenuOpen: false
         }
         this.controlMenu = this.controlMenu.bind(this);
         this.setCanvasSize = this.setCanvasSize.bind(this);
@@ -42,38 +44,54 @@ class LeftPanel extends Component {
             canvasHeight: height ? height : this.props.height
          }))
     }
+    closeShapeMenu = () => {
+        this.setState(state => ({
+            ...state,
+            shapeMenuOpen: false
+        }))
+    }
     render(){
+        const { shapeMenuOpen } = this.state;
         const {canvasData} = this.props;
         return (
-            <div className='left-panel'>
-
-                {this.props.isOpen && (
-                    <ShapeMenu
-                        canvasData={canvasData}
-                    />
-                )}
+            // <div className='left-panel'>
+            <Menu vertical icon inverted attached='left'>
                 <PanelButton 
-                    name={'Add New Shape'}
+                    tooltip={'Add New Shape'}
                     type={Common.sidePanel}
                     tooltipPosition={TooltipPositions.left}
                     onClick={() => this.handleShapeSelection(false)}
-                    icon={<i className="fal fa-plus-circle"></i>}
+                    icon='plus'
                 />
                 <PanelButton 
-                    name={'Select Shape'}
+                    tooltip={'Select Shape'}
                     type={Common.sidePanel}
                     tooltipPosition={TooltipPositions.left}
                     onClick={() => this.handleShapeSelection(true)}
-                    icon={<i className="fal fa-mouse-pointer"></i>}
+                    // icon={<i className="fal fa-mouse-pointer"></i>}
+                    icon='hand pointer outline'
                 />
                 <PanelButton 
-                    name={Common.shapes}
+                    tooltip={Common.shapes}
                     type={Common.sidePanel}
                     tooltipPosition={TooltipPositions.left}
-                    onClick={this.handleMenus}
-                    icon={<i className="fal fa-shapes"></i>}
+                    onClick={() => {
+                        this.setState(state => ({
+                            ...state,
+                            shapeMenuOpen: true
+                        }))
+                    }}
+                    // icon={<i className="fal fa-shapes"></i>}
+                    icon='clone outline'
+
                 />
-            </div>
+                <ShapeMenuModal
+                    open={shapeMenuOpen}
+                    addShape={this.props.addShape}
+                    canvasData={this.props.canvasData}
+                    closeModal={this.closeShapeMenu}
+                />
+            </Menu>
         )
     }
 }

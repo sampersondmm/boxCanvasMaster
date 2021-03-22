@@ -3,23 +3,18 @@ version: 0.2
 phases: 
   install: 
     commands: 
-      # install node 12
       - echo Installing Node 12...
       - curl -sL https: cinst nodejs.install
-      # install yarn
       - echo Installing yarn...
       - choco install yarn
   pre_build: 
     commands: 
-      # install dependencies
       - echo Installing yarn dependencies
       - yarn
   build: 
     commands:
-      # tests
       - echo Testing...
       - yarn test
-      # build
       - echo Building...
       - yarn build
 artifacts: 

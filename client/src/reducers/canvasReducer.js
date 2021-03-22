@@ -8,7 +8,7 @@ const DEFAULT_STATE = {
     canvasHeight: 400,
     backgroundColor: 'rgb(180,180,180)',
     canvasScale: 1,
-    shapeColor: 'rgb(20,20,20)',
+    shapeColor: '#000000',
     shapeList: [],
     shapeType: Common.square,
     selectedShape: '',
@@ -16,6 +16,7 @@ const DEFAULT_STATE = {
     shapeWidth: 20,
     shapeHeight: 20,
     shapeRadius: 10,
+    shapeOpacity: 1,
     colorPalette: [
       {color: "#4771e8", uuid: "50ecc8b-23f5-dc2f-e06d-15e01b437a0"},
       {color: "#af56d8", uuid: "4dc6017-71d3-1b5-0067-4017bbe66efd"},
@@ -113,6 +114,14 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         canvasData: {
           ...state.canvasData,
           shapeColor: payload.shapeColor
+        }
+      }
+    case ActionTypes.CHANGE_SHAPE_OPACITY:
+      return {
+        ...state,
+        canvasData: {
+          ...state.canvasData,
+          shapeOpacity: payload.shapeOpacity
         }
       }
     case ActionTypes.CHANGE_BACKGROUND_COLOR:

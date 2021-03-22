@@ -4,7 +4,7 @@ import Colors from '../../../constants/colors';
 import SizeMenu from './SizeMenu';
 import ZoomMenu from './ZoomMenu';
 import ColorMenu from './ColorMenu';
-import ShapeMenu from './ShapeMenu';
+import ShapeMenu from './ShapeMenuModal';
 import PaletteMenu from './PaletteMenu';
 import Common from '../../../constants/common';
 import {connect} from 'react-redux';

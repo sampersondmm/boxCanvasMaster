@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Common from '../../constants/common';
+import { Menu, Icon, Popup } from 'semantic-ui-react';
 import {Link} from 'react-router-dom';
 import TooltipPositions from '../../constants/tooltips';
 
@@ -46,41 +47,19 @@ class PanelButton extends Component {
                 tooltipClass = 'panel-tooltip';
                 break 
         }
-        return !this.props.exit ? 
-        (
-            <div 
-                className='panel-button'
-                id='panel-button'
-                onMouseEnter={() => this.handleHover(true)} 
-                onMouseLeave={() => this.handleHover(false)}
-                onClick={this.handleClick}
-            >
-                {this.props.icon}
-                {this.state.hover && (
-                    <div 
-                        className={tooltipClass}
-                        onMouseEnter={this.handleTooltipEvents}
-                        onMouseLeave={this.handleTooltipEvents}
-                    >{this.props.name}</div>
-                )}
-            </div>
-        ):
-        (
-            <Link 
-                className='panel-button'
-                style={{color: 'white', textDecoration: 'none'}}
-                onMouseEnter={() => this.handleHover(true)} 
-                onMouseLeave={() => this.handleHover(false)}
-                to='/'
-            >
-                {this.props.icon}
-                {this.state.hover && (
-                    <div 
-                        className={tooltipClass}
-                    >{this.props.name}</div>
-                )}
-            </Link>
-        ) 
+         return (
+            <Popup
+                style={{margin: '0', borderRadius: '0'}}
+                basic
+                trigger={
+                    <Menu.Item onClick={this.props.onClick}>
+                        <Icon name={this.props.icon} inverted/>
+                    </Menu.Item>
+                }
+                content={this.props.tooltip}
+                position='right center'
+            />
+        )
     }
 }
 

@@ -6,6 +6,7 @@ const Common = {
     zoom: 'Zoom',
     exit: 'Exit',
     shape: 'Shape',
+    display: 'Display',
     shapes: 'Shapes',
     background: 'Background',
     clear: 'Clear',

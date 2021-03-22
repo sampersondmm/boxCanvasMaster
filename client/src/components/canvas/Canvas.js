@@ -4,14 +4,16 @@ import RightPanel from './RightPanel';
 import LeftPanel from './LeftPanel';
 import TopPanel from './topPanel/TopPanel';
 import Size from '../../constants/size';
+import { Modal, Menu, Tab, Card } from 'semantic-ui-react';
 import ShapeCanvas from './ShapeCanvas'
+import ShapeMenu from './topPanel/ShapeMenu'
 import {addShapeToCanvas, createCanvas, clearCanvasData} from '../../actions/canvasActions';
 
 class Canvas extends Component {
     constructor(props){
         super(props);
         this.state = {
-            rightPanelOpen: true,
+            rightPanelOpen: false,
             leftPanelOpen: false
         }
         this.handleRightMenu = this.handleRightMenu.bind(this);
@@ -77,28 +79,33 @@ class Canvas extends Component {
                     top: '0'
                 }
             };
+        
         return(
             <div className='canvas-wrap'>
                 <TopPanel 
                     canvas={canvasData}
                     createCanvas={this.createCanvas}
                 />
-                <div className='canvas-display' style={style.canvasDisplay}>
+                <div className='canvas-display' style={{height: 'calc(100vh - 50px)'}}>
                     <LeftPanel
                         handleMenu={this.handleLeftMenu}
                         isOpen={this.state.leftPanelOpen}
+                        addShape={this.addShape}
                         canvasData={canvasData}
                     />
-                    <div className='canvas-display-inner' style={style.canvasDisplayInner}>
+                    <div className='canvas-display-inner'>
                         <ShapeCanvas 
                             addShape={this.addShape}
                             canvas={canvasData}
                         />
                     </div>
-                    <RightPanel
+                    {/* <RightPanel
                         canvasData={canvasData}
                         handleMenu={this.handleRightMenu}
                         isOpen={this.state.rightPanelOpen}
+                    /> */}
+                    <ShapeMenu
+                        canvasData={canvasData}
                     />
                 </div>
             </div>

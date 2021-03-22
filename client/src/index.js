@@ -32,6 +32,8 @@ import './css/layerMenu.css';
 import './css/layerMenu2.css';
 import './css/canvasList.css';
 
+import 'semantic-ui-css/semantic.min.css';
+
 export const store = createStore(
     rootReducer,
     compose(

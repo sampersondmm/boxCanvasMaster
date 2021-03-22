@@ -43,6 +43,14 @@ changeShapeColor = color => {
         }
     }
 },
+changeShapeOpacity = opacity => {
+    return {
+        type: ActionTypes.CHANGE_SHAPE_OPACITY,
+        payload: {
+            shapeOpacity: opacity
+        }
+    }
+},
 changeShapeWidth = width => {
     return {
         type: ActionTypes.CHANGE_SHAPE_WIDTH,
@@ -128,7 +136,8 @@ export {
     setCanvasSize, 
     addShapeToCanvas, 
     changeShapeType, 
-    changeShapeColor, 
+    changeShapeColor,
+    changeShapeOpacity, 
     changeShapeWidth, 
     changeCanvasScale, 
     createCanvas, 
