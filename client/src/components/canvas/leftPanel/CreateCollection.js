@@ -74,7 +74,6 @@ class CreateCollection extends Component {
                                 <ShapeCollectionCanvas
                                     open={open}
                                     addShape={this.addShapeToCollection}
-                                    canvas={canvasData}
                                 />
 
                             </div>

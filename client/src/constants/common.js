@@ -17,7 +17,6 @@ const Common = {
     topPanel: 'Top Panel',
     sidePanel: 'Side Panel',
     type: 'Type',
-    rotation: 'Rotation',
     border: 'Border',
     square: 'Square',
     circle: 'Circle',
@@ -26,6 +25,7 @@ const Common = {
     radius: 'Radius',
     zoom: 'Zoom',
     stamp: 'Stamp',
+    radius: 'Radius',
     selectCurrentShape: 'Select Current Shape'
 }
 

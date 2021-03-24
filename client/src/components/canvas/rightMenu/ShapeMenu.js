@@ -28,6 +28,7 @@ class ShapeMenu extends Component {
             activeIndex: 1,
             sizeIncrement: 20,
             rotationIncrement: 20,
+            radiusIncrement: 20,
             tabOpen: {
                 display: true,
                 type: true,
@@ -72,22 +73,17 @@ class ShapeMenu extends Component {
         this.props.dispatch(changeShapeType(type))
     }
     handleSizeChange = (data, type) => {
+        const value = parseInt(data.value, 10)
         switch(type){
             case Common.width:
-                store.dispatch(changeShapeWidth(data.value));
+                this.props.dispatch(changeShapeWidth(value));
                 break;
             case Common.height:
-                store.dispatch(changeShapeHeight(data.value));
+                this.props.dispatch(changeShapeHeight(value));
                 break;
             case Common.radius:
-                store.dispatch(changeShapeRadius(data.value));
+                this.props.dispatch(changeShapeRadius(value));
                 break;
-            
-        }
-        if(type === Common.width) {
-            store.dispatch(changeShapeWidth(data.value))
-        } else {
-            store.dispatch(changeShapeHeight(data.value))
         }
     }
     handleRotationChange = (data) => {
@@ -103,6 +99,12 @@ class ShapeMenu extends Component {
         this.setState(state => ({
             ...state,
             rotationIncrement: parseInt(data.value, 10)
+        }))
+    }
+    handleChangeRadiusIncrement = (data) => {
+        this.setState(state => ({
+            ...state,
+            radiusIncrement: parseInt(data.value, 10)
         }))
     }
     toggleAccordian = (selectedTab) => {
@@ -152,12 +154,36 @@ class ShapeMenu extends Component {
             value
         }));
     }
+    incrementWidth = (value) => {
+        const { shapeWidth } = this.props.currentShape;
+        const { sizeIncrement } = this.state;
+        const newValue = value === 'down' ? (shapeWidth - sizeIncrement <= 0 ? 0 : shapeWidth - sizeIncrement) : shapeWidth + sizeIncrement;
+        this.props.dispatch(changeShapeWidth(newValue))
+    }
+    incrementHeight = (value) => {
+        const { shapeHeight } = this.props.currentShape;
+        const { sizeIncrement } = this.state;
+        const newValue = value === 'down' ? (shapeHeight - sizeIncrement <= 0 ? 0 : shapeHeight - sizeIncrement) : shapeHeight + sizeIncrement;
+        this.props.dispatch(changeShapeHeight(newValue))
+    }
+    incrementRadius = (value) => {
+        const { shapeRadius } = this.props.currentShape;
+        const { sizeIncrement } = this.state;
+        const newValue = value === 'down' ? (shapeRadius - sizeIncrement <= 0 ? 0 : shapeRadius - sizeIncrement) : shapeRadius + sizeIncrement;
+        this.props.dispatch(changeShapeRadius(newValue))
+    }
+    incrementRotation = (value) => {
+        const { shapeRotation } = this.props.currentShape;
+        const { rotationIncrement } = this.state;
+        const newValue = value === 'down' ? (shapeRotation - rotationIncrement <= 0 ? 0 : shapeRotation - rotationIncrement) : shapeRotation + rotationIncrement;
+        this.props.dispatch(changeShapeRotation(newValue))
+    }
 
     //Accordian items
     createDisplayItem = () => {
         const { tabOpen } = this.state;
         const { backgroundColor } = this.props.canvasData
-        const {shapeOpacity, borderRadius, shapeColor, shapeType } = this.props.canvasData.currentShape;
+        const {shapeOpacity, borderRadius, shapeColor, shapeType } = this.props.currentShape;
         return (
             <Menu.Item className='shape-accordian-option'>
                 <Accordion.Title
@@ -214,7 +240,7 @@ class ShapeMenu extends Component {
         const { tabOpen } = this.state;
         const { modal } = this.props;
         const { backgroundColor } = this.props.canvasData
-        const { shapeColor } = this.props.canvasData.currentShape;
+        const { shapeColor } = this.props.currentShape;
         const isInverted = modal ? false : true;
 
         let color = null;
@@ -267,9 +293,9 @@ class ShapeMenu extends Component {
         )
     }
     createSizeItem = () => {
-        const { tabOpen, sizeIncrement } = this.state;
+        const { tabOpen, sizeIncrement, rotationIncrement, radiusIncrement } = this.state;
         const { modal } = this.props;
-        const { shapeType, shapeWidth, shapeHeight, shapeRadius } = this.props.canvasData.currentShape;
+        const { shapeType, shapeWidth, shapeHeight, shapeRadius } = this.props.currentShape;
         const isInverted = modal ? false : true;
         return (
             <Menu.Item textAlign='center' className='shape-accordian-option' >
@@ -326,15 +352,15 @@ class ShapeMenu extends Component {
                     {shapeType === Common.circle && (
                          <Menu.Menu inverted={isInverted} vertical >
                             <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
-                                <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('down')}/>
+                                <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementRadius('down')}/>
                                 <Menu.Header style={{margin: '0'}}>{Common.radius}</Menu.Header>
-                                <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('up')}/>
+                                <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementRadius('up')}/>
                             </Menu.Item>
                             <Menu.Item>
                                 <Input
                                     inverted={isInverted}
                                     type='number'
-                                    value={shapeWidth}
+                                    value={shapeRadius}
                                     onChange={(e, data) => this.handleSizeChange(data, Common.radius)}
                                     placeholder='Radius...'
                                 />
@@ -344,8 +370,8 @@ class ShapeMenu extends Component {
                                     <Input
                                         inverted={isInverted}
                                         type='number'
-                                        value={sizeIncrement}
-                                        onChange={(e, data) => this.handleChangeIncrement(data)}
+                                        value={radiusIncrement}
+                                        onChange={(e, data) => this.handleChangeRadiusIncrement(data)}
                                         placeholder='Increment...'
                                     />
                             </Menu.Item>
@@ -356,9 +382,9 @@ class ShapeMenu extends Component {
         )
     }
     createRotationItem = () => {
-        const { tabOpen, increment } = this.state;
+        const { tabOpen, rotationIncrement } = this.state;
         const { modal } = this.props;
-        const { shapeType, shapeWidth, shapeHeight, shapeRotation } = this.props.canvasData.currentShape;
+        const { shapeType, shapeWidth, shapeHeight, shapeRotation } = this.props.currentShape;
         const isInverted = modal ? false : true;
         return (
             <Menu.Item textAlign='center' className='shape-accordian-option' >
@@ -392,7 +418,7 @@ class ShapeMenu extends Component {
                                 <Input
                                     inverted={isInverted}
                                     type='number'
-                                    value={increment}
+                                    value={rotationIncrement}
                                     onChange={(e, data) => this.handleChangeIncrement(data)}
                                     placeholder='Increment...'
                                 />
@@ -403,7 +429,7 @@ class ShapeMenu extends Component {
         )
     }
     createAccordianList = () => {
-        const { shapeType } = this.props.canvasData;
+        const { shapeType } = this.props.currentShape;
         const arr = [
             {
                 key: Common.display,
@@ -424,10 +450,9 @@ class ShapeMenu extends Component {
             {
                 key: Common.rotation,
                 render: () => {
-                    if(shapeType === Common.circle) {
-                        return null;
+                    if(shapeType !== Common.circle) {
+                        return this.createRotationItem()
                     }
-                    return this.createRotationItem()
                 },
             },
 
@@ -436,28 +461,10 @@ class ShapeMenu extends Component {
             return  item.render()
         })
     }
-    incrementWidth = (value) => {
-        const { shapeWidth } = this.props.canvasData.currentShape;
-        const { sizeIncrement } = this.state;
-        const newValue = value === 'down' ? (shapeWidth - sizeIncrement <= 0 ? 0 : shapeWidth - sizeIncrement) : shapeWidth + sizeIncrement;
-        this.props.dispatch(changeShapeWidth(newValue))
-    }
-    incrementHeight = (value) => {
-        const { shapeHeight } = this.props.canvasData.currentShape;
-        const { sizeIncrement } = this.state;
-        const newValue = value === 'down' ? (shapeHeight - sizeIncrement <= 0 ? 0 : shapeHeight - sizeIncrement) : shapeHeight + sizeIncrement;
-        this.props.dispatch(changeShapeHeight(newValue))
-    }
-    incrementRotation = (value) => {
-        const { shapeRotation } = this.props.canvasData.currentShape;
-        const { rotationIncrement } = this.state;
-        const newValue = value === 'down' ? (shapeRotation - rotationIncrement <= 0 ? 0 : shapeRotation - rotationIncrement) : shapeRotation + rotationIncrement;
-        this.props.dispatch(changeShapeRotation(newValue))
-    }
     currentShapePane = () => {
         const { modal, canvasData } = this.props;
-        const { shapeColor} = canvasData.currentShape;
-        const { backgroundColor } = canvasData.currentShape;
+        const { shapeColor } = this.props.currentShape;
+        const { backgroundColor } = canvasData;
 
         const isInverted = modal ? false : true;
         const wrapHeight = modal ? '433px' : 'calc(100vh - 120px)';
@@ -484,7 +491,6 @@ class ShapeMenu extends Component {
         collectionList.map(shape => {
             return (
                 <Menu.Item>
-                    
                     {shape.type}
                 </Menu.Item>
             )
@@ -508,8 +514,6 @@ class ShapeMenu extends Component {
                                             <Card.Header>{shape.type}</Card.Header>
                                         </Card.Content>
                                     </Card>
-                                    {/* <div style={{width: '20px', height: '20px', backgroundColor: shape.shapeColor, borderRadius: shape.shapeType === Common.square ? 0 : '50%'}}></div> */}
-                                    {/* {shape.type} */}
                                 </Menu.Item>
                             )
                         })}
@@ -555,9 +559,10 @@ class ShapeMenu extends Component {
 }
 
 const mapStateToProps = state => {
-    const { collectionList } = state.canvas.canvasData;
+    const { collectionList, currentShape } = state.canvas;
     return {
-        collectionList
+        collectionList,
+        currentShape
     }
 }
 

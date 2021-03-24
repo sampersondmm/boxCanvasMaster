@@ -5,7 +5,7 @@ import uuid from 'react-uuid';
 import {clearCanvasData} from '../../actions/canvasActions';
 import {connect} from 'react-redux';
 
-class ShapeCollectionCanvas extends Component {
+class ShapeCanvas extends Component {
     /**
      * Creates an instance of the Canvas
      *
@@ -18,7 +18,7 @@ class ShapeCollectionCanvas extends Component {
         this.speedConst = 0.5;
         this.particleCount = 150;
         this.connectionDistance = 100;
-        this.shapeArr = props.canvas.collectionList;
+        this.shapeArr = [];
         this.currentShape = {};
         this.lines = [];
         this.posX = 100; 
@@ -26,6 +26,9 @@ class ShapeCollectionCanvas extends Component {
         this.scalePosX = 1;
         this.scalePosY = 1;
         this.hoverActive = false;
+        this.originX = 0;
+        this.originY = 0;
+        this.rotation = 0;
 
         this.state = {
             posX: 100,
@@ -47,35 +50,39 @@ class ShapeCollectionCanvas extends Component {
         this.centerStamp = this.centerStamp.bind(this);
     }
 
-    componentWillReceiveProps(nextProps){
-        const {canvasWidth, canvasHeight, canvasScale, shapeType, shapeWidth, shapeHeight, shapeRadius, selectedShape, shapeColor, shapeOpacity} = nextProps.canvas;
-        if(shapeColor !== this.props.canvas.shapeColor){
+    componentDidUpdate(prevProps){
+        const {shapeType, shapeWidth, shapeHeight, shapeRadius, selectedShape, shapeRotation, shapeColor, shapeOpacity} = this.props.currentShape;
+        const { canvasWidth, canvasHeight, canvasScale } = this.props.canvasData;
+        if(shapeColor !== prevProps.currentShape.shapeColor){
             this.changeShapeColor(shapeColor)
         }
-        if(shapeOpacity !== this.props.canvas.shapeOpacity){
+        if(shapeOpacity !== prevProps.currentShape.shapeOpacity){
             this.changeShapeOpacity(shapeOpacity)
         }
-        if(shapeType !== this.props.canvas.shapeType){
+        if(shapeType !== prevProps.currentShape.shapeType){
             this.changeShapeType(shapeType)
         }
-        if(shapeWidth !== this.props.canvas.shapeWidth){
+        if(shapeWidth !== prevProps.currentShape.shapeWidth){
             this.changeShapeWidth(shapeWidth)
         }
-        if(shapeHeight !== this.props.canvas.shapeHeight){
+        if(shapeHeight !== prevProps.currentShape.shapeHeight){
             this.changeShapeHeight(shapeHeight)
         }
-        if(shapeRadius !== this.props.canvas.shapeRadius){
+        if(shapeRotation !== prevProps.currentShape.shapeRotation){
+            this.changeShapeRotation(shapeRotation)
+        }
+        if(shapeRadius !== prevProps.currentShape.shapeRadius){
             this.changeShapeRadius(shapeRadius)
         }
-        if(canvasScale !== this.props.canvas.canvasScale){
+        if(canvasScale !== prevProps.canvasScale){
             this.changeCanvasScale(canvasScale)
         }
-        if(selectedShape !== this.props.canvas.selectedShape){
+        if(selectedShape !== prevProps.selectedShape){
             this.selectShape(selectedShape)
         }
-        if(nextProps.canvas !== this.props.canvas){
-            this.centerStamp();
-        }
+        // if(nextProps.canvas !== this.props.canvas){
+        //     this.centerStamp();
+        // }
     }
 
     /**
@@ -84,7 +91,8 @@ class ShapeCollectionCanvas extends Component {
      * @returns {void}
      */
     componentDidMount() {
-        const {shapeColor, backgroundColor} = this.props.canvas;
+        const { backgroundColor } = this.props.canvasData;
+        const {shapeColor} = this.props.currentShape;
         this.setState(state => ({
             ...state,
             shapeColor: shapeColor,
@@ -94,97 +102,17 @@ class ShapeCollectionCanvas extends Component {
         this.setupCanvas();
     }
 
-    moveShape(){
-        const {shapeType, shapeRadius} = this.props.canvas,
-            canvasElement = document.getElementById('canvas-collection').getBoundingClientRect(),
-            node = select(this.node)
-                .select('.stamp');
-
-        this.hoverActive = true;
-
-        node.attr('visibility', 'visible')
-
-        let shapeWidth = null,
-            shapeHeight = null,
-            shapePosX = null,
-            shapePosY = null;
-
-
-        if(shapeType === Common.square){
-            shapeWidth = node.attr('width'); 
-            shapeHeight = node.attr('height'); 
-
-            shapePosX = (event.x - canvasElement.left) * this.scalePosX;
-            shapePosY = (event.y - canvasElement.top) * this.scalePosY;
-
-            node
-                .attr('x', () => (shapePosX))
-                .attr('y', () => (shapePosY))
-                .attr('transform', `translate(-${shapeWidth/2}, -${shapeHeight/2})`);
-
-            this.currentShape.posX = shapePosX;
-            this.currentShape.posY = shapePosY;
-
-        } else {
-            shapePosX = event.x - canvasElement.left;
-            shapePosY = event.y - canvasElement.top;
-            node
-                .attr('cx', () => (shapePosX))
-                .attr('cy', () => (shapePosY));
-
-            this.currentShape.posX = (shapePosX);
-            this.currentShape.posY = (shapePosY);
-        }
-    }
-
-    centerStamp(){
-        const {canvasWidth, canvasHeight} = this.props.canvas;
-        this.hoverActive = false;
-
-        const stamp = select(this.node)
-            .selectAll('.stamp');
-
-        if(this.currentShape.type === Common.square){
-            stamp
-                .attr('x', canvasWidth / 2)
-                .attr('y', canvasHeight / 2)
-        } else {
-            stamp
-                .attr('cx', canvasWidth / 2)
-                .attr('cy', canvasHeight / 2)
-        }       
-    }
-
-    createExistingShapes = () => {
-        const { collectionList } = this.props.canvas;
-        for(const listItem of collectionList) {
-            if(listItem.type === Common.square){
-                select(this.node)
-                    .selectAll('rect')
-                    .data([listItem])
-                    .enter()
-                    .append('rect')
-                    .attr('class', 'stamp')
-                    .attr('fill', obj => obj.color)
-                    .attr('opacity', obj => obj.opacity)
-                    .attr('width', obj => obj.width)
-                    .attr('height', obj => obj.height)
-                    .attr('x', obj => obj.posX)
-                    .attr('y', obj => obj.posY)
-                    .attr('transform', obj => `translate(-${obj.width / 2}, -${obj.height / 2})`)
-            }
-        }
-    }
-
     setupCanvas(){
-        const {shapeWidth, shapeHeight, shapeColor, shapeOpacity, collectionList} = this.props.canvas;
-
+        const { canvasWidth, canvasHeight } = this.props.canvasData;
+        const {shapeWidth, shapeHeight, shapeColor, shapeOpacity} = this.props.currentShape;
+        this.centerX = canvasWidth / 2;
+        this.centerY = canvasHeight/2;
         // Default starting shape
         this.currentShape = {
             width: shapeWidth,
             height: shapeHeight,
-            posX: 100, 
-            posY: 100,
+            posX: this.centerX - (shapeWidth/2), 
+            posY: this.centerY - (shapeHeight/2),
             type: Common.square,
             border: 0,
             rotation: 0,
@@ -204,27 +132,80 @@ class ShapeCollectionCanvas extends Component {
             .attr('height', obj => obj.height)
             .attr('x', obj => obj.posX)
             .attr('y', obj => obj.posY)
-            .attr('transform', obj => `translate(-${obj.width / 2}, -${obj.height / 2})`)
 
         select(this.node)
             .on('mousemove', () => this.moveShape())
             .on('mouseleave', () => this.centerStamp())
             .on('click', (obj, index, arr) => this.addShape(index, arr))
 
-        select(this.node)
-            .selectAll('.shape')
-            .data(collectionList.reverse())
-            .enter()
-            .append('rect')
-            .attr('class', 'shape')
-            .attr('fill', obj => obj.color)
-            .attr('opacity', obj => obj.opacity)
-            .attr('width', obj => obj.width)
-            .attr('height', obj => obj.height)
-            .attr('x', obj => obj.posX)
-            .attr('y', obj => obj.posY)
-            .attr('transform', obj => `translate(-${obj.width / 2}, -${obj.height / 2})`)
+        // this.centerStamp();
+    }
 
+    moveShape(){
+        const {shapeType, shapeWidth, shapeRotation, shapeHeight} = this.props.currentShape;
+        const canvasElement = document.getElementById('canvas').getBoundingClientRect();
+        const node = select(this.node)
+            .select('.stamp');
+        const ref = select(this.node)
+            .select('.ref');
+
+        this.hoverActive = true;
+
+        if(shapeType === Common.square){
+            const newX = (event.x - canvasElement.left) - (shapeWidth/2);
+            const newY = (event.y - canvasElement.top) - (shapeHeight/2);
+            this.originX = event.x - canvasElement.left;
+            this.originY = event.y - canvasElement.top;
+            node
+                .attr('transform', obj => `rotate(0 ${this.originX} ${this.originY})`);
+
+            node
+                .attr('x', () => (newX) * this.scalePosX)
+                .attr('y', () => (newY) * this.scalePosY)
+
+            node
+                .attr('transform', obj => `rotate(${shapeRotation} ${this.originX} ${this.originY})`);
+
+        } else {
+            node
+                .attr('cx', () => (event.x - canvasElement.left) * this.scalePosX)
+                .attr('cy', () => (event.y - canvasElement.top) * this.scalePosY);
+
+            // this.currentShape.posX = (event.x - canvasElement.left);
+            // this.currentShape.posY = (event.y - canvasElement.top);
+        }
+    }
+
+    centerStamp(){
+        const {shapeWidth, shapeHeight, shapeRotation, shapeRadius} = this.props.currentShape;
+        const {canvasWidth, canvasHeight} = this.props.canvasData;
+        const stamp = select(this.node)
+            .selectAll('.stamp');
+        let centerX = (canvasWidth / 2) - (shapeWidth/2);
+        let centerY = (canvasHeight / 2) - (shapeHeight/2);
+
+        if(this.currentShape.type === Common.square){
+            centerX = (canvasWidth / 2) - (shapeWidth/2);
+            centerY = (canvasHeight / 2) - (shapeHeight/2);
+
+            stamp
+                .attr('transform', `rotate(0 ${this.originX} ${this.originY})`)
+
+            stamp
+                .attr('x', centerX)
+                .attr('y', centerY)
+
+            stamp
+                .attr('transform', `rotate(${shapeRotation} ${this.centerX} ${this.centerY})`)
+        } else {
+            centerX = (canvasWidth / 2);
+            centerY = (canvasHeight / 2);
+            stamp
+                .attr('cx', centerX)
+                .attr('cy', centerY)
+        }       
+        this.currentShape.posX = centerX;
+        this.currentShape.posY = centerY;
     }
 
     loadShapes(){
@@ -250,7 +231,7 @@ class ShapeCollectionCanvas extends Component {
     }
 
     addShape(){
-        const {shapeType, shapeOpacity} = this.props.canvas,
+        const {shapeType, shapeRotation, shapeOpacity} = this.props.currentShape,
             newShapeUuid = uuid(),
             transform = select(this.node).selectAll('.stamp').attr('transform');
 
@@ -291,7 +272,7 @@ class ShapeCollectionCanvas extends Component {
                 .attr('height', obj => obj.height)
                 .attr('x', obj => obj.posX)
                 .attr('y', obj => obj.posY)
-                .attr('transform', transform);
+                .attr('transform', `rotate(${shapeRotation} ${this.originX} ${this.originY})`);
 
             select(this.node)
                 .selectAll('.stamp')
@@ -305,7 +286,7 @@ class ShapeCollectionCanvas extends Component {
                 .attr('height', obj => obj.height)
                 .attr('x', obj => obj.posX)
                 .attr('y', obj => obj.posY)
-                .attr('transform', obj => `translate(-${obj.width / 2}, -${obj.height / 2})`)
+                .attr('transform', `rotate(${shapeRotation} ${this.originX} ${this.originY})`);
 
         } else {
             select(this.node)
@@ -340,15 +321,7 @@ class ShapeCollectionCanvas extends Component {
         select(this.node)
             .selectAll('.stamp')
             .attr('width', newWidth)
-            .attr('transform', `translate(-${newWidth/2}, -${this.currentShape.height/2})`)
-    }
-
-    changeCanvasScale(newScale) {
-        const {canvasWidth, canvasHeight} = this.props.canvas;
-        select(this.node)
-            .attr('transform', `scale(${newScale})`)
-        this.scalePosX = canvasWidth / (canvasWidth * newScale);
-        this.scalePosY = canvasHeight / (canvasHeight * newScale);
+        this.centerStamp();
     }
 
     changeShapeHeight(newHeight){
@@ -356,7 +329,26 @@ class ShapeCollectionCanvas extends Component {
         select(this.node)
             .selectAll('.stamp')
             .attr('height', newHeight)
-            .attr('transform', `translate(-${this.currentShape.width/2}, -${newHeight/2})`)
+        this.centerStamp();
+    }
+
+    changeShapeRotation = (newRotation) => {
+        const { canvasWidth, canvasHeight} = this.props.canvasData;
+        this.originX = canvasWidth/2;
+        this.originY = canvasHeight/2;
+        select(this.node)
+            .selectAll('.stamp')
+            .attr('transform', obj => `rotate(${newRotation} ${this.originX} ${this.originY})`)
+
+        this.currentShape.rotation = newRotation;
+    }
+
+    changeCanvasScale(newScale) {
+        const {canvasWidth, canvasHeight} = this.props.canvasData;
+        select(this.node)
+            .attr('transform', `scale(${newScale})`)
+        this.scalePosX = canvasWidth / (canvasWidth * newScale);
+        this.scalePosY = canvasHeight / (canvasHeight * newScale);
     }
 
     changeShapeRadius(newRadius){
@@ -381,7 +373,7 @@ class ShapeCollectionCanvas extends Component {
     }
 
     changeShapeType(newType){
-        const {shapeWidth, shapeHeight, shapeRadius} = this.props.canvas;
+        const {shapeWidth, shapeHeight, shapeRadius} = this.props.currentShape;
 
         select(this.node)
             .selectAll('.stamp')
@@ -407,10 +399,10 @@ class ShapeCollectionCanvas extends Component {
                 .attr('class', 'stamp')
                 .attr('fill', obj => obj.color)
                 .attr('width', obj => obj.width)
+                .attr('opacity', obj => obj.opacity)
                 .attr('height', obj => obj.height)
                 .attr('x', obj => obj.posX * this.scalePosX)
                 .attr('y', obj => obj.posY * this.scalePosY)
-                // .attr('transform', obj => `translate(-${obj.width / 2}, -${obj.height / 2})`)
 
         } else {
             this.currentShape = {
@@ -426,14 +418,16 @@ class ShapeCollectionCanvas extends Component {
                 .append('circle')
                 .attr('class', 'stamp')
                 .attr('fill', obj => obj.color)
+                .attr('opacity', obj => obj.opacity)
                 .attr('r', obj => obj.radius)
                 .attr('cx', obj => obj.posX * this.scalePosX)
                 .attr('cy', obj => obj.posY * this.scalePosY)
         }
+        this.centerStamp();
     }
 
     render() {
-        const {canvasWidth, canvasHeight, backgroundColor} = this.props.canvas,
+        const {canvasWidth, canvasHeight, backgroundColor} = this.props.canvasData,
             style = {
                 main: {
                     width: `${canvasWidth}px`,
@@ -443,12 +437,20 @@ class ShapeCollectionCanvas extends Component {
             };
             
         return (
-            <svg style={style.main} id='canvas-collection' ref={node => (this.node = node)}/>
+            <svg style={style.main} id='canvas' ref={node => (this.node = node)}/>
         );
     }
 }
 
-export default ShapeCollectionCanvas;
+const mapStateToProps = (state) => {
+    const {canvasData, currentShape} = state.canvas;
+    return { 
+        canvasData,
+        currentShape
+    }
+} 
+
+export default connect(mapStateToProps)(ShapeCanvas);
 
 
 

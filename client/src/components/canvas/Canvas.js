@@ -93,7 +93,6 @@ class Canvas extends Component {
                     <div className='canvas-display-inner'>
                         <ShapeCanvas 
                             addShape={this.addShape}
-                            canvas={canvasData}
                         />
                     </div>
                     {/* <RightPanel
