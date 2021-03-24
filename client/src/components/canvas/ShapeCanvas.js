@@ -26,6 +26,7 @@ class ShapeCanvas extends Component {
         this.scalePosX = 1;
         this.scalePosY = 1;
         this.hoverActive = false;
+        this.rotation = 0;
 
         this.state = {
             posX: 100,
@@ -48,23 +49,27 @@ class ShapeCanvas extends Component {
     }
 
     componentWillReceiveProps(nextProps){
-        const {canvasWidth, canvasHeight, canvasScale, shapeType, shapeWidth, shapeHeight, shapeRadius, selectedShape, shapeColor, shapeOpacity} = nextProps.canvas;
-        if(shapeColor !== this.props.canvas.shapeColor){
+        const {shapeType, shapeWidth, shapeHeight, shapeRadius, selectedShape, shapeRotation, shapeColor, shapeOpacity} = nextProps.canvas.currentShape;
+        const { canvasWidth, canvasHeight, canvasScale } = this.props.canvas;
+        if(shapeColor !== this.props.canvas.currentShape.shapeColor){
             this.changeShapeColor(shapeColor)
         }
-        if(shapeOpacity !== this.props.canvas.shapeOpacity){
+        if(shapeOpacity !== this.props.canvas.currentShape.shapeOpacity){
             this.changeShapeOpacity(shapeOpacity)
         }
-        if(shapeType !== this.props.canvas.shapeType){
+        if(shapeType !== this.props.canvas.currentShape.shapeType){
             this.changeShapeType(shapeType)
         }
-        if(shapeWidth !== this.props.canvas.shapeWidth){
+        if(shapeWidth !== this.props.canvas.currentShape.shapeWidth){
             this.changeShapeWidth(shapeWidth)
         }
-        if(shapeHeight !== this.props.canvas.shapeHeight){
-            this.changeShapeHeight(shapeHeight)
+        if(shapeHeight !== this.props.canvas.currentShape.shapeHeight){
+            this.changeShapeWidth(shapeHeight)
         }
-        if(shapeRadius !== this.props.canvas.shapeRadius){
+        if(shapeRotation !== this.props.canvas.currentShape.shapeRotation){
+            this.changeShapeRotation(shapeRotation)
+        }
+        if(shapeRadius !== this.props.canvas.currentShape.shapeRadius){
             this.changeShapeRadius(shapeRadius)
         }
         if(canvasScale !== this.props.canvas.canvasScale){
@@ -84,7 +89,8 @@ class ShapeCanvas extends Component {
      * @returns {void}
      */
     componentDidMount() {
-        const {shapeColor, backgroundColor} = this.props.canvas;
+        const { backgroundColor } = this.props.canvas;
+        const {shapeColor} = this.props.canvas.currentShape;
         this.setState(state => ({
             ...state,
             shapeColor: shapeColor,
@@ -94,62 +100,9 @@ class ShapeCanvas extends Component {
         this.setupCanvas();
     }
 
-    moveShape(){
-        const {shapeType} = this.props.canvas,
-            canvasElement = document.getElementById('canvas').getBoundingClientRect(),
-            node = select(this.node)
-                .select('.stamp');
-
-        this.hoverActive = true;
-
-        node.attr('visibility', 'visible')
-
-        let shapeWidth = null,
-            shapeHeight = null;
-
-
-        if(shapeType === Common.square){
-            shapeWidth = node.attr('width'); 
-            shapeHeight = node.attr('height'); 
-
-
-            node
-                .attr('x', () => (event.x - canvasElement.left) * this.scalePosX)
-                .attr('y', () => (event.y - canvasElement.top) * this.scalePosY)
-                .attr('transform', `translate(-${shapeWidth/2}, -${shapeHeight/2})`);
-
-            this.currentShape.posX = (event.x - canvasElement.left);
-            this.currentShape.posY = (event.y - canvasElement.top);
-        } else {
-            node
-                .attr('cx', () => (event.x - canvasElement.left) * this.scalePosX)
-                .attr('cy', () => (event.y - canvasElement.top) * this.scalePosY);
-
-            this.currentShape.posX = (event.x - canvasElement.left);
-            this.currentShape.posY = (event.y - canvasElement.top);
-        }
-    }
-
-    centerStamp(){
-        const {canvasWidth, canvasHeight} = this.props.canvas;
-        this.hoverActive = false;
-
-        const stamp = select(this.node)
-            .selectAll('.stamp');
-
-        if(this.currentShape.type === Common.square){
-            stamp
-                .attr('x', canvasWidth / 2)
-                .attr('y', canvasHeight / 2)
-        } else {
-            stamp
-                .attr('cx', canvasWidth / 2)
-                .attr('cy', canvasHeight / 2)
-        }       
-    }
-
     setupCanvas(){
-        const {shapeWidth, shapeHeight, shapeColor, shapeOpacity} = this.props.canvas;
+        const { canvasWidth, canvasHeight } = this.props.canvas;
+        const {shapeWidth, shapeHeight, shapeColor, shapeOpacity} = this.props.canvas.currentShape;
         // Default starting shape
         this.currentShape = {
             width: shapeWidth,
@@ -181,6 +134,73 @@ class ShapeCanvas extends Component {
             .on('mousemove', () => this.moveShape())
             .on('mouseleave', () => this.centerStamp())
             .on('click', (obj, index, arr) => this.addShape(index, arr))
+
+        this.centerStamp();
+        this.centerX = canvasWidth / 2;
+        this.centerY = canvasHeight/2;
+    }
+
+    moveShape(){
+        const { canvasWidth, canvasHeight } = this.props.canvas;
+        const {shapeType, shapeRotation} = this.props.canvas.currentShape,
+            canvasElement = document.getElementById('canvas').getBoundingClientRect(),
+            node = select(this.node)
+                .select('.stamp');
+
+        this.hoverActive = true;
+
+        node.attr('visibility', 'visible')
+
+        let shapeWidth = null,
+            shapeHeight = null;
+
+
+        if(shapeType === Common.square){
+            shapeWidth = node.attr('width'); 
+            shapeHeight = node.attr('height'); 
+
+            node
+                .attr('transform', obj => `translate(-${shapeWidth/2}, -${shapeHeight/2}) rotate(${ -shapeRotation} ${this.centerX} ${this.centerY})`);
+
+            node
+                .attr('x', () => (event.x - canvasElement.left) * this.scalePosX)
+                .attr('y', () => (event.y - canvasElement.top) * this.scalePosY)
+
+            // node
+            //     .attr('transform', obj => `translate(-${shapeWidth/2}, -${shapeHeight/2}) rotate(${obj.rotation} ${this.centerX} ${this.centerY})`);
+
+            this.currentShape.posX = (event.x - canvasElement.left);
+            this.currentShape.posY = (event.y - canvasElement.top);
+        } else {
+            node
+                .attr('cx', () => (event.x - canvasElement.left) * this.scalePosX)
+                .attr('cy', () => (event.y - canvasElement.top) * this.scalePosY);
+
+            this.currentShape.posX = (event.x - canvasElement.left);
+            this.currentShape.posY = (event.y - canvasElement.top);
+        }
+    }
+
+    centerStamp(){
+        const {canvasWidth, canvasHeight} = this.props.canvas;
+        this.hoverActive = false;
+        const centerX = canvasWidth / 2;
+        const centerY = canvasHeight / 2;
+
+        const stamp = select(this.node)
+            .selectAll('.stamp');
+
+        if(this.currentShape.type === Common.square){
+            stamp
+                .attr('x', centerX)
+                .attr('y', centerY)
+        } else {
+            stamp
+                .attr('cx', centerX)
+                .attr('cy', centerY)
+        }       
+        this.currentShape.posX = centerX;
+        this.currentShape.posY = centerY;
     }
 
     loadShapes(){
@@ -299,20 +319,34 @@ class ShapeCanvas extends Component {
             .attr('transform', `translate(-${newWidth/2}, -${this.currentShape.height/2})`)
     }
 
-    changeCanvasScale(newScale) {
-        const {canvasWidth, canvasHeight} = this.props.canvas;
-        select(this.node)
-            .attr('transform', `scale(${newScale})`)
-        this.scalePosX = canvasWidth / (canvasWidth * newScale);
-        this.scalePosY = canvasHeight / (canvasHeight * newScale);
-    }
-
     changeShapeHeight(newHeight){
         this.currentShape.height = newHeight;
         select(this.node)
             .selectAll('.stamp')
             .attr('height', newHeight)
             .attr('transform', `translate(-${this.currentShape.width/2}, -${newHeight/2})`)
+    }
+
+    changeShapeRotation = (newRotation) => {
+        const { canvasWidth, canvasHeight} = this.props.canvas;
+        const { shapeWidth, shapeHeight } = this.props.canvas.currentShape;
+        const centerX = (canvasWidth / 2);
+        const centerY = (canvasHeight / 2);
+        this.currentShape.rotation = newRotation;
+        const node = select(this.node)
+        
+        node
+            .selectAll('.stamp')
+            .attr('transform', obj => `rotate(${newRotation} ${centerX} ${centerY}) translate(-${obj.width/2}, -${obj.height/2})`)
+            // .attr('transform', obj => `translate(-${obj.width/2}, -${obj.height/2})`)
+    }
+
+    changeCanvasScale(newScale) {
+        const {canvasWidth, canvasHeight} = this.props.canvas;
+        select(this.node)
+            .attr('transform', `scale(${newScale})`)
+        this.scalePosX = canvasWidth / (canvasWidth * newScale);
+        this.scalePosY = canvasHeight / (canvasHeight * newScale);
     }
 
     changeShapeRadius(newRadius){

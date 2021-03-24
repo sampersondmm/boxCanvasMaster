@@ -12,6 +12,7 @@ const Common = {
     clear: 'Clear',
     save: 'Save',
     palette: 'Palette',
+    colorPalette: 'Color Palette',
     layers: 'Layers',
     topPanel: 'Top Panel',
     sidePanel: 'Side Panel',
@@ -23,7 +24,9 @@ const Common = {
     width: 'Width',
     height: 'Height',
     radius: 'Radius',
-    zoom: 'Zoom'
+    zoom: 'Zoom',
+    stamp: 'Stamp',
+    selectCurrentShape: 'Select Current Shape'
 }
 
 export default Common;

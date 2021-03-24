@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import RightPanel from './RightPanel';
-import LeftPanel from './LeftPanel';
-import TopPanel from './topPanel/TopPanel';
+import LeftPanel from './leftPanel/LeftPanel';
 import Size from '../../constants/size';
 import { Modal, Menu, Tab, Card } from 'semantic-ui-react';
 import ShapeCanvas from './ShapeCanvas'
-import ShapeMenu from './topPanel/ShapeMenu'
+import ShapeMenu from './rightMenu/ShapeMenu';
+import NavBar from '../NavBar';
 import {addShapeToCanvas, createCanvas, clearCanvasData} from '../../actions/canvasActions';
 
 class Canvas extends Component {
@@ -82,10 +82,7 @@ class Canvas extends Component {
         
         return(
             <div className='canvas-wrap'>
-                <TopPanel 
-                    canvas={canvasData}
-                    createCanvas={this.createCanvas}
-                />
+                <NavBar/>
                 <div className='canvas-display' style={{height: 'calc(100vh - 50px)'}}>
                     <LeftPanel
                         handleMenu={this.handleLeftMenu}
@@ -104,9 +101,10 @@ class Canvas extends Component {
                         handleMenu={this.handleRightMenu}
                         isOpen={this.state.rightPanelOpen}
                     /> */}
-                    <ShapeMenu
-                        canvasData={canvasData}
-                    />
+                        <ShapeMenu
+                            width={`${Size.sidePanelMenuWidth}px`}
+                            canvasData={canvasData}
+                        />
                 </div>
             </div>
         )

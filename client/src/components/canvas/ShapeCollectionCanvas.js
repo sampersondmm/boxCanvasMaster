@@ -18,7 +18,7 @@ class ShapeCollectionCanvas extends Component {
         this.speedConst = 0.5;
         this.particleCount = 150;
         this.connectionDistance = 100;
-        this.shapeArr = [];
+        this.shapeArr = props.canvas.collectionList;
         this.currentShape = {};
         this.lines = [];
         this.posX = 100; 
@@ -95,8 +95,8 @@ class ShapeCollectionCanvas extends Component {
     }
 
     moveShape(){
-        const {shapeType} = this.props.canvas,
-            canvasElement = document.getElementById('canvas').getBoundingClientRect(),
+        const {shapeType, shapeRadius} = this.props.canvas,
+            canvasElement = document.getElementById('canvas-collection').getBoundingClientRect(),
             node = select(this.node)
                 .select('.stamp');
 
@@ -105,28 +105,35 @@ class ShapeCollectionCanvas extends Component {
         node.attr('visibility', 'visible')
 
         let shapeWidth = null,
-            shapeHeight = null;
+            shapeHeight = null,
+            shapePosX = null,
+            shapePosY = null;
 
 
         if(shapeType === Common.square){
             shapeWidth = node.attr('width'); 
             shapeHeight = node.attr('height'); 
 
+            shapePosX = (event.x - canvasElement.left) * this.scalePosX;
+            shapePosY = (event.y - canvasElement.top) * this.scalePosY;
 
             node
-                .attr('x', () => (event.x - canvasElement.left) * this.scalePosX + 90)
-                .attr('y', () => (event.y - canvasElement.top) * this.scalePosY + 50)
+                .attr('x', () => (shapePosX))
+                .attr('y', () => (shapePosY))
                 .attr('transform', `translate(-${shapeWidth/2}, -${shapeHeight/2})`);
 
-            this.currentShape.posX = (event.x - canvasElement.left);
-            this.currentShape.posY = (event.y - canvasElement.top);
-        } else {
-            node
-                .attr('cx', () => (event.x - canvasElement.left) * this.scalePosX + 90)
-                .attr('cy', () => (event.y - canvasElement.top) * this.scalePosY + 50);
+            this.currentShape.posX = shapePosX;
+            this.currentShape.posY = shapePosY;
 
-            this.currentShape.posX = (event.x - canvasElement.left);
-            this.currentShape.posY = (event.y - canvasElement.top);
+        } else {
+            shapePosX = event.x - canvasElement.left;
+            shapePosY = event.y - canvasElement.top;
+            node
+                .attr('cx', () => (shapePosX))
+                .attr('cy', () => (shapePosY));
+
+            this.currentShape.posX = (shapePosX);
+            this.currentShape.posY = (shapePosY);
         }
     }
 
@@ -148,8 +155,30 @@ class ShapeCollectionCanvas extends Component {
         }       
     }
 
+    createExistingShapes = () => {
+        const { collectionList } = this.props.canvas;
+        for(const listItem of collectionList) {
+            if(listItem.type === Common.square){
+                select(this.node)
+                    .selectAll('rect')
+                    .data([listItem])
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'stamp')
+                    .attr('fill', obj => obj.color)
+                    .attr('opacity', obj => obj.opacity)
+                    .attr('width', obj => obj.width)
+                    .attr('height', obj => obj.height)
+                    .attr('x', obj => obj.posX)
+                    .attr('y', obj => obj.posY)
+                    .attr('transform', obj => `translate(-${obj.width / 2}, -${obj.height / 2})`)
+            }
+        }
+    }
+
     setupCanvas(){
-        const {shapeWidth, shapeHeight, shapeColor, shapeOpacity} = this.props.canvas;
+        const {shapeWidth, shapeHeight, shapeColor, shapeOpacity, collectionList} = this.props.canvas;
+
         // Default starting shape
         this.currentShape = {
             width: shapeWidth,
@@ -181,6 +210,21 @@ class ShapeCollectionCanvas extends Component {
             .on('mousemove', () => this.moveShape())
             .on('mouseleave', () => this.centerStamp())
             .on('click', (obj, index, arr) => this.addShape(index, arr))
+
+        select(this.node)
+            .selectAll('.shape')
+            .data(collectionList.reverse())
+            .enter()
+            .append('rect')
+            .attr('class', 'shape')
+            .attr('fill', obj => obj.color)
+            .attr('opacity', obj => obj.opacity)
+            .attr('width', obj => obj.width)
+            .attr('height', obj => obj.height)
+            .attr('x', obj => obj.posX)
+            .attr('y', obj => obj.posY)
+            .attr('transform', obj => `translate(-${obj.width / 2}, -${obj.height / 2})`)
+
     }
 
     loadShapes(){
@@ -399,7 +443,7 @@ class ShapeCollectionCanvas extends Component {
             };
             
         return (
-            <svg style={style.main} id='canvas' ref={node => (this.node = node)}/>
+            <svg style={style.main} id='canvas-collection' ref={node => (this.node = node)}/>
         );
     }
 }

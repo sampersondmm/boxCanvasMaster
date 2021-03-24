@@ -19,6 +19,14 @@ addShapeToCanvas = newShape => {
         }
     }
 },
+addShapeToCollection = newShape => {
+    return {
+        type: ActionTypes.ADD_SHAPE_TO_COLLECTION,
+        payload: {
+            newShape, 
+        }
+    }
+},
 changeCanvasScale = scale => {
     return {
         type: ActionTypes.CHANGE_CANVAS_SCALE,
@@ -64,6 +72,14 @@ changeShapeHeight = height => {
         type: ActionTypes.CHANGE_SHAPE_HEIGHT,
         payload: {
             shapeHeight: height
+        }
+    }
+},
+changeShapeRotation = rotation => {
+    return {
+        type: ActionTypes.CHANGE_SHAPE_ROTATION,
+        payload: {
+            shapeRotation: rotation
         }
     }
 },
@@ -135,10 +151,12 @@ createCanvas = canvasData => (dispatch, getState) => {
 export {
     setCanvasSize, 
     addShapeToCanvas, 
+    addShapeToCollection, 
     changeShapeType, 
     changeShapeColor,
     changeShapeOpacity, 
     changeShapeWidth, 
+    changeShapeRotation,
     changeCanvasScale, 
     createCanvas, 
     fetchCanvasList,

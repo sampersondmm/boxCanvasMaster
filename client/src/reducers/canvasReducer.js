@@ -6,10 +6,37 @@ const DEFAULT_STATE = {
   canvasData: {
     canvasWidth: 400,
     canvasHeight: 400,
+    backgroundColor: '#0f0e0e',
+    canvasScale: 1,
+    shapeList: [],
+    collectionList: [],
+    currentShape: {
+      shapeType: Common.square,
+      shapeColor: '#6ab8c5',
+      shapeWidth: 60,
+      shapeHeight: 60,
+      shapeRadius: 10,
+      shapeOpacity: 0.5,
+      shapeRotation: 0,
+    },
+    shapeType: Common.square,
+    selectedShape: '',
+    selectShape: false,
+    colorPalette: [
+      {color: "#4771e8", uuid: "50ecc8b-23f5-dc2f-e06d-15e01b437a0"},
+      {color: "#af56d8", uuid: "4dc6017-71d3-1b5-0067-4017bbe66efd"},
+      {color: "#5b2175", uuid: "55fa65b-b05-e446-d0f-77757824e5"},
+      {color: "#cd5b5b", uuid: "b24323-3bc0-1671-c67e-53823dac62"}
+    ]
+  },
+  collectionCanvasData: {
+    canvasWidth: 400,
+    canvasHeight: 400,
     backgroundColor: 'rgb(180,180,180)',
     canvasScale: 1,
     shapeColor: '#000000',
     shapeList: [],
+    collectionList: [],
     shapeType: Common.square,
     selectedShape: '',
     selectShape: false,
@@ -68,6 +95,15 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
           shapeList: newShapeList
         }
       }
+    case ActionTypes.ADD_SHAPE_TO_COLLECTION:
+      const newCollectionList = [{...payload.newShape}, ...state.canvasData.collectionList];
+      return {
+        ...state,
+        canvasData: {
+          ...state.canvasData,
+          collectionList: newCollectionList
+        }
+      }
     case ActionTypes.CHANGE_CANVAS_SCALE:
       return {
         ...state,
@@ -81,7 +117,10 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         canvasData: {
           ...state.canvasData,
-          shapeWidth: payload.shapeWidth
+          currentShape: {
+            ...state.canvasData.currentShape,
+            shapeWidth: payload.shapeWidth
+          }
         }
       }
     case ActionTypes.CHANGE_SHAPE_HEIGHT: 
@@ -89,7 +128,21 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         canvasData: {
           ...state.canvasData,
-          shapeHeight: payload.shapeHeight
+          currentShape: {
+            ...state.canvasData.currentShape,
+            shapeHeight: payload.shapeHeight
+          }
+        }
+      }
+    case ActionTypes.CHANGE_SHAPE_ROTATION: 
+      return {
+        ...state,
+        canvasData: {
+          ...state.canvasData,
+          currentShape: {
+            ...state.canvasData.currentShape,
+            shapeRotation: payload.shapeRotation
+          }
         }
       }
     case ActionTypes.CHANGE_SHAPE_RADIUS: 
@@ -97,7 +150,10 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         canvasData: {
           ...state.canvasData,
-          shapeRadius: payload.shapeRadius
+          currentShape: {
+            ...state.canvasData.currentShape,
+            shapeRadius: payload.shapeRadius
+          }
         }
       }
     case ActionTypes.CHANGE_SHAPE_TYPE: 
@@ -105,7 +161,10 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         canvasData: {
           ...state.canvasData,
-          shapeType: payload.shapeType
+          currentShape: {
+            ...state.canvasData.currentShape,
+            shapeType: payload.shapeType
+          }
         }
       }
     case ActionTypes.CHANGE_SHAPE_COLOR:
@@ -113,7 +172,10 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         canvasData: {
           ...state.canvasData,
-          shapeColor: payload.shapeColor
+          currentShape: {
+            ...state.canvasData.currentShape,
+            shapeColor: payload.shapeColor
+          }
         }
       }
     case ActionTypes.CHANGE_SHAPE_OPACITY:
@@ -121,7 +183,10 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         canvasData: {
           ...state.canvasData,
-          shapeOpacity: payload.shapeOpacity
+          currentShape: {
+            ...state.canvasData.currentShape,
+            shapeOpacity: payload.shapeOpacity
+          }
         }
       }
     case ActionTypes.CHANGE_BACKGROUND_COLOR:
