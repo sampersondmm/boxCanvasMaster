@@ -1,19 +1,12 @@
 import React, {Component} from 'react';
-import BaseMenu from './BaseMenu';
-import {connect} from 'react-redux';
-import ColorPicker from './ColorPicker';
 import Common from '../../constants/common';
-import PanelButton from './PanelButton';
 import Size from '../../constants/size';
 import {changeShapeColor, selectShape, changeBackgroundColor} from '../../actions/canvasActions';
 import map from 'lodash/map';
-import {MenuTypes} from './BaseMenu';
-import TooltipPositions from '../../constants/tooltips';
 
 class LayerMenu extends Component {
     constructor(props){
         super(props);
-        this.menuType = MenuTypes.sideMenu
         this.state = {
             status: Common.shape,
             dirty: false

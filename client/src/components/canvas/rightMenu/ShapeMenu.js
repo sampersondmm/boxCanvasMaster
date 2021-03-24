@@ -8,15 +8,13 @@ import {
     changeShapeColor, 
     changeBackgroundColor, 
     changeShapeRotation, 
-    changeShapeRadius, 
-    changeShapeWidth, 
     changeShapeOpacity, 
-    changeShapeHeight
 } from '../../../actions/canvasActions';
 import Common from '../../../constants/common';
 import Size from '../../../constants/size';
 import ColorPicker from '../ColorPicker';
 import {store} from '../../..';
+import ShapeSizeCard from './shapeCards/ShapeSizeCard';
 
 class ShapeMenu extends Component {
     constructor(props){
@@ -72,39 +70,13 @@ class ShapeMenu extends Component {
     changeShapeType = (type) => {
         this.props.dispatch(changeShapeType(type))
     }
-    handleSizeChange = (data, type) => {
-        const value = parseInt(data.value, 10)
-        switch(type){
-            case Common.width:
-                this.props.dispatch(changeShapeWidth(value));
-                break;
-            case Common.height:
-                this.props.dispatch(changeShapeHeight(value));
-                break;
-            case Common.radius:
-                this.props.dispatch(changeShapeRadius(value));
-                break;
-        }
-    }
     handleRotationChange = (data) => {
         this.props.dispatch(changeShapeRotation(data.value))
-    }
-    handleChangeSizeIncrement = (data) => {
-        this.setState(state => ({
-            ...state,
-            sizeIncrement: parseInt(data.value, 10)
-        }))
     }
     handleChangeRotationIncrement = (data) => {
         this.setState(state => ({
             ...state,
             rotationIncrement: parseInt(data.value, 10)
-        }))
-    }
-    handleChangeRadiusIncrement = (data) => {
-        this.setState(state => ({
-            ...state,
-            radiusIncrement: parseInt(data.value, 10)
         }))
     }
     toggleAccordian = (selectedTab) => {
@@ -153,24 +125,6 @@ class ShapeMenu extends Component {
             dirty: true,
             value
         }));
-    }
-    incrementWidth = (value) => {
-        const { shapeWidth } = this.props.currentShape;
-        const { sizeIncrement } = this.state;
-        const newValue = value === 'down' ? (shapeWidth - sizeIncrement <= 0 ? 0 : shapeWidth - sizeIncrement) : shapeWidth + sizeIncrement;
-        this.props.dispatch(changeShapeWidth(newValue))
-    }
-    incrementHeight = (value) => {
-        const { shapeHeight } = this.props.currentShape;
-        const { sizeIncrement } = this.state;
-        const newValue = value === 'down' ? (shapeHeight - sizeIncrement <= 0 ? 0 : shapeHeight - sizeIncrement) : shapeHeight + sizeIncrement;
-        this.props.dispatch(changeShapeHeight(newValue))
-    }
-    incrementRadius = (value) => {
-        const { shapeRadius } = this.props.currentShape;
-        const { sizeIncrement } = this.state;
-        const newValue = value === 'down' ? (shapeRadius - sizeIncrement <= 0 ? 0 : shapeRadius - sizeIncrement) : shapeRadius + sizeIncrement;
-        this.props.dispatch(changeShapeRadius(newValue))
     }
     incrementRotation = (value) => {
         const { shapeRotation } = this.props.currentShape;
@@ -292,99 +246,10 @@ class ShapeMenu extends Component {
             </Menu.Item>
         )
     }
-    createSizeItem = () => {
-        const { tabOpen, sizeIncrement, rotationIncrement, radiusIncrement } = this.state;
-        const { modal } = this.props;
-        const { shapeType, shapeWidth, shapeHeight, shapeRadius } = this.props.currentShape;
-        const isInverted = modal ? false : true;
-        return (
-            <Menu.Item textAlign='center' className='shape-accordian-option' >
-                <Accordion.Title
-                    index={3}
-                    onClick={() => this.toggleAccordian(Common.size)}
-                    >
-                    <Icon name={tabOpen.size ? 'plus' : 'minus'} />
-                    {Common.size}
-                </Accordion.Title>
-                <Accordion.Content active={tabOpen.size}>
-                    {shapeType === Common.square && (
-                        <Menu.Menu inverted={isInverted} vertical >
-                            <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
-                                <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('down')}/>
-                                <Menu.Header style={{margin: '0'}}>{Common.width}</Menu.Header>
-                                <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('up')}/>
-                            </Menu.Item>
-                            <Menu.Item>
-                                <Input
-                                    inverted={isInverted}
-                                    type='number'
-                                    value={shapeWidth}
-                                    onChange={(e, data) => this.handleSizeChange(data, Common.width)}
-                                    placeholder='Width...'
-                                />
-                            </Menu.Item>
-                            <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
-                                <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementHeight('down')}/>
-                                <Menu.Header style={{margin: '0'}}>{Common.height}</Menu.Header>
-                                <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementHeight('up')}/>
-                            </Menu.Item>
-                            <Menu.Item>
-                                <Input
-                                    inverted={isInverted}
-                                    type='number'
-                                    value={shapeHeight}
-                                    onChange={(e, data) => this.handleSizeChange(data, Common.height)}
-                                    placeholder='Height...'
-                                />
-                            </Menu.Item>
-                            <Menu.Item>
-                                <Menu.Header>Increment</Menu.Header>
-                                    <Input
-                                        inverted={isInverted}
-                                        type='number'
-                                        value={sizeIncrement}
-                                        onChange={(e, data) => this.handleChangeSizeIncrement(data)}
-                                        placeholder='Increment...'
-                                    />
-                            </Menu.Item>
-                        </Menu.Menu>
-                    )}
-                    {shapeType === Common.circle && (
-                         <Menu.Menu inverted={isInverted} vertical >
-                            <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
-                                <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementRadius('down')}/>
-                                <Menu.Header style={{margin: '0'}}>{Common.radius}</Menu.Header>
-                                <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementRadius('up')}/>
-                            </Menu.Item>
-                            <Menu.Item>
-                                <Input
-                                    inverted={isInverted}
-                                    type='number'
-                                    value={shapeRadius}
-                                    onChange={(e, data) => this.handleSizeChange(data, Common.radius)}
-                                    placeholder='Radius...'
-                                />
-                            </Menu.Item>
-                            <Menu.Item>
-                                <Menu.Header>Increment</Menu.Header>
-                                    <Input
-                                        inverted={isInverted}
-                                        type='number'
-                                        value={radiusIncrement}
-                                        onChange={(e, data) => this.handleChangeRadiusIncrement(data)}
-                                        placeholder='Increment...'
-                                    />
-                            </Menu.Item>
-                        </Menu.Menu>
-                    )}
-                </Accordion.Content>
-            </Menu.Item>
-        )
-    }
     createRotationItem = () => {
         const { tabOpen, rotationIncrement } = this.state;
         const { modal } = this.props;
-        const { shapeType, shapeWidth, shapeHeight, shapeRotation } = this.props.currentShape;
+        const { shapeRotation } = this.props.currentShape;
         const isInverted = modal ? false : true;
         return (
             <Menu.Item textAlign='center' className='shape-accordian-option' >
@@ -429,7 +294,10 @@ class ShapeMenu extends Component {
         )
     }
     createAccordianList = () => {
+        const { modal } = this.props;
         const { shapeType } = this.props.currentShape;
+        const { tabOpen } = this.state;
+        const isInverted = modal ? false : true;
         const arr = [
             {
                 key: Common.display,
@@ -445,7 +313,15 @@ class ShapeMenu extends Component {
             },
             {
                 key: Common.size,
-                render: () => this.createSizeItem(),
+                render: () => {
+                    return (
+                        <ShapeSizeCard 
+                            open={tabOpen.size}
+                            handleOpen={() => this.toggleAccordian(Common.size)}
+                            inverted={isInverted}
+                        />
+                    )
+                },
             },
             {
                 key: Common.rotation,

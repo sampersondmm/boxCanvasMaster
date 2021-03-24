@@ -1,22 +1,14 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import ColorPicker from '../ColorPicker';
 import Common from '../../../constants/common';
-import PanelButton from '../PanelButton';
-import { Modal, Step, Icon, Button, Card, Header } from 'semantic-ui-react';
-import Size from '../../../constants/size';
-import {changeShapeColor, addShapeToCollection, changeShapeType, changeShapeWidth, changeShapeHeight, changeShapeRadius, selectShape, changeBackgroundColor} from '../../../actions/canvasActions';
-import map from 'lodash/map';
-import {MenuTypes} from '../BaseMenu';
-import TooltipPositions from '../../../constants/tooltips';
-import {store} from '../../..';
+import { Modal, Button} from 'semantic-ui-react';
+import {addShapeToCollection} from '../../../actions/canvasActions';
 import ShapeMenu from '../rightMenu/ShapeMenu';
 import ShapeCollectionCanvas from '../ShapeCollectionCanvas';
 
 class CreateCollection extends Component {
     constructor(props){
         super(props);
-        this.menuType = MenuTypes.sideMenu
         this.state = {
             status: Common.shape,
             dirty: false,
@@ -26,8 +18,7 @@ class CreateCollection extends Component {
         }
     }
     addShapeToCollection = (newShape) => {
-        const { canvasData } = this.props;
-        store.dispatch(addShapeToCollection(newShape))
+        this.props.dispatch(addShapeToCollection(newShape))
     }
     shapeDisplay = () => {
         const { canvasData } = this.props;
@@ -56,14 +47,14 @@ class CreateCollection extends Component {
     }
     render(){
         const {currentStep, totalSteps } = this.state; 
-        const { open, canvasData } = this.props;
+        const { open, collectionCanvasData } = this.props;
         return (
                 <Modal
                     open={open}
                     style={{position: 'relative', height: 'auto', height: '650px'}}
                     trigger={this.props.trigger}
                 >
-                    <Modal.Header>Create Shape</Modal.Header>
+                    <Modal.Header>Create Shape Collection</Modal.Header>
                     <Modal.Content style={{
                         display: 'flex', 
                         flexDirection: 'column', 
@@ -80,6 +71,7 @@ class CreateCollection extends Component {
                             <div style={{width: '250px'}}>
                                 <ShapeMenu 
                                     canvasData={this.props.canvasData}
+                                    shapeList={collectionCanvasData.collectionList}
                                     modal={true}
                                 />
                             </div>
@@ -89,25 +81,19 @@ class CreateCollection extends Component {
                                 width: '100%', 
                                 height: '45px',
                                 display: 'flex',
-                                justifyContent: 'space-between',
+                                justifyContent: 'flex-end',
                                 alignItems: 'center'
                             }
                         }>
-                            <div>
+                            <div style={{display: 'flex', marginTop: '10px'}}>
                                 <Button
                                     content='Cancel'
                                     onClick={this.props.closeModal}
                                 />
-                            </div>
-                            <div style={{display: 'flex'}}>
-                                <Button
-                                    content='Back'
-                                    onClick={this.previousStep}
-                                />
                                 <Button
                                     primary
                                     onClick={this.nextStep}
-                                    content={currentStep < totalSteps - 1 ? 'Next' : 'Submit'}
+                                    content={'Submit'}
                                 />
                             </div>
                         </div>
@@ -118,4 +104,12 @@ class CreateCollection extends Component {
 }
 
 
-export default CreateCollection;
+const mapStateToProps = state => {
+    const {collectionCanvasData} = state.canvas;
+    return {
+        ...state,
+        collectionCanvasData
+    }
+}
+
+export default connect(mapStateToProps)(CreateCollection);

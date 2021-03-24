@@ -102,6 +102,7 @@ class Canvas extends Component {
                     /> */}
                         <ShapeMenu
                             width={`${Size.sidePanelMenuWidth}px`}
+                            shapeList={canvasData.shapeList}
                             canvasData={canvasData}
                         />
                 </div>

@@ -1,6 +1,4 @@
 import React, {Component} from 'react';
-import BaseMenu from '../BaseMenu';
-import {connect} from 'react-redux';
 import ColorPicker from '../ColorPicker';
 import Common from '../../../constants/common';
 import Size from '../../../constants/size';

@@ -23,9 +23,7 @@ const Common = {
     width: 'Width',
     height: 'Height',
     radius: 'Radius',
-    zoom: 'Zoom',
     stamp: 'Stamp',
-    radius: 'Radius',
     selectCurrentShape: 'Select Current Shape'
 }
 

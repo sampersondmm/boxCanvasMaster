@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
-import BaseMenu from './BaseMenu';
 import ColorPicker from './ColorPicker';
 import Common from '../../constants/common';
 import {Button, InputGroup, FormControl} from 'react-bootstrap';
-import { CustomPicker } from 'react-color';
 import Size from '../../constants/size';
 
 class ColorMenu extends BaseMenu {

@@ -1,6 +1,7 @@
 import ActionTypes from "../actions/ActionTypes";
 import Common from '../constants/common';
 import uuid from 'react-uuid';
+import cloneDeep from 'lodash/cloneDeep';
 
 const DEFAULT_STATE = {
   canvasData: {
@@ -87,7 +88,8 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         }
       }
     case ActionTypes.ADD_SHAPE_TO_CANVAS:
-      const newShapeList = [{...payload.newShape}, ...state.canvasData.shapeList];
+      const newShapeList = cloneDeep(state.canvasData.shapeList)
+      newShapeList.unshift(payload.newShape)
       return {
         ...state,
         canvasData: {

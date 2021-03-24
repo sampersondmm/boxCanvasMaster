@@ -1,12 +1,9 @@
 import React, {Component} from 'react';
-import BaseMenu from '../BaseMenu';
-import {connect} from 'react-redux';
 import ColorPicker from '../ColorPicker';
 import Common from '../../../constants/common';
 import {changeShapeColor, changeBackgroundColor, addColorToPalette, removeColorFromPalette} from '../../../actions/canvasActions';
 import map from 'lodash/map';
 import reject from 'lodash/reject';
-import uuid from 'react-uuid';
 import {store} from '../../../';
 
 class PaletteMenu extends Component {

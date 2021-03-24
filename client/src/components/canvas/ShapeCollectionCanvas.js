@@ -143,7 +143,7 @@ class ShapeCanvas extends Component {
 
     moveShape(){
         const {shapeType, shapeWidth, shapeRotation, shapeHeight} = this.props.currentShape;
-        const canvasElement = document.getElementById('canvas').getBoundingClientRect();
+        const canvasElement = document.getElementById('collection-canvas').getBoundingClientRect();
         const node = select(this.node)
             .select('.stamp');
         const ref = select(this.node)
@@ -437,7 +437,7 @@ class ShapeCanvas extends Component {
             };
             
         return (
-            <svg style={style.main} id='canvas' ref={node => (this.node = node)}/>
+            <svg style={style.main} id='collection-canvas' ref={node => (this.node = node)}/>
         );
     }
 }
