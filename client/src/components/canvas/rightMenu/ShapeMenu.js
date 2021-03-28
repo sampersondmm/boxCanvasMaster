@@ -1,20 +1,30 @@
 import React, {Component} from 'react';
-import { Menu, Card, Tab, Accordion } from 'semantic-ui-react';
-import {connect} from 'react-redux'
-import { addShapeToCollection } from '../../../actions/canvasActions';
 import Common from '../../../constants/common';
-import Size from '../../../constants/size';
+import { Tab, Accordion, Menu, Icon } from 'semantic-ui-react';
 import ShapeDisplayCard from './shapeCards/ShapeDisplayCard';
 import ShapeSizeCard from './shapeCards/ShapeSizeCard';
 import ShapeColorCard from './shapeCards/ShapeColorCard';
 import ShapeTypeCard from './shapeCards/ShapeTypeCard';
 import ShapeRotationCard from './shapeCards/ShapeRotationCard';
+import AccordionIcon from '../../AccordionIcon';
+import findIndex from 'lodash/findIndex';
+import slice from 'lodash/slice';
+import without from 'lodash/without';
+
 
 class ShapeMenu extends Component {
     constructor(props){
         super(props);
         this.state = {
             activeIndex: 1,
+            selection: '',
+            cardOrder: [
+                Common.display,
+                Common.type,
+                Common.color,
+                Common.size,
+                Common.rotation
+            ],
             tabOpen: {
                 display: true,
                 type: true,
@@ -23,11 +33,6 @@ class ShapeMenu extends Component {
                 rotation: true
             },
         }
-
-    }
-
-    addShape(newShape){
-        this.props.dispatch(addShapeToCollection(newShape))
     }
     toggleAccordian = (selectedTab) => {
         this.setState(state => {
@@ -63,182 +68,145 @@ class ShapeMenu extends Component {
             }
         })
     }
+    handleMove = (direction) => {
+        this.setState(state => {
+            let { cardOrder, selection } = state;
+            const index = findIndex(cardOrder, card => card === selection);
+            if(direction === 'up'){
+                if(index === 0){
+                    
+                } else {
+                    const prevStep = cardOrder[index - 1];
+                    cardOrder[index - 1] = selection;
+                    cardOrder[index] = prevStep;
+                }
+            } else {
+                if(index === cardOrder.length - 1){
+                    cardOrder.pop();
+                    cardOrder.unshift(selection)
+                } else {
+                    const nextStep = cardOrder[index + 1];
+                    cardOrder[index + 1] = selection;
+                    cardOrder[index] = nextStep;
+                }
+            }
+            return {
+                ...state,
+                cardOrder
+            }  
+        })
+    }
+    handleSelect = (selection) => {
+        this.setState(state => ({
+            ...state,
+            selection: selection === state.selection ? '' : selection
+        }))
+    }
     createAccordianList = () => {
         const { modal } = this.props;
-        const { shapeType } = this.props.currentShape;
-        const { tabOpen } = this.state;
+        const { currentShape } = this.props;
+        const { tabOpen, selection, cardOrder } = this.state;
         const isInverted = modal ? false : true;
-        const arr = [
-            {
-                key: Common.display,
-                render: () => {
+        let listArr = [];
+        listArr = cardOrder.map(item => {
+            switch(item){
+                case Common.display:
                     return (
                         <ShapeDisplayCard
                             open={tabOpen.display}
+                            selection={selection}
+                            handleSelect={() => this.handleSelect(Common.display)}
                             handleOpen={() => this.toggleAccordian(Common.display)}
                         />
-                    )
-                },
-            },
-            {
-                key: Common.type,
-                render: () => {
+                    );
+                case Common.type:
                     return (
                         <ShapeTypeCard
                             open={tabOpen.type}
+                            selection={selection}
+                            handleSelect={() => this.handleSelect(Common.type)}
                             handleOpen={() => this.toggleAccordian(Common.type)}
                             inverted={isInverted}
-                        />
-                    )
-                },
-            },
-            {
-                key: Common.color,
-                render: () => {
+                            />
+                        )
+                case Common.color:
                     return (
                         <ShapeColorCard
                             open={tabOpen.color}
+                            selection={selection}
+                            handleSelect={() => this.handleSelect(Common.color)}
                             handleOpen={() => this.toggleAccordian(Common.color)}
                             inverted={isInverted}
                         />
                     )
-                },
-            },
-            {
-                key: Common.size,
-                render: () => {
+                case Common.size:
                     return (
                         <ShapeSizeCard 
                             open={tabOpen.size}
+                            selection={selection}
+                            handleSelect={() => this.handleSelect(Common.size)}
                             handleOpen={() => this.toggleAccordian(Common.size)}
                             inverted={isInverted}
                         />
-                    )
-                },
-            },
-            {
-                key: Common.rotation,
-                render: () => {
-                    if(shapeType === Common.square){
+                    )  
+                case Common.rotation:
+                    if(currentShape.type === Common.square){
                         return (
                             <ShapeRotationCard
                                 open={tabOpen.rotation}
+                                selection={selection}
+                                handleSelect={this.handleSelect}
+                                handleSelect={() => this.handleSelect(Common.rotation)}
                                 handleOpen={() => this.toggleAccordian(Common.rotation)}
                                 inverted={isInverted}
                             />
                         )
                     }
-                },
-            },
-
-        ]
-        return arr.map(item => {
-            return  item.render()
+                    return null;
+                default:
+                    return null;
+            }
         })
-    }
-    currentShapePane = () => {
-        const { modal, canvasData } = this.props;
-        const { shapeColor } = this.props.currentShape;
-        const { backgroundColor } = canvasData;
-
-        const isInverted = modal ? false : true;
-        const wrapHeight = modal ? '433px' : 'calc(100vh - 120px)';
-        const scrollClass = modal ? 'scrollbar' : 'scrollbar-inverted'
-
-        let color = null;
-          if(this.state.colorStatus === Common.shape){
-            color = this.state.dirty ? this.state.value : shapeColor;
-          } else {
-            color = this.state.dirty ? this.state.value : backgroundColor;
-          }
-        return (
-            <div className={`${scrollClass} tab-pane-wrap`} style={{height: wrapHeight}}>
-                <Tab.Pane inverted={isInverted} style={{padding: '0', border: '0', display: 'flex', justifyContent: 'center', margin: '0 10px 0 20px'}}>
-                    <Accordion inverted={isInverted} as={Menu} vertical style={{border: '0'}} fluid >
-                        {this.createAccordianList()}
-                    </Accordion>
-                </Tab.Pane>
-            </div>
-        )
-    }
-    createCollectionCards = () => {
-        const { collectionList } = this.props;
-        collectionList.map(shape => {
-            return (
-                <Menu.Item>
-                    {shape.type}
-                </Menu.Item>
-            )
-        })
-    }
-    layerMenuPane = () => {
-        const { modal, canvasData } = this.props;
-        const isInverted = modal ? false : true;
-        const wrapHeight = modal ? '433px' : 'calc(100vh - 120px)';
-        const scrollClass = modal ? 'scrollbar' : 'scrollbar-inverted';
-        return (
-            <div className={`${scrollClass} tab-pane-wrap`} style={{height: wrapHeight}}>
-                <Tab.Pane inverted={isInverted} style={{padding: '0', border: '0', display: 'flex', justifyContent: 'center', margin: '0'}}>
-                    <Menu vertical inverted={isInverted} style={{margin: '10px'}}>
-                        {canvasData.collectionList.map(shape => {
-                            return (
-                                <Menu.Item>
-                                    <Card inverted={isInverted}>
-                                        <Card.Content style={{display: 'flex', alignItems: 'center'}}>
-                                            <div style={{width: '20px', height: '20px', backgroundColor: shape.color, borderRadius: shape.type === Common.square ? 0 : '50%', marginRight: '10px'}}></div>
-                                            <Card.Header>{shape.type}</Card.Header>
-                                        </Card.Content>
-                                    </Card>
-                                </Menu.Item>
-                            )
-                        })}
-                    </Menu>
-                </Tab.Pane>
-            </div>
-        )
+        return listArr;
     }
     render(){
-        const { canvasData, modal } = this.props;
-        const isInverted = modal ? false : true;
+        const { modal, inverted } = this.props;
+        const { selection } = this.state;
+        const wrapHeight = modal ? '433px' : 'calc(100vh - 100px)';
+        const scrollHeight = 'calc(100vh - 150px)';
+        const scrollClass = modal ? 'scrollbar' : 'scrollbar-inverted'
+    
         return (
-            <Menu
-                style={{ height: '100%', width: `${Size.sidePanelMenuWidth}px`}}
-                inverted={isInverted}
-                attached='right'
-                vertical
-            >
-                <Menu.Item style={{height: '100%', padding: '0', paddingBottom: '20px'}}>
-                        <div style={{height: '100%'}}>
-                            <Tab
-                                menu={{secondary: true}}
-                                panes={[
-                                    {
-                                        menuItem: {key: 'Current Shape', icon: 'circle', color: 'teal'},
-                                        render: () => this.currentShapePane()
-                                    },
-                                    {
-                                        menuItem: {key: 'Current Shape', icon: 'list'},
-                                        render: () => this.layerMenuPane()
-                                    },
-                                    {
-                                        menuItem: {key: 'Settings', icon: 'cogs'},
-                                        render: () => this.layerMenu()
-                                    }
-                                ]}
-                            />
-                        </div>
-                </Menu.Item>
-            </Menu>
+            <div style={{height: wrapHeight, overflow: 'hidden'}}>
+                <div className={`${scrollClass} tab-pane-wrap`} style={{height: scrollHeight, overflowY: 'scroll'}}>
+                    <Tab.Pane inverted={inverted} activeIndex={1} style={{padding: '0', border: '0', display: 'flex', justifyContent: 'center', margin: '0'}}>
+                        <Accordion inverted={inverted} as={Menu} vertical style={{border: '0'}} fluid >
+                            {this.createAccordianList()}
+                        </Accordion>
+                    </Tab.Pane>
+                </div>
+                <div style={{height: '50px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px'}}>
+                     <AccordionIcon
+                        icon='angle down'
+                        width='20px'
+                        height='20px'
+                        onClick={() => this.handleMove('down')}
+                        disabled={selection === ''}
+                     />
+                     <AccordionIcon
+                        icon='angle up'
+                        width='20px'
+                        height='20px'
+                        style={{
+                            marginLeft: '7px'
+                        }}
+                        disabled={selection === ''}
+                        onClick={() => this.handleMove('up')}
+                     />
+                </div>
+            </div> 
         )
     }
 }
 
-const mapStateToProps = state => {
-    const { collectionList, currentShape } = state.canvas;
-    return {
-        collectionList,
-        currentShape
-    }
-}
-
-export default connect(mapStateToProps)(ShapeMenu);
+export default ShapeMenu;

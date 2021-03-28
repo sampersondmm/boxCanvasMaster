@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Common from '../../../constants/common';
 import { Modal, Button} from 'semantic-ui-react';
-import {addShapeToCollection} from '../../../actions/canvasActions';
-import ShapeMenu from '../rightMenu/ShapeMenu';
+import {addShapeToCollection, createCollection} from '../../../actions/canvasActions';
+import ShapeMenu from '../rightMenu/RightMenu';
 import ShapeCollectionCanvas from '../ShapeCollectionCanvas';
 
 class CreateCollection extends Component {
@@ -16,6 +16,10 @@ class CreateCollection extends Component {
             totalSteps: 4,
             open: false,
         }
+    }
+    createCollection = () => {
+        const { shapeList } = this.props;
+        this.props.dispatch(createCollection(shapeList))
     }
     addShapeToCollection = (newShape) => {
         this.props.dispatch(addShapeToCollection(newShape))
@@ -46,7 +50,6 @@ class CreateCollection extends Component {
         }))
     }
     render(){
-        const {currentStep, totalSteps } = this.state; 
         const { open, collectionCanvasData } = this.props;
         return (
                 <Modal
@@ -92,8 +95,8 @@ class CreateCollection extends Component {
                                 />
                                 <Button
                                     primary
-                                    onClick={this.nextStep}
-                                    content={'Submit'}
+                                    onClick={this.createCollection}
+                                    content='Create'
                                 />
                             </div>
                         </div>

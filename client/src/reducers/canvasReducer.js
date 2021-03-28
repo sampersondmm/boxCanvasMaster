@@ -10,7 +10,7 @@ const DEFAULT_STATE = {
     backgroundColor: '#0f0e0e',
     canvasScale: 1,
     shapeList: [],
-    collectionList: [],
+    createdCollectionList: [],
     selectedShape: '',
     selectShape: false,
     colorPalette: [
@@ -21,14 +21,14 @@ const DEFAULT_STATE = {
     ]
   },
   currentShape: {
-    shapeType: Common.square,
-    shapeColor: '#6ab8c5',
-    shapeWidth: 60,
-    shapeHeight: 60,
-    shapeRadius: 30,
-    shapeOpacity: 0.5,
-    shapeRotation: 0,
-    shapeType: Common.square
+    id: '',
+    type: Common.square,
+    color: '#6ab8c5',
+    width: 60,
+    height: 60,
+    radius: 30,
+    opacity: 0.5,
+    rotation: 0,
   },
   collectionCanvasData: {
     canvasWidth: 400,
@@ -78,6 +78,16 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
 
       
     //Changes to canvas data
+    case ActionTypes.CREATE_COLLECTION:
+      const createdCollections = cloneDeep(state.canvasData.createdCollectionList)
+      createdCollections.unshift(payload.newCollection)
+      return {
+        ...state,
+        canvasData: {
+          ...state.canvasData,
+          createdCollectionList: createdCollections
+        }
+      }
     case ActionTypes.SET_CANVAS_SIZE:
       return {
         ...state,
@@ -98,10 +108,11 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         }
       }
     case ActionTypes.ADD_SHAPE_TO_COLLECTION:
-      const newCollectionList = [{...payload.newShape}, ...state.canvasData.collectionList];
+      const newCollectionList = cloneDeep(state.collectionCanvasData.collectionList);
+      newCollectionList.unshift(payload.newShape)
       return {
         ...state,
-        canvasData: {
+        collectionCanvasData: {
           ...state.canvasData,
           collectionList: newCollectionList
         }
@@ -153,7 +164,7 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         currentShape: {
           ...state.currentShape,
-          shapeWidth: payload.shapeWidth
+          width: payload.width
         }
       }
     case ActionTypes.CHANGE_SHAPE_HEIGHT: 
@@ -161,7 +172,7 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         currentShape: {
             ...state.currentShape,
-            shapeHeight: payload.shapeHeight
+            height: payload.height
         }
       }
     case ActionTypes.CHANGE_SHAPE_ROTATION: 
@@ -169,7 +180,7 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         currentShape: {
             ...state.currentShape,
-            shapeRotation: payload.shapeRotation
+            rotation: payload.rotation
         }
       }
     case ActionTypes.CHANGE_SHAPE_RADIUS: 
@@ -177,7 +188,7 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         currentShape: {
           ...state.currentShape,
-          shapeRadius: payload.shapeRadius
+          radius: payload.radius
       }
       }
     case ActionTypes.CHANGE_SHAPE_TYPE: 
@@ -185,7 +196,7 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         currentShape: {
           ...state.currentShape,
-          shapeType: payload.shapeType
+          type: payload.type
       }
       }
     case ActionTypes.CHANGE_SHAPE_COLOR:
@@ -193,7 +204,7 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         currentShape: {
           ...state.currentShape,
-          shapeColor: payload.shapeColor
+          color: payload.color
       }
       }
     case ActionTypes.CHANGE_SHAPE_OPACITY:
@@ -201,7 +212,7 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         currentShape: {
           ...state.currentShape,
-          shapeOpacity: payload.shapeOpacity
+          opacity: payload.opacity
         }
       }
     default:

@@ -5,7 +5,7 @@ import LeftPanel from './leftPanel/LeftPanel';
 import Size from '../../constants/size';
 import { Modal, Menu, Tab, Card } from 'semantic-ui-react';
 import ShapeCanvas from './ShapeCanvas'
-import ShapeMenu from './rightMenu/ShapeMenu';
+import RightMenu from './rightMenu/RightMenu';
 import NavBar from '../NavBar';
 import {addShapeToCanvas, createCanvas, clearCanvasData} from '../../actions/canvasActions';
 
@@ -100,7 +100,7 @@ class Canvas extends Component {
                         handleMenu={this.handleRightMenu}
                         isOpen={this.state.rightPanelOpen}
                     /> */}
-                        <ShapeMenu
+                        <RightMenu
                             width={`${Size.sidePanelMenuWidth}px`}
                             shapeList={canvasData.shapeList}
                             canvasData={canvasData}

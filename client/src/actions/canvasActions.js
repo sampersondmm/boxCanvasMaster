@@ -27,6 +27,14 @@ addShapeToCollection = newShape => {
         }
     }
 },
+createCollection = newCollection => {
+    return {
+        type: ActionTypes.CREATE_COLLECTION,
+        payload: {
+            newCollection, 
+        }
+    }
+},
 changeCanvasScale = scale => {
     return {
         type: ActionTypes.CHANGE_CANVAS_SCALE,
@@ -39,7 +47,7 @@ changeShapeType = type => {
     return {
         type: ActionTypes.CHANGE_SHAPE_TYPE,
         payload: {
-            shapeType: type
+            type
         }
     }
 },
@@ -47,7 +55,7 @@ changeShapeColor = color => {
     return {
         type: ActionTypes.CHANGE_SHAPE_COLOR,
         payload: {
-            shapeColor: color
+            color
         }
     }
 },
@@ -55,7 +63,7 @@ changeShapeOpacity = opacity => {
     return {
         type: ActionTypes.CHANGE_SHAPE_OPACITY,
         payload: {
-            shapeOpacity: opacity
+            opacity
         }
     }
 },
@@ -63,7 +71,7 @@ changeShapeWidth = width => {
     return {
         type: ActionTypes.CHANGE_SHAPE_WIDTH,
         payload: {
-            shapeWidth: width
+            width
         }
     }
 },
@@ -71,7 +79,7 @@ changeShapeHeight = height => {
     return {
         type: ActionTypes.CHANGE_SHAPE_HEIGHT,
         payload: {
-            shapeHeight: height
+            height
         }
     }
 },
@@ -79,7 +87,7 @@ changeShapeRotation = rotation => {
     return {
         type: ActionTypes.CHANGE_SHAPE_ROTATION,
         payload: {
-            shapeRotation: rotation
+            rotation
         }
     }
 },
@@ -87,7 +95,7 @@ changeShapeRadius = radius => {
     return {
         type: ActionTypes.CHANGE_SHAPE_RADIUS,
         payload: {
-            shapeRadius: radius
+            radius
         }
     }
 },
@@ -105,10 +113,10 @@ addColorToPalette = color => {
         payload: color
     }
 },
-selectShape = (itemId) => {
+selectShape = (id) => {
     return {
         type: ActionTypes.SELECT_SHAPE,
-        payload: itemId
+        payload: id
     }
 },
 removeColorFromPalette = newColorPalette => {
@@ -152,6 +160,7 @@ export {
     setCanvasSize, 
     addShapeToCanvas, 
     addShapeToCollection, 
+    createCollection,
     changeShapeType, 
     changeShapeColor,
     changeShapeOpacity, 

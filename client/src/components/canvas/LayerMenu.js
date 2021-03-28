@@ -53,7 +53,7 @@ class LayerMenu extends Component {
     renderShapeList(){
         return map(this.props.canvasData.shapeList, item => {
             return (
-                <div className='layer-menu-shape-item' onClick={() => this.selectShape(item)}>
+                <div className='layer-menu-shape-item' style={{border: '2px solid red'}} onClick={() => this.selectShape(item)}>
                     <div 
                         className={item.type === Common.square ? 'layer-menu-shape-item-square' : 'layer-menu-shape-item-circle'} 
                         style={{backgroundColor: item.color}}

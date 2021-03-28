@@ -24,7 +24,11 @@ const Common = {
     height: 'Height',
     radius: 'Radius',
     stamp: 'Stamp',
-    selectCurrentShape: 'Select Current Shape'
+    selectCurrentShape: 'Select Current Shape',
+    positionX: 'Position X',
+    positionY: 'Position Y',
+    posX: 'Pos X',
+    posY: 'Pos Y'
 }
 
 export default Common;

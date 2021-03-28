@@ -4,8 +4,10 @@ import { changeShapeType } from '../../../../actions/canvasActions';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
 import Carousel, { consts } from 'react-elastic-carousel';
+import AccordianCard from '../../../AccordionCard';
+import AccordionCard from '../../../AccordionCard';
 
-class ShapeSizeCard extends Component {
+class ShapeTypeCard extends Component {
     constructor(props){
         super(props);
         this.state = {
@@ -30,32 +32,31 @@ class ShapeSizeCard extends Component {
         return pointer;
     }
 
-    render(){
-        const { open, inverted } = this.props;
+    cardContent = () => {
+        const { inverted } = this.props;
         const backgroundColor = !inverted ? 'rgb(50,50,50)' : 'rgb(220,220,220)'
         return (
-            <Menu.Item className='shape-accordian-option'>
-                <Accordion.Title
-                    index={1}
-                    onClick={this.props.handleOpen}
-                    >
-                    <Icon name={open ? 'plus' : 'minus'} />
-                    {Common.type}
-                </Accordion.Title>
-                <Accordion.Content active={open}>
-                    <Carousel itemsToShow={2} renderArrow={this.renderArrow}>
+            <Carousel itemsToShow={2} renderArrow={this.renderArrow}>
+                <div style={{width: '30px', height: '30px', backgroundColor}} onClick={() => this.changeShapeType(Common.square)}></div>
+                <div style={{width: '30px', height: '30px', borderRadius: '50%', backgroundColor}} onClick={() => this.changeShapeType(Common.circle)}></div>
+                <div style={{width: '30px', height: '30px', borderRadius: '50%', backgroundColor}} onClick={() => this.changeShapeType(Common.circle)}></div>
+                <div style={{width: '30px', height: '30px', borderRadius: '50%', backgroundColor}} onClick={() => this.changeShapeType(Common.circle)}></div>
+             </Carousel>
+        )
+    }
 
-                        <div style={{width: '30px', height: '30px', backgroundColor}} onClick={() => this.changeShapeType(Common.square)}></div>
-
-                        <div style={{width: '30px', height: '30px', borderRadius: '50%', backgroundColor}} onClick={() => this.changeShapeType(Common.circle)}></div>
-
-                        <div style={{width: '30px', height: '30px', borderRadius: '50%', backgroundColor}} onClick={() => this.changeShapeType(Common.circle)}></div>
-
-                        <div style={{width: '30px', height: '30px', borderRadius: '50%', backgroundColor}} onClick={() => this.changeShapeType(Common.circle)}></div>
-
-                    </Carousel>
-                </Accordion.Content>
-            </Menu.Item>
+    render(){
+        const { open, selection, handleSelect } = this.props;
+        return (
+            <AccordionCard
+                open={open}
+                index={1}
+                header={Common.type}
+                selection={selection}
+                handleSelect={handleSelect}
+                handleOpen={this.props.handleOpen}
+                content={this.cardContent()}
+            />
         )
     }
 }
@@ -68,4 +69,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps)(ShapeSizeCard);
+export default connect(mapStateToProps)(ShapeTypeCard);

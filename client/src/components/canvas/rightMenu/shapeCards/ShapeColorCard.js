@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { Icon, Menu, Tab, Accordion} from 'semantic-ui-react';
 import ColorPicker from '../../ColorPicker';
+import AccordionCard from '../../../AccordionCard';
 import { 
     changeShapeColor,
     changeBackgroundColor,
@@ -9,7 +10,7 @@ import {
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
 
-class ShapeSizeCard extends Component {
+class ShapeColorCard extends Component {
     constructor(props){
         super(props);
         this.state = {
@@ -39,58 +40,60 @@ class ShapeSizeCard extends Component {
         }))
     }
 
-    render(){
-        const { open, inverted } = this.props;
+
+    cardContent = () => {
+        const { inverted, currentShape } = this.props;
         const { backgroundColor } = this.props.canvasData
-        const { shapeColor } = this.props.currentShape;
-
         let color = null;
-          if(this.state.colorStatus === Common.shape){
-            color = this.state.dirty ? this.state.value : shapeColor;
-          } else {
+        if(this.state.colorStatus === Common.shape){
+            color = this.state.dirty ? this.state.value : currentShape.color;
+        } else {
             color = this.state.dirty ? this.state.value : backgroundColor;
-          }
-
+        }
         return (
-            <Menu.Item className='shape-accordian-option'>
-                <Accordion.Title
-                    index={2}
-                    onClick={this.props.handleOpen}
-                    >
-                    <Icon name={open ? 'plus' : 'minus'} />
-                    {Common.color}
-                </Accordion.Title>
-                <Accordion.Content active={open}>
-                    <Tab 
-                            onTabChange={this.colorTabChange}
-                            menu={{secondary: true}}
-                            panes={[
-                                {
-                                    menuItem: 'Shape',
-                                    render: () => <Tab.Pane inverted={inverted} style={{padding: '0', display: 'flex', justifyContent: 'center', alignItems:'center', border: '0'}}>
-                                        <ColorPicker 
-                                            color={color} 
-                                            colorChange={this.handleColorChange}
-                                            shapeColor={shapeColor}
-                                            backgroundColor={backgroundColor}
-                                            />
-                                    </Tab.Pane>
-                                },
-                                {
-                                    menuItem: 'Background',
-                                    render: () => <Tab.Pane inverted={inverted} style={{padding: '0', display: 'flex', justifyContent: 'center', alignItems:'center', border: '0'}}>
-                                        <ColorPicker 
-                                            color={color} 
-                                            colorChange={this.handleColorChange}
-                                            shapeColor={shapeColor}
-                                            backgroundColor={backgroundColor}
-                                            />
-                                    </Tab.Pane>
-                                }
-                            ]}
-                            />
-                </Accordion.Content>
-            </Menu.Item>
+            <Tab 
+                onTabChange={this.colorTabChange}
+                menu={{secondary: true}}
+                panes={[
+                    {
+                        menuItem: 'Shape',
+                        render: () => <Tab.Pane inverted={inverted} style={{padding: '0', display: 'flex', justifyContent: 'center', alignItems:'center', border: '0'}}>
+                            <ColorPicker 
+                                color={color} 
+                                colorChange={this.handleColorChange}
+                                shapeColor={currentShape.color}
+                                backgroundColor={backgroundColor}
+                                />
+                        </Tab.Pane>
+                    },
+                    {
+                        menuItem: 'Background',
+                        render: () => <Tab.Pane inverted={inverted} style={{padding: '0', display: 'flex', justifyContent: 'center', alignItems:'center', border: '0'}}>
+                            <ColorPicker 
+                                color={color} 
+                                colorChange={this.handleColorChange}
+                                shapeColor={currentShape.color}
+                                backgroundColor={backgroundColor}
+                                />
+                        </Tab.Pane>
+                    }
+                ]}
+            />
+        )
+    }
+
+    render(){
+        const { open, selection, handleSelect } = this.props;
+        return (
+            <AccordionCard
+                open={open}
+                selection={selection}
+                handleSelect={handleSelect}
+                handleOpen={this.props.handleOpen}
+                index={2}
+                header={Common.color}
+                content={this.cardContent()}
+            />
         )
     }
 }
@@ -103,4 +106,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps)(ShapeSizeCard);
+export default connect(mapStateToProps)(ShapeColorCard);
