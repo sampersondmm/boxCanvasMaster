@@ -1,7 +1,5 @@
 import React from 'react';
-import { Menu, Accordion, Icon } from 'semantic-ui-react'; 
-import Common from '../constants/common';
-import Size from '../constants/size';
+import { Menu, Accordion } from 'semantic-ui-react'; 
 import AccordionIcon from './AccordionIcon';
  
 
@@ -14,15 +12,6 @@ const AccordionCard = ({
     content,
     handleSelect
 }) => {
-    const center = {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        border: '1px solid rgb(120,120,120)',
-        borderRadius: '2px',
-        cursor: 'pointer',
-    }
-    const selected = selection === header;
     return (
             <Menu.Item className='shape-accordian-option' style={{margin: '0 2px'}}>
                 <Accordion.Title
@@ -54,17 +43,6 @@ const AccordionCard = ({
                         hideIcon={selection !== header}
                         icon='check'
                     />
-                    {/* <div 
-                        style={{
-                            ...center,
-                            width: '15px',
-                            height: '15px',
-                            // backgroundColor: 'rgba(120,120,120,0.4)',
-                        }}
-                        onClick={handleSelect}
-                    >
-                        {selected && <Icon name='check' size='small' style={{margin: '0', padding: '0'}} color='teal'/>}
-                    </div> */}
                 </Accordion.Title>
                 <Accordion.Content active={open}>
                     {content}

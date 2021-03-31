@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import Common from '../../../constants/common';
-import { Tab, Accordion, Menu, Icon } from 'semantic-ui-react';
+import {connect} from 'react-redux';
+import { Tab, Accordion, Menu, Header } from 'semantic-ui-react';
 import ShapeDisplayCard from './shapeCards/ShapeDisplayCard';
 import ShapeSizeCard from './shapeCards/ShapeSizeCard';
 import ShapeColorCard from './shapeCards/ShapeColorCard';
@@ -8,9 +9,6 @@ import ShapeTypeCard from './shapeCards/ShapeTypeCard';
 import ShapeRotationCard from './shapeCards/ShapeRotationCard';
 import AccordionIcon from '../../AccordionIcon';
 import findIndex from 'lodash/findIndex';
-import slice from 'lodash/slice';
-import without from 'lodash/without';
-
 
 class ShapeMenu extends Component {
     constructor(props){
@@ -104,7 +102,7 @@ class ShapeMenu extends Component {
     }
     createAccordianList = () => {
         const { modal } = this.props;
-        const { currentShape } = this.props;
+        const { currentShapeType } = this.props;
         const { tabOpen, selection, cardOrder } = this.state;
         const isInverted = modal ? false : true;
         let listArr = [];
@@ -150,12 +148,11 @@ class ShapeMenu extends Component {
                         />
                     )  
                 case Common.rotation:
-                    if(currentShape.type === Common.square){
+                    if(currentShapeType === Common.square){
                         return (
                             <ShapeRotationCard
                                 open={tabOpen.rotation}
                                 selection={selection}
-                                handleSelect={this.handleSelect}
                                 handleSelect={() => this.handleSelect(Common.rotation)}
                                 handleOpen={() => this.toggleAccordian(Common.rotation)}
                                 inverted={isInverted}
@@ -172,15 +169,18 @@ class ShapeMenu extends Component {
     render(){
         const { modal, inverted } = this.props;
         const { selection } = this.state;
-        const wrapHeight = modal ? '433px' : 'calc(100vh - 100px)';
-        const scrollHeight = 'calc(100vh - 150px)';
+        const wrapHeight = modal ? '433px' : 'calc(100vh - 90px)';
+        const scrollHeight = 'calc(100vh - 180px)';
         const scrollClass = modal ? 'scrollbar' : 'scrollbar-inverted'
     
         return (
             <div style={{height: wrapHeight, overflow: 'hidden'}}>
+                <div style={{height: '40px', display: 'flex', alignItems: 'center', paddingLeft: '10px'}}>
+                    <Header style={{ color: 'white', margin: '0'}}>Create Shape</Header>
+                </div>
                 <div className={`${scrollClass} tab-pane-wrap`} style={{height: scrollHeight, overflowY: 'scroll'}}>
-                    <Tab.Pane inverted={inverted} activeIndex={1} style={{padding: '0', border: '0', display: 'flex', justifyContent: 'center', margin: '0'}}>
-                        <Accordion inverted={inverted} as={Menu} vertical style={{border: '0'}} fluid >
+                    <Tab.Pane inverted={inverted} style={{padding: '0', border: '0', display: 'flex', justifyContent: 'center', margin: '0'}}>
+                        <Accordion inverted={inverted} as={Menu} vertical style={{border: '0', paddingTop: '0'}} fluid >
                             {this.createAccordianList()}
                         </Accordion>
                     </Tab.Pane>
@@ -209,4 +209,11 @@ class ShapeMenu extends Component {
     }
 }
 
-export default ShapeMenu;
+const mapStateToProps = state => {
+    const { currentShapeType } = state.canvas;
+    return {
+        currentShapeType
+    }
+}
+
+export default connect(mapStateToProps)(ShapeMenu);

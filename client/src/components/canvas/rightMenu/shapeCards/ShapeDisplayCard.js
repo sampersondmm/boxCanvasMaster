@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import { Icon, Menu, Accordion} from 'semantic-ui-react';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
 import AccordionCard from '../../../AccordionCard';
@@ -7,6 +6,46 @@ import AccordionCard from '../../../AccordionCard';
 class ShapeDisplayCard extends Component {
     constructor(props){
         super(props);
+    }
+
+    returnShape = () => {
+        const { currentShape, currentShapeType } = this.props;
+        const { square, circle, line } = currentShape;
+        switch(currentShapeType){
+            case Common.square:
+                return (
+                    <div 
+                        style={{
+                            width: '70px', 
+                            height: '70px', 
+                            opacity: square.opacity, 
+                            backgroundColor: square.color
+                        }}></div>
+                )
+            case Common.circle:
+                return (
+                    <div 
+                        style={{
+                            width: '70px', 
+                            height: '70px', 
+                            opacity: circle.opacity, 
+                            borderRadius: '50%', 
+                            backgroundColor: circle.color
+                        }}></div>
+                )
+            case Common.line:
+                return (
+                    <div 
+                        style={{
+                            width: '70px', 
+                            height: '3px', 
+                            opacity: line.opacity, 
+                            backgroundColor: line.stroke
+                        }}></div>
+                )
+            default:
+                return;
+        }
     }
 
     cardContent = () => {
@@ -20,7 +59,7 @@ class ShapeDisplayCard extends Component {
                 alignItems: 'center',
                 justifyContent: 'center',
             }}>
-                <div style={{width: '70px', height: '70px', opacity, borderRadius: type === Common.square ? '0' : '50%', backgroundColor: color}}></div>
+                {this.returnShape()}
             </div>
         )
     }
@@ -43,9 +82,10 @@ class ShapeDisplayCard extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { currentShape, canvasData } = state.canvas;
+    const { currentShape, canvasData, currentShapeType } = state.canvas;
     return {
         canvasData,
+        currentShapeType,
         currentShape
     }
 }

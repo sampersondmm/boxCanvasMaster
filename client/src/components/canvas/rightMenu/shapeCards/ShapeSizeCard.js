@@ -6,7 +6,6 @@ import {
     changeShapeHeight
 } from '../../../../actions/canvasActions';
 import Common from '../../../../constants/common';
-import AccordianCard from '../../../AccordionCard';
 import {connect} from 'react-redux';
 import AccordionCard from '../../../AccordionCard';
 
@@ -34,21 +33,21 @@ class ShapeSizeCard extends Component {
         }
     }
     incrementWidth = (value) => {
-        const { currentShape } = this.props;
+        const { square } = this.props.currentShape;
         const { sizeIncrement } = this.state;
-        const newValue = value === 'down' ? (currentShape.width - sizeIncrement <= 0 ? 0 : currentShape.width - sizeIncrement) : currentShape.width + sizeIncrement;
+        const newValue = value === 'down' ? (square.width - sizeIncrement <= 0 ? 0 : square.width - sizeIncrement) : square.width + sizeIncrement;
         this.props.dispatch(changeShapeWidth(newValue))
     }
     incrementHeight = (value) => {
-        const { currentShape } = this.props;
+        const { square } = this.props.currentShape;
         const { sizeIncrement } = this.state;
-        const newValue = value === 'down' ? (currentShape.height - sizeIncrement <= 0 ? 0 : currentShape.height - sizeIncrement) : currentShape.height + sizeIncrement;
+        const newValue = value === 'down' ? (square.height - sizeIncrement <= 0 ? 0 : square.height - sizeIncrement) : square.height + sizeIncrement;
         this.props.dispatch(changeShapeHeight(newValue))
     }
     incrementRadius = (value) => {
-        const { currentShape } = this.props;
+        const { circle } = this.props.currentShape;
         const { sizeIncrement } = this.state;
-        const newValue = value === 'down' ? (currentShape.radius - sizeIncrement <= 0 ? 0 : currentShape.radius - sizeIncrement) : currentShape.radius + sizeIncrement;
+        const newValue = value === 'down' ? (circle.radius - sizeIncrement <= 0 ? 0 : circle.radius - sizeIncrement) : circle.radius + sizeIncrement;
         this.props.dispatch(changeShapeRadius(newValue))
     }
     handleChangeRadiusIncrement = (data) => {
@@ -67,8 +66,9 @@ class ShapeSizeCard extends Component {
     cardContent = () => {
         const { inverted } = this.props;
         const { sizeIncrement, radiusIncrement } = this.state;
-        const { currentShape } = this.props;
-        if(currentShape.type === Common.square){
+        const { currentShape, currentShapeType } = this.props;
+        const { square, circle } = currentShape;
+        if(currentShapeType === Common.square){
             return (
                 <Menu.Menu inverted={inverted} vertical >
                     <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
@@ -80,7 +80,7 @@ class ShapeSizeCard extends Component {
                         <Input
                             inverted={inverted}
                             type='number'
-                            value={currentShape.width}
+                            value={square.width}
                             onChange={(e, data) => this.handleSizeChange(data, Common.width)}
                             placeholder='Width...'
                         />
@@ -94,7 +94,7 @@ class ShapeSizeCard extends Component {
                         <Input
                             inverted={inverted}
                             type='number'
-                            value={currentShape.height}
+                            value={square.height}
                             onChange={(e, data) => this.handleSizeChange(data, Common.height)}
                             placeholder='Height...'
                         />
@@ -111,7 +111,7 @@ class ShapeSizeCard extends Component {
                     </Menu.Item>
                 </Menu.Menu>
             )
-        } else if (currentShape.type === Common.circle) {
+        } else if (currentShapeType === Common.circle) {
             return (
                 <Menu.Menu inverted={inverted} vertical >
                     <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
@@ -123,7 +123,7 @@ class ShapeSizeCard extends Component {
                         <Input
                             inverted={inverted}
                             type='number'
-                            value={currentShape.radius}
+                            value={circle.radius}
                             onChange={(e, data) => this.handleSizeChange(data, Common.radius)}
                             placeholder='Radius...'
                         />
@@ -161,9 +161,10 @@ class ShapeSizeCard extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { currentShape } = state.canvas;
+    const { currentShape, currentShapeType } = state.canvas;
     return {
-        currentShape
+        currentShape,
+        currentShapeType
     }
 }
 

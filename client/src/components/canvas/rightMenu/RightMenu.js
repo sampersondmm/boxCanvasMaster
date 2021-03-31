@@ -1,21 +1,12 @@
 import React, {Component} from 'react';
-import { Menu, Tab, Accordion } from 'semantic-ui-react';
+import { Menu, Tab } from 'semantic-ui-react';
 import {connect} from 'react-redux'
 import { addShapeToCollection } from '../../../actions/canvasActions';
 import Common from '../../../constants/common';
-import Size from '../../../constants/size';
-import ShapeDisplayCard from './shapeCards/ShapeDisplayCard';
-import ShapeSizeCard from './shapeCards/ShapeSizeCard';
-import ShapeColorCard from './shapeCards/ShapeColorCard';
-import ShapeTypeCard from './shapeCards/ShapeTypeCard';
-import ShapeRotationCard from './shapeCards/ShapeRotationCard';
 import ShapeMenu from './ShapeMenu';
 import LayerMenu from './LayerMenu';
 
 class RightMenu extends Component {
-    constructor(props){
-        super(props);
-    }
 
     addShape(newShape){
         this.props.dispatch(addShapeToCollection(newShape))
@@ -60,7 +51,7 @@ class RightMenu extends Component {
         const isInverted = modal ? false : true;
         return (
             <Menu
-                style={{ height: '100%', width: `${Size.sidePanelMenuWidth}px`, margin: '0', borderRadius: '0'}}
+                style={{ height: '100%', width: this.props.width, margin: '0', borderRadius: '0'}}
                 inverted={isInverted}
                 vertical
             >
@@ -68,7 +59,6 @@ class RightMenu extends Component {
                         <div style={{height: '100%'}}>
                             <Tab
                                 menu={{secondary: true}}
-                                // activeIndex={1}
                                 panes={[
                                     {
                                         menuItem: {key: 'Current Shape', icon: 'circle', color: 'teal'},
@@ -79,12 +69,13 @@ class RightMenu extends Component {
                                                     modal={modal} 
                                                     canvasData={canvasData}
                                                     currentShape={this.props.currentShape}
+                                                    shapeType={this.props.currentShapeType}
                                                 />
                                             )
                                         }
                                     },
                                     {
-                                        menuItem: {key: 'Current Shape', icon: 'list'},
+                                        menuItem: {key: 'Layers', icon: 'list'},
                                         render: () => <LayerMenu shapeList={this.props.shapeList} inverted={isInverted}/>
                                     },
                                     {
@@ -101,10 +92,11 @@ class RightMenu extends Component {
 }
 
 const mapStateToProps = state => {
-    const { collectionList, currentShape } = state.canvas;
+    const { currentShape, canvasData, currentShapeType } = state.canvas;
     return {
-        collectionList,
-        currentShape
+        currentShape,
+        currentShapeType,
+        canvasData
     }
 }
 

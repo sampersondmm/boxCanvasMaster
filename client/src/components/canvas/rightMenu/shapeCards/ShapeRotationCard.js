@@ -25,11 +25,11 @@ class ShapeRotationCard extends Component {
     }
 
     incrementRotation = (value) => {
-        const { currentShape } = this.props;
+        const { square } = this.props.currentShape;
         const { rotationIncrement } = this.state;
         let newRotation = 0;
         if(value === 'down'){
-            let updatedRotation = currentShape.rotation - rotationIncrement;
+            let updatedRotation = square.rotation - rotationIncrement;
             //goes below 0
             if(updatedRotation < 0) {
                 newRotation = 360 - Math.abs(updatedRotation);
@@ -37,7 +37,7 @@ class ShapeRotationCard extends Component {
                 newRotation = updatedRotation;
             }
         } else {
-            let updatedRotation = currentShape.rotation + rotationIncrement;
+            let updatedRotation = square.rotation + rotationIncrement;
             //goes below 0
             if(updatedRotation >= 360) {
                 newRotation = updatedRotation - 360;
@@ -45,14 +45,13 @@ class ShapeRotationCard extends Component {
                 newRotation = updatedRotation;
             }
         }
-        const newValue = value === 'down' ? (currentShape.rotation - rotationIncrement <= 0 ? 360 : currentShape.rotation - rotationIncrement) : currentShape.rotation + rotationIncrement;
         this.props.dispatch(changeShapeRotation(newRotation))
     }
 
     cardContent = () => {
         const { rotationIncrement } = this.state;
         const { inverted } = this.props;
-        const { currentShape } = this.props;
+        const { square } = this.props.currentShape;
         return (
             <Menu.Menu inverted={inverted} vertical >
                 <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
@@ -66,7 +65,7 @@ class ShapeRotationCard extends Component {
                         type='number'
                         min={0}
                         max={360}
-                        value={currentShape.rotation}
+                        value={square.rotation}
                         onChange={(e, data) => this.handleRotationChange(data, Common.rotation)}
                         placeholder='Rotation...'
                     />

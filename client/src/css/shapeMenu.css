@@ -53,7 +53,7 @@
 
 .tab-pane-wrap {
     width: 100%;
-    padding: 10px 0;
+    padding-bottom: 10px;
     padding-left: 8px;
     display: flex !important;
     overflow-y: scroll !important;

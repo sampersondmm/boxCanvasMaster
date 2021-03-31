@@ -28,7 +28,8 @@ const Common = {
     positionX: 'Position X',
     positionY: 'Position Y',
     posX: 'Pos X',
-    posY: 'Pos Y'
+    posY: 'Pos Y',
+    line: 'Line'
 }
 
 export default Common;

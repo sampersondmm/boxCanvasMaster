@@ -61,14 +61,14 @@ class LeftPanel extends Component {
                     type={Common.sidePanel}
                     tooltipPosition={TooltipPositions.left}
                     onClick={() => this.handleShapeSelection(false)}
-                    icon='plus'
+                    fa={true}
+                    icon='fas fa-stamp'
                 />
                 <PanelButton 
                     tooltip={Common.selectCurrentShape}
                     type={Common.sidePanel}
                     tooltipPosition={TooltipPositions.left}
                     onClick={() => this.handleShapeSelection(true)}
-                    // icon={<i className="fal fa-mouse-pointer"></i>}
                     icon='hand pointer outline'
                 />
                 <PanelButton 
@@ -81,7 +81,6 @@ class LeftPanel extends Component {
                             shapeMenuOpen: true
                         }))
                     }}
-                    // icon={<i className="fal fa-shapes"></i>}
                     icon='clone outline'
 
                 />

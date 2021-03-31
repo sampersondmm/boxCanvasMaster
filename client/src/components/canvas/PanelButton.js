@@ -30,27 +30,9 @@ class PanelButton extends Component {
     }
     render(){
         const { icon, fa, onClick } = this.props;
-        let tooltipClass = '';
-        switch(this.props.tooltipPosition){
-            case TooltipPositions.bottom:
-                tooltipClass = 'panel-tooltip-bottom';
-                break;
-            case TooltipPositions.bottomRight:
-                tooltipClass = 'panel-tooltip-bottom-right';
-                break;
-            case TooltipPositions.right:
-                tooltipClass = 'panel-tooltip-right';
-                break;
-            case TooltipPositions.left:
-                tooltipClass = 'panel-tooltip-left';
-                break;
-            default:
-                tooltipClass = 'panel-tooltip';
-                break 
-        }
          return (
             <Popup
-                style={{margin: '0', borderRadius: '0', height: '40px'}}
+                style={{margin: '0', borderRadius: '0', height: '40px', display: 'flex', padding: '0', alignItems: 'center', justifyContent: 'center', border: '1px solid green'}}
                 basic
                 trigger={
                     <Menu.Item onClick={onClick}>
@@ -61,7 +43,7 @@ class PanelButton extends Component {
                         )}
                     </Menu.Item>
                 }
-                content={this.props.tooltip}
+                content={<div style={{border: '1px solid black', margin: '0'}}>{this.props.tooltip}</div>}
                 position='right center'
             />
         )

@@ -2,6 +2,7 @@ import ActionTypes from "../actions/ActionTypes";
 import Common from '../constants/common';
 import uuid from 'react-uuid';
 import cloneDeep from 'lodash/cloneDeep';
+import { updateCurrentShape } from "../utils/canvasUtils";
 
 const DEFAULT_STATE = {
   canvasData: {
@@ -20,15 +21,35 @@ const DEFAULT_STATE = {
       {color: "#cd5b5b", uuid: "b24323-3bc0-1671-c67e-53823dac62"}
     ]
   },
+  currentShapeType: Common.square,
   currentShape: {
-    id: '',
-    type: Common.square,
-    color: '#6ab8c5',
-    width: 60,
-    height: 60,
-    radius: 30,
-    opacity: 0.5,
-    rotation: 0,
+    square: {
+      id: '',
+      color: 'rgba(200,220,255, 0.8)',
+      posX: 0,
+      posY: 0,
+      width: 60,
+      height: 60,
+      // opacity: 0.5,
+      rotation: 0,
+    },
+    circle: {
+      id: '',
+      color: '#6ab8c5',
+      posX: 0,
+      posY: 0,
+      radius: 30,
+      opacity: 0.5,
+    },
+    line: {
+      id: '',
+      stroke: '#6ab8c5',
+      strokeWidth: 2,
+      fill: 'transparent',
+      opacity: 0.5,
+      completed: false,
+      points: 'M 100 100'
+    },
   },
   collectionCanvasData: {
     canvasWidth: 400,
@@ -58,6 +79,7 @@ const DEFAULT_STATE = {
 const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
   const {type, payload} = action,
     result = payload || {};
+  let updatedShape = {};
   switch(type){
     // Changes to canvas
     case ActionTypes.UPDATE_CANVAS_DATA:
@@ -160,60 +182,75 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
 
     //Current shape data
     case ActionTypes.CHANGE_SHAPE_WIDTH: 
+      updatedShape = updateCurrentShape(
+        state.currentShape, 
+        state.currentShapeType,
+        'width',
+        payload.width
+      )
       return {
         ...state,
-        currentShape: {
-          ...state.currentShape,
-          width: payload.width
-        }
+        currentShape: updatedShape
       }
     case ActionTypes.CHANGE_SHAPE_HEIGHT: 
+      updatedShape = updateCurrentShape(
+        state.currentShape, 
+        state.currentShapeType,
+        'height',
+        payload.height
+      )
       return {
         ...state,
-        currentShape: {
-            ...state.currentShape,
-            height: payload.height
-        }
+        currentShape: updatedShape
       }
     case ActionTypes.CHANGE_SHAPE_ROTATION: 
+      updatedShape = updateCurrentShape(
+        state.currentShape, 
+        state.currentShapeType,
+        'rotation',
+        payload.rotation
+      )
       return {
         ...state,
-        currentShape: {
-            ...state.currentShape,
-            rotation: payload.rotation
-        }
+        currentShape: updatedShape
       }
-    case ActionTypes.CHANGE_SHAPE_RADIUS: 
+    case ActionTypes.CHANGE_SHAPE_RADIUS:
+      updatedShape = updateCurrentShape(
+        state.currentShape, 
+        state.currentShapeType,
+        'radius',
+        payload.radius
+      )
       return {
         ...state,
-        currentShape: {
-          ...state.currentShape,
-          radius: payload.radius
-      }
+        currentShape: updatedShape
       }
     case ActionTypes.CHANGE_SHAPE_TYPE: 
       return {
         ...state,
-        currentShape: {
-          ...state.currentShape,
-          type: payload.type
-      }
-      }
+        currentShapeType: payload.type
+    }
     case ActionTypes.CHANGE_SHAPE_COLOR:
+      updatedShape = updateCurrentShape(
+        state.currentShape, 
+        state.currentShapeType,
+        'color',
+        payload.color
+      )
       return {
         ...state,
-        currentShape: {
-          ...state.currentShape,
-          color: payload.color
-      }
+        currentShape: updatedShape
       }
     case ActionTypes.CHANGE_SHAPE_OPACITY:
+      updatedShape = updateCurrentShape(
+        state.currentShape, 
+        state.currentShapeType,
+        'opacity',
+        payload.opacity
+      )
       return {
         ...state,
-        currentShape: {
-          ...state.currentShape,
-          opacity: payload.opacity
-        }
+        currentShape: updatedShape
       }
     default:
       return state;

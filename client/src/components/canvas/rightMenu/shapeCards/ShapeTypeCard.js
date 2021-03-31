@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
-import { Icon, Menu, Tab, Accordion} from 'semantic-ui-react';
+import { Icon } from 'semantic-ui-react';
 import { changeShapeType } from '../../../../actions/canvasActions';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
 import Carousel, { consts } from 'react-elastic-carousel';
-import AccordianCard from '../../../AccordionCard';
 import AccordionCard from '../../../AccordionCard';
 
 class ShapeTypeCard extends Component {
@@ -21,11 +20,11 @@ class ShapeTypeCard extends Component {
 
     renderArrow = ({ type, onClick, isEdge }) => {
         const pointer = type === consts.PREV ? (
-            <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
+            <div style={{height: '100%', display: 'flex', alignItems: 'center', cursor: 'pointer'}}>
                 <Icon name='angle left' onClick={onClick}/>
             </div>
         ) : (
-            <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
+            <div style={{height: '100%', display: 'flex', alignItems: 'center', cursor: 'pointer'}}>
                 <Icon name='angle right' onClick={onClick}/>
             </div>
         )
@@ -39,8 +38,9 @@ class ShapeTypeCard extends Component {
             <Carousel itemsToShow={2} renderArrow={this.renderArrow}>
                 <div style={{width: '30px', height: '30px', backgroundColor}} onClick={() => this.changeShapeType(Common.square)}></div>
                 <div style={{width: '30px', height: '30px', borderRadius: '50%', backgroundColor}} onClick={() => this.changeShapeType(Common.circle)}></div>
-                <div style={{width: '30px', height: '30px', borderRadius: '50%', backgroundColor}} onClick={() => this.changeShapeType(Common.circle)}></div>
-                <div style={{width: '30px', height: '30px', borderRadius: '50%', backgroundColor}} onClick={() => this.changeShapeType(Common.circle)}></div>
+                <div style={{width: '30px', height: '30px', display: 'flex', alignItems: 'center'}} onClick={() => this.changeShapeType(Common.line)}>
+                    <div style={{width: '30px', height: '3px', backgroundColor}}></div>
+                </div>
              </Carousel>
         )
     }

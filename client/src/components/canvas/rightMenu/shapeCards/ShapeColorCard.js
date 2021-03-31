@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Icon, Menu, Tab, Accordion} from 'semantic-ui-react';
+import { Tab } from 'semantic-ui-react';
 import ColorPicker from '../../ColorPicker';
 import AccordionCard from '../../../AccordionCard';
 import { 
@@ -42,11 +42,12 @@ class ShapeColorCard extends Component {
 
 
     cardContent = () => {
-        const { inverted, currentShape } = this.props;
-        const { backgroundColor } = this.props.canvasData
+        const { inverted, currentShape, currentShapeType } = this.props;
+        const { backgroundColor } = this.props.canvasData;
+        const shapeColor = currentShape[currentShapeType.toLowerCase()].color
         let color = null;
         if(this.state.colorStatus === Common.shape){
-            color = this.state.dirty ? this.state.value : currentShape.color;
+            color = this.state.dirty ? this.state.value : shapeColor;
         } else {
             color = this.state.dirty ? this.state.value : backgroundColor;
         }
@@ -99,10 +100,11 @@ class ShapeColorCard extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { currentShape, canvasData } = state.canvas;
+    const { currentShape, canvasData, currentShapeType } = state.canvas;
     return {
         canvasData,
-        currentShape
+        currentShape,
+        currentShapeType
     }
 }
 

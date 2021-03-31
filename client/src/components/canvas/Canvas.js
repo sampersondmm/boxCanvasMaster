@@ -31,11 +31,6 @@ class Canvas extends Component {
     componentDidMount(){
         this.props.dispatch(clearCanvasData())
     }
-    componentWillReceiveProps(nextProps){
-        if(this.props.canvas !== nextProps.canvas){
-            console.log('test');
-        }
-    }
     handleLeftMenu(){
         this.setState(state => ({
             ...state,
@@ -101,9 +96,8 @@ class Canvas extends Component {
                         isOpen={this.state.rightPanelOpen}
                     /> */}
                         <RightMenu
-                            width={`${Size.sidePanelMenuWidth}px`}
+                            width={`${Size.sidePanelMenuWidth + 100}px`}
                             shapeList={canvasData.shapeList}
-                            canvasData={canvasData}
                         />
                 </div>
             </div>
