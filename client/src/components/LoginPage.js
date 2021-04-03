@@ -2,9 +2,6 @@ import React, {Component} from 'react';
 import {Form, Button} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
 import logo from '../images/newLogo.png';
-import CircleCanvas from './loginAnimation';
-import {apiCall} from '../actions/api'; 
-import {authorizeUser} from '../actions/userActions';
 
 class LoginPage extends Component {
     constructor(props){

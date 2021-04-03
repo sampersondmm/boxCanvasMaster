@@ -29,7 +29,10 @@ const Common = {
     positionY: 'Position Y',
     posX: 'Pos X',
     posY: 'Pos Y',
-    line: 'Line'
+    line: 'Line',
+    stroke: 'Stroke',
+    strokeWidth: 'Stroke Width',
+    numberOfPoints: 'Number of Points'
 }
 
 export default Common;

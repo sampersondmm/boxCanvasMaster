@@ -76,7 +76,13 @@ class RightMenu extends Component {
                                     },
                                     {
                                         menuItem: {key: 'Layers', icon: 'list'},
-                                        render: () => <LayerMenu shapeList={this.props.shapeList} inverted={isInverted}/>
+                                        render: () => (
+                                            <LayerMenu 
+                                                shapeList={this.props.shapeList} 
+                                                inverted={isInverted}
+                                                modal={modal}
+                                            />
+                                        )
                                     },
                                     {
                                         menuItem: {key: 'Settings', icon: 'cogs'},

@@ -8,7 +8,7 @@ const DEFAULT_STATE = {
   canvasData: {
     canvasWidth: 400,
     canvasHeight: 400,
-    backgroundColor: '#0f0e0e',
+    backgroundColor: 'rgba(50,50,55,1)',
     canvasScale: 1,
     shapeList: [],
     createdCollectionList: [],
@@ -25,28 +25,28 @@ const DEFAULT_STATE = {
   currentShape: {
     square: {
       id: '',
-      color: 'rgba(200,220,255, 0.8)',
+      type: Common.square,
+      color: 'rgba(106, 184, 197, 0.8)',
       posX: 0,
       posY: 0,
       width: 60,
       height: 60,
-      // opacity: 0.5,
       rotation: 0,
     },
     circle: {
       id: '',
-      color: '#6ab8c5',
+      type: Common.circle,
+      color: 'rgba(106, 184, 197, 0.8)',
       posX: 0,
       posY: 0,
       radius: 30,
-      opacity: 0.5,
     },
     line: {
       id: '',
-      stroke: '#6ab8c5',
+      type: Common.line,
+      stroke: 'rgba(106, 184, 197, 0.8)',
       strokeWidth: 2,
       fill: 'transparent',
-      opacity: 0.5,
       completed: false,
       points: 'M 100 100'
     },

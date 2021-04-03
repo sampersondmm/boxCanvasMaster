@@ -40,9 +40,9 @@ class LayerMenu extends Component {
     }
     createShapeItem = (shape) => {
         const type = shape.type;
-        return (
-            <Aux>
-                {type === Common.square ? (
+        switch(type){
+            case Common.square:
+                return (
                     <Aux>
                         <Menu.Item >
                             <Label color='teal'>{shape.width}</Label>
@@ -56,82 +56,172 @@ class LayerMenu extends Component {
                             <Label color='teal'>{shape.rotation}</Label>
                             {Common.rotation}
                         </Menu.Item>
-                    </Aux>
-                ) : (
-                    <Aux>
                         <Menu.Item >
+                            <Label color='teal'>{Number(shape.posX).toFixed(0)}</Label>
+                            {Common.positionX}
+                        </Menu.Item>
+                        <Menu.Item >
+                            <Label color='teal'>{Number(shape.posY).toFixed(0)}</Label>
+                            {Common.positionY}
+                        </Menu.Item>
+                    </Aux>
+                )
+            case Common.circle:
+                return (
+                    <Aux>
+                        <Menu.Item>
                             <Label color='teal'>{shape.radius}</Label>
                             {Common.radius}
                         </Menu.Item>
+                        <Menu.Item >
+                            <Label color='teal'>{Number(shape.posX).toFixed(0)}</Label>
+                            {Common.positionX}
+                        </Menu.Item>
+                        <Menu.Item >
+                            <Label color='teal'>{Number(shape.posY).toFixed(0)}</Label>
+                            {Common.positionY}
+                        </Menu.Item>
                     </Aux>
-                )}
-                <Menu.Item >
-                    <Label color='teal'>{Number(shape.posX).toFixed(0)}</Label>
-                    {Common.positionX}
+                )
+            case Common.line:
+                return (
+                    <Aux>
+                        <Menu.Item>
+                            <Label color='teal'>{shape.stroke}</Label>
+                            {Common.stroke}
+                        </Menu.Item>
+                        <Menu.Item >
+                            <Label color='teal'>{shape.strokeWidth}</Label>
+                            {Common.strokeWidth}
+                        </Menu.Item>
+                        <Menu.Item >
+                            <Label color='teal'>{shape.points.length}</Label>
+                            {Common.numberOfPoints}
+                        </Menu.Item>
+                    </Aux>
+                )
+            default:
+                return;
+        }
+    }
+    determineShapeDisplay = (shape) => {
+        switch(shape.type){
+            case Common.square:
+                return (
+                    <div style={{
+                        width: '20px', 
+                        height: '20px', 
+                        backgroundColor: shape.color, 
+                        margin: '0 10px 0 5px'
+                    }}></div>
+                )
+            case Common.circle:
+                return (
+                    <div style={{
+                        width: '20px', 
+                        height: '20px', 
+                        backgroundColor: shape.color, 
+                        borderRadius: '50%',
+                        margin: '0 10px 0 5px'
+                    }}></div>
+                )
+            case Common.line:
+                return (
+                    <div style={{
+                        width: '20px', 
+                        height: '2px', 
+                        backgroundColor: shape.stroke, 
+                        margin: '0 10px 0 5px'
+                    }}></div>
+                )
+            default:
+                break;
+        }
+    }
+    createShapeList = () => {
+        const { shapeList, inverted } = this.props;
+        const { openList, selection } = this.state;
+        const newList = shapeList.map((shape, index) => {
+            return (
+                <Menu.Item className='shape-accordian-option' style={{margin: '0 2px', marginBottom: '5px', borderRadius: '4px'}}>
+                        <Accordion.Title
+                            index={0}
+                            style={{
+                                cursor: 'default',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}
+                        >
+                            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                                <AccordionIcon 
+                                    width='20px'
+                                    spaceRight='7px'
+                                    disabled={false}
+                                    height='20px'
+                                    onClick={() => this.handleOpen(shape.id)}
+                                    icon={openList.includes(index) ? 'plus' : 'minus'}
+                                />
+                                {this.determineShapeDisplay(shape)}
+                                {shape.type}
+                            </div>
+                            <AccordionIcon
+                                width='15px'
+                                height='15px'
+                                disabled={false}
+                                onClick={() => this.handleSelect(shape.id)}
+                                color='teal'
+                                hideIcon={selection !== shape.id}
+                                icon='check'
+                            />
+                        </Accordion.Title>
+
+                    <Accordion.Content active={openList.includes(shape.id)} as={Menu} inverted={inverted} style={{margin: '0', marginTop: '5px', border: '0', boxShadow: '0 0 0 0'}}>
+                        {this.createShapeItem(shape)}
+                    </Accordion.Content>
                 </Menu.Item>
-                <Menu.Item >
-                    <Label color='teal'>{Number(shape.posY).toFixed(0)}</Label>
-                    {Common.positionY}
-                </Menu.Item>
-            </Aux>
-        )
+            )
+        })
+        return newList;
     }
     render(){
-        const { inverted, shapeList } = this.props;
-        const { openList, selection } = this.state;
-        const wrapHeight = !inverted ? '433px' : 'calc(100vh - 150px)';
+        const { inverted, modal } = this.props;
+        const wrapHeight = modal ? '433px' : 'calc(100vh - 90px)';
+        const { selection } = this.state;
+        const scrollHeight = 'calc(100vh - 180px)';
         const scrollClass = !inverted ? 'scrollbar' : 'scrollbar-inverted';
         return (
-            <div>
-                <div className={`${scrollClass} tab-pane-wrap`} style={{height: wrapHeight, borderBottom: '1px solid rgb(120,120,120)', borderTop: '1px solid rgb(120,120,120)'}}>
-                    <Header style={{ color: 'white'}}>LAYER</Header>
+            <div style={{height: wrapHeight, overflow: 'hidden'}}>
+                <div style={{height: '40px', display: 'flex', alignItems: 'center', paddingLeft: '10px'}}>
+                    <Header style={{ color: 'white', margin: '0'}}>Layers</Header>
+                </div>
+                <div className={`${scrollClass} tab-pane-wrap`} style={{height: scrollHeight, overflowY: 'scroll'}}>
                     <Tab.Pane inverted={inverted} style={{padding: '0', border: '0', display: 'flex', justifyContent: 'center', margin: '0'}}>
-                        <Accordion inverted={inverted} as={Menu} vertical style={{border: '0'}} fluid >
-                            {shapeList.map((shape, index) => {
-                                return (
-                                    <Menu.Item className='shape-accordian-option' style={{margin: '0 2px', marginBottom: '5px', borderRadius: '4px'}}>
-                                            <Accordion.Title
-                                                index={0}
-                                                style={{
-                                                    cursor: 'default',
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center'
-                                                }}
-                                            >
-                                                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                                                    <AccordionIcon 
-                                                        width='20px'
-                                                        spaceRight='7px'
-                                                        disabled={false}
-                                                        height='20px'
-                                                        onClick={() => this.handleOpen(shape.id)}
-                                                        icon={openList.includes(index) ? 'plus' : 'minus'}
-                                                    />
-                                                    <div style={{width: '20px', height: '20px', backgroundColor: shape.color, borderRadius: shape.type === Common.square ? 0 : '50%', margin: '0 10px 0 5px'}}></div>
-                                                    {shape.type}
-                                                </div>
-                                                <AccordionIcon
-                                                    width='15px'
-                                                    height='15px'
-                                                    disabled={false}
-                                                    onClick={() => this.handleSelect(shape.id)}
-                                                    color='teal'
-                                                    hideIcon={selection !== shape.id}
-                                                    icon='check'
-                                                />
-                                            </Accordion.Title>
-
-                                        <Accordion.Content active={openList.includes(shape.id)} as={Menu} inverted={inverted} style={{margin: '0', marginTop: '5px', border: '0', boxShadow: '0 0 0 0'}}>
-                                            {this.createShapeItem(shape)}
-                                        </Accordion.Content>
-                                    </Menu.Item>
-                                )
-                            })}
+                        <Accordion inverted={inverted} as={Menu} vertical style={{border: '0', paddingTop: '0'}} fluid >
+                            {this.createShapeList()}
                         </Accordion>
                     </Tab.Pane>
                 </div>
-            </div>
+                <div style={{height: '50px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px'}}>
+                     <AccordionIcon
+                        icon='angle down'
+                        width='20px'
+                        height='20px'
+                        onClick={() => this.handleMove('down')}
+                        disabled={selection === ''}
+                     />
+                     <AccordionIcon
+                        icon='angle up'
+                        width='20px'
+                        height='20px'
+                        style={{
+                            marginLeft: '7px'
+                        }}
+                        disabled={selection === ''}
+                        onClick={() => this.handleMove('up')}
+                     />
+                </div>
+            </div> 
         )
     }
 }

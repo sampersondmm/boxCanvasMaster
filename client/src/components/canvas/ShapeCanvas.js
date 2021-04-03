@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
 import {event, select} from 'd3-selection';
+import { transition } from 'd3-transition'
 import Common from '../../constants/common';
 import uuid from 'react-uuid';
 import {connect} from 'react-redux';
 import cloneDeep from 'lodash/cloneDeep';
+import { map } from 'lodash';
 
 class ShapeCanvas extends Component {
     /**
@@ -94,23 +96,56 @@ class ShapeCanvas extends Component {
     }
 
     setupCanvas = () => {
-        const { currentShape } = this.props;
+        const { currentShape, currentShapeType } = this.props;
         const { canvasWidth, canvasHeight } = this.props.canvasData;
         this.centerX = canvasWidth / 2;
         this.centerY = canvasHeight / 2;
 
-        select(this.node)
-            .selectAll('rect')
-            .data([currentShape.square])
-            .enter()
-            .append('rect')
-            .attr('class', 'stamp')
-            .attr('fill', obj => obj.color)
-            .attr('opacity', obj => obj.opacity)
-            .attr('width', obj => obj.width)
-            .attr('height', obj => obj.height)
-            .attr('x', obj => obj.posX)
-            .attr('y', obj => obj.posY)
+        switch(currentShapeType){
+            case Common.square:
+                select(this.node)
+                    .selectAll('rect')
+                    .data([currentShape.square])
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'stamp')
+                    .attr('fill', obj => obj.color)
+                    .attr('opacity', obj => obj.opacity)
+                    .attr('width', obj => obj.width)
+                    .attr('height', obj => obj.height)
+                    .attr('x', obj => obj.posX)
+                    .attr('y', obj => obj.posY)
+                break;
+            case Common.circle:
+                select(this.node)
+                    .selectAll('rect')
+                    .data([currentShape.circle])
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'stamp')
+                    .attr('fill', obj => obj.color)
+                    .attr('opacity', obj => obj.opacity)
+                    .attr('r', obj => obj.radius)
+                    .attr('cx', obj => obj.posX)
+                    .attr('cy', obj => obj.posY)
+                break;
+            case Common.line:
+                select(this.node)
+                    .selectAll('rect')
+                    .data([currentShape.square])
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'stamp')
+                    .attr('fill', obj => obj.color)
+                    .attr('opacity', obj => obj.opacity)
+                    .attr('width', obj => obj.width)
+                    .attr('height', obj => obj.height)
+                    .attr('x', obj => obj.posX)
+                    .attr('y', obj => obj.posY)
+                break;
+            default:
+                break;
+        }
 
         select(this.node)
             .on('mousemove', () => this.moveShape())
@@ -122,12 +157,22 @@ class ShapeCanvas extends Component {
 
     moveShape = () => {
         const { currentShapeType } = this.props;
+        const { selectedShape } = this.props.canvasData;
         const { square, line } = this.props.currentShape;
         const canvasElement = document.getElementById('canvas').getBoundingClientRect();
+
         const stamp = select(this.node)
             .select('.stamp');
         const lineStamp = select(this.node)
             .select('.line-stamp');
+
+        select(this.node)
+            .selectAll('.shape-highlight')
+            .remove();
+
+        stamp
+            .attr('opacity', 1)
+
         let newX = 0;
         let newY = 0;
 
@@ -264,67 +309,90 @@ class ShapeCanvas extends Component {
     }
 
     selectShape = (id) => {
-        const { type } = this.props.currentShape;
+        const { canvasWidth, canvasHeight } = this.props.canvasData
         select(this.node)
             .selectAll('.shape-highlight')
             .remove();
+
+        select(this.node)
+            .selectAll('.stamp')
+            .attr('opacity', '0')
 
         if(id !== ''){
             const selectedShape = select(this.node)
                 .selectAll('.shape')
                 .filter(obj => obj.id === id)
-            const shapeTransform = selectedShape.attr('transform')
             const shapeData = selectedShape.data();
-            if(shapeData[0].type === Common.square){
-                select(this.node)
-                    .selectAll('.shape-highlight')
-                    .data(shapeData)
-                    .enter()
-                    .append('rect')
-                    .attr('class', 'shape-highlight')
-                    .attr('fill', 'rgba(0,0,0,0)')
-                    .attr('stroke', 'yellow')
-                    .attr('stroke-width', '1')
-                    .attr('width', obj => obj.width)
-                    .attr('height', obj => obj.height)
-                    .attr('x', obj => obj.posX)
-                    .attr('y', obj => obj.posY)
-                    .attr('transform', shapeTransform);
 
-                select(this.node)
-                    .selectAll('.shape-highlight-animation')
-                    .data(shapeData)
-                    .enter()
-                    .append('rect')
-                    .attr('class', 'shape-highlight')
-                    .attr('fill', 'rgba(0,0,0,0)')
-                    .attr('stroke', 'yellow')
-                    .attr('stroke-width', '1')
-                    .attr('width', obj => obj.width)
-                    .attr('height', obj => obj.height)
-                    .attr('x', obj => obj.posX)
-                    .attr('y', obj => obj.posY)
-                    .attr('transform', shapeTransform)
+            switch(shapeData[0].type){
+                case Common.square:
+                    const shapeTransform = selectedShape.attr('transform')
+                    select(this.node)
+                        .selectAll('.shape-highlight')
+                        .data(shapeData)
+                        .enter()
+                        .append('rect')
+                        .attr('class', 'shape-highlight')
+                        .attr('fill', 'rgba(0,0,0,0)')
+                        .attr('stroke', 'yellow')
+                        .attr('stroke-width', '1')
+                        .attr('width', obj => obj.width)
+                        .attr('height', obj => obj.height)
+                        .attr('x', obj => obj.posX)
+                        .attr('y', obj => obj.posY)
+                        .attr('transform', shapeTransform);
 
-                // select(this.node)
-                //     .select('shape-highlight-animation')
-                //     .transition()
-                //     .duration(2000)
-                //     .attr('width', obj => obj.width + 50)
+                    const animation = select(this.node)
+                        .selectAll('.shape-highlight-animation')
+                        .data(shapeData)
+                        .enter()
+                        .append('rect')
+                        .attr('class', 'shape-highlight')
+                        .attr('fill', 'rgba(0,0,0,0)')
+                        .attr('stroke', 'yellow')
+                        .attr('stroke-width', '1')
+                        .attr('width', obj => obj.width)
+                        .attr('height', obj => obj.height)
+                        .attr('x', obj => obj.posX)
+                        .attr('y', obj => obj.posY)
+                        .attr('transform', shapeTransform)
 
-            } else {
-                select(this.node)
-                    .selectAll('.shape-highlight')
-                    .data(shapeData)
-                    .enter()
-                    .append('circle')
-                    .attr('class', 'shape-highlight')
-                    .attr('fill', 'rgba(0,0,0,0)')
-                    .attr('stroke', 'yellow')
-                    .attr('stroke-width', '1')
-                    .attr('r', obj => obj.radius)
-                    .attr('cx', obj => obj.posX)
-                    .attr('cy', obj => obj.posY)
+                    animation
+                        .transition()
+                        .duration(500)
+                        .attr('stroke', 'rgba(0,0,0,0)')
+                        .attr('transform', obj => `translate(-${obj.posX + (obj.width / 2)}, -${obj.posY + (obj.height / 2)}) scale(2)`)
+                        .remove()
+                    break;
+                case Common.circle:
+                    select(this.node)
+                        .selectAll('.shape-highlight')
+                        .data(shapeData)
+                        .enter()
+                        .append('circle')
+                        .attr('class', 'shape-highlight')
+                        .attr('fill', 'rgba(0,0,0,0)')
+                        .attr('stroke', 'yellow')
+                        .attr('stroke-width', '1')
+                        .attr('r', obj => obj.radius)
+                        .attr('cx', obj => obj.posX)
+                        .attr('cy', obj => obj.posY);
+                    break;
+                case Common.line:
+                    select(this.node)
+                        .selectAll('.shape-highlight')
+                        .data(shapeData[0].pointData)
+                        .enter()
+                        .append('circle')
+                        .attr('class', 'shape-highlight')
+                        .attr('fill', 'yellow')
+                        .attr('r', 5)
+                        .attr('cx', obj => obj.x)
+                        .attr('cy', obj => obj.y)
+
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -344,6 +412,8 @@ class ShapeCanvas extends Component {
                 shapeCopy = cloneDeep(square);
                 shapeCopy.posX = this.posX;
                 shapeCopy.posY = this.posY;
+                shapeCopy.originX = this.originX;
+                shapeCopy.originY = this.originY;
                 shapeCopy.id = uuid();
                 this.shapeArr.push(shapeCopy);
                 select(this.node)
@@ -409,9 +479,9 @@ class ShapeCanvas extends Component {
                     shapeCopy = cloneDeep(line);
                     shapeCopy.id = uuid();
                     shapeCopy.points = this.createPointString();
+                    shapeCopy.pointData = this.linePoints;
                     this.shapeArr.push(shapeCopy);
                     this.linePoints = [];
-                    this.closeShapeRange = false;
 
                     select(this.node)
                         .select('.line-stamp')
@@ -422,7 +492,7 @@ class ShapeCanvas extends Component {
                         .data(this.shapeArr)
                         .enter()
                         .append('path')
-                        .attr('class', '.shape')
+                        .attr('class', 'shape')
                         .attr('stroke', line.stroke)
                         .attr('fill', line.fill)
                         .attr('stroke-width', line.strokeWidth)
@@ -461,6 +531,7 @@ class ShapeCanvas extends Component {
         if(currentShapeType === Common.line){
             if(this.closeShapeRange){
                 this.props.addShape(shapeCopy);
+                this.closeShapeRange = false;
             }
         } else {
             this.props.addShape(shapeCopy);
@@ -477,7 +548,7 @@ class ShapeCanvas extends Component {
                 points = points.concat(` L ${point.x} ${point.y}`)
             }
         }
-        points = points.concat(` L ${firstPoint.x} ${firstPoint.y} Z`)
+        points = points.concat(` Z`)
         return points;
     }
 

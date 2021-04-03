@@ -12,6 +12,7 @@
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
     "d3-selection": "^1.4.1",
+    "d3-transition": "^2.0.0",
     "eslint-plugin-react": "^7.20.0",
     "font-awesome": "^4.7.0",
     "jwt-decode": "^2.2.0",
