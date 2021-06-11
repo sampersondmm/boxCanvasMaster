@@ -68,80 +68,82 @@ class ShapeSizeCard extends Component {
         const { sizeIncrement, radiusIncrement } = this.state;
         const { currentShape, currentShapeType } = this.props;
         const { square, circle } = currentShape;
-        if(currentShapeType === Common.square){
-            return (
-                <Menu.Menu inverted={inverted} vertical >
-                    <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
-                        <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('down')}/>
-                        <Menu.Header style={{margin: '0'}}>{Common.width}</Menu.Header>
-                        <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('up')}/>
-                    </Menu.Item>
-                    <Menu.Item>
-                        <Input
-                            inverted={inverted}
-                            type='number'
-                            value={square.width}
-                            onChange={(e, data) => this.handleSizeChange(data, Common.width)}
-                            placeholder='Width...'
-                        />
-                    </Menu.Item>
-                    <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
-                        <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementHeight('down')}/>
-                        <Menu.Header style={{margin: '0'}}>{Common.height}</Menu.Header>
-                        <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementHeight('up')}/>
-                    </Menu.Item>
-                    <Menu.Item>
-                        <Input
-                            inverted={inverted}
-                            type='number'
-                            value={square.height}
-                            onChange={(e, data) => this.handleSizeChange(data, Common.height)}
-                            placeholder='Height...'
-                        />
-                    </Menu.Item>
-                    <Menu.Item>
-                        <Menu.Header>Increment</Menu.Header>
+        switch(currentShapeType){
+            case Common.square:
+                return (
+                    <Menu.Menu inverted={inverted} vertical >
+                        <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
+                            <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('down')}/>
+                            <Menu.Header style={{margin: '0'}}>{Common.width}</Menu.Header>
+                            <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('up')}/>
+                        </Menu.Item>
+                        <Menu.Item>
                             <Input
                                 inverted={inverted}
                                 type='number'
-                                value={sizeIncrement}
-                                onChange={(e, data) => this.handleChangeSizeIncrement(data)}
-                                placeholder='Increment...'
+                                value={square.width}
+                                onChange={(e, data) => this.handleSizeChange(data, Common.width)}
+                                placeholder='Width...'
                             />
-                    </Menu.Item>
-                </Menu.Menu>
-            )
-        } else if (currentShapeType === Common.circle) {
-            return (
-                <Menu.Menu inverted={inverted} vertical >
-                    <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
-                        <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementRadius('down')}/>
-                        <Menu.Header style={{margin: '0'}}>{Common.radius}</Menu.Header>
-                        <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementRadius('up')}/>
-                    </Menu.Item>
-                    <Menu.Item>
-                        <Input
-                            inverted={inverted}
-                            type='number'
-                            value={circle.radius}
-                            onChange={(e, data) => this.handleSizeChange(data, Common.radius)}
-                            placeholder='Radius...'
-                        />
-                    </Menu.Item>
-                    <Menu.Item>
-                        <Menu.Header>Increment</Menu.Header>
+                        </Menu.Item>
+                        <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
+                            <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementHeight('down')}/>
+                            <Menu.Header style={{margin: '0'}}>{Common.height}</Menu.Header>
+                            <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementHeight('up')}/>
+                        </Menu.Item>
+                        <Menu.Item>
                             <Input
                                 inverted={inverted}
                                 type='number'
-                                value={radiusIncrement}
-                                onChange={(e, data) => this.handleChangeRadiusIncrement(data)}
-                                placeholder='Increment...'
+                                value={square.height}
+                                onChange={(e, data) => this.handleSizeChange(data, Common.height)}
+                                placeholder='Height...'
                             />
-                    </Menu.Item>
-                </Menu.Menu>
-            )
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Menu.Header>Increment</Menu.Header>
+                                <Input
+                                    inverted={inverted}
+                                    type='number'
+                                    value={sizeIncrement}
+                                    onChange={(e, data) => this.handleChangeSizeIncrement(data)}
+                                    placeholder='Increment...'
+                                />
+                        </Menu.Item>
+                    </Menu.Menu>
+                )
+            case Common.circle:
+                return (
+                    <Menu.Menu inverted={inverted} vertical >
+                        <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
+                            <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementRadius('down')}/>
+                            <Menu.Header style={{margin: '0'}}>{Common.radius}</Menu.Header>
+                            <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementRadius('up')}/>
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Input
+                                inverted={inverted}
+                                type='number'
+                                value={circle.radius}
+                                onChange={(e, data) => this.handleSizeChange(data, Common.radius)}
+                                placeholder='Radius...'
+                            />
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Menu.Header>Increment</Menu.Header>
+                                <Input
+                                    inverted={inverted}
+                                    type='number'
+                                    value={radiusIncrement}
+                                    onChange={(e, data) => this.handleChangeRadiusIncrement(data)}
+                                    placeholder='Increment...'
+                                />
+                        </Menu.Item>
+                    </Menu.Menu>
+                )
+            default:
+                return <div>N/A</div>
         }
-        return <div>N/A</div>
     }
 
     render(){

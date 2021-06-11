@@ -35,7 +35,7 @@ class ShapeTypeCard extends Component {
         const { inverted } = this.props;
         const backgroundColor = !inverted ? 'rgb(50,50,50)' : 'rgb(220,220,220)'
         return (
-            <Carousel itemsToShow={2} renderArrow={this.renderArrow}>
+            <Carousel itemsToShow={3} renderArrow={this.renderArrow}>
                 <div style={{width: '30px', height: '30px', backgroundColor}} onClick={() => this.changeShapeType(Common.square)}></div>
                 <div style={{width: '30px', height: '30px', borderRadius: '50%', backgroundColor}} onClick={() => this.changeShapeType(Common.circle)}></div>
                 <div style={{width: '30px', height: '30px', display: 'flex', alignItems: 'center'}} onClick={() => this.changeShapeType(Common.line)}>

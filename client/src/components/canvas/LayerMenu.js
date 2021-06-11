@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Common from '../../constants/common';
 import Size from '../../constants/size';
-import {changeShapeColor, selectShape, changeBackgroundColor} from '../../actions/canvasActions';
+import {changeShapeFill, selectShape, changeBackgroundColor} from '../../actions/canvasActions';
 import map from 'lodash/map';
 
 class LayerMenu extends Component {
@@ -40,7 +40,7 @@ class LayerMenu extends Component {
     }
     handleColorChange(value, color) {
         if(this.state.status === Common.shape){
-            this.props.dispatch(changeShapeColor(color));
+            this.props.dispatch(changeShapeFill(color));
         } else {
             this.props.dispatch(changeBackgroundColor(color));
         }

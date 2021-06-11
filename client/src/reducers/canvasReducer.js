@@ -1,7 +1,7 @@
 import ActionTypes from "../actions/ActionTypes";
 import Common from '../constants/common';
 import uuid from 'react-uuid';
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep, filter, indexOf } from 'lodash';
 import { updateCurrentShape } from "../utils/canvasUtils";
 
 const DEFAULT_STATE = {
@@ -26,7 +26,8 @@ const DEFAULT_STATE = {
     square: {
       id: '',
       type: Common.square,
-      color: 'rgba(106, 184, 197, 0.8)',
+      fill: 'rgba(106, 184, 197, 0.8)',
+      stroke: 'rgba(0,0,0,0)',
       posX: 0,
       posY: 0,
       width: 60,
@@ -36,7 +37,8 @@ const DEFAULT_STATE = {
     circle: {
       id: '',
       type: Common.circle,
-      color: 'rgba(106, 184, 197, 0.8)',
+      fill: 'rgba(106, 184, 197, 0.8)',
+      stroke: 'rgba(0,0,0,0)',
       posX: 0,
       posY: 0,
       radius: 30,
@@ -46,7 +48,7 @@ const DEFAULT_STATE = {
       type: Common.line,
       stroke: 'rgba(106, 184, 197, 0.8)',
       strokeWidth: 2,
-      fill: 'transparent',
+      fill: 'rgba(0,0,0,0)',
       completed: false,
       points: 'M 100 100'
     },
@@ -179,6 +181,19 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
           selectedShape: payload
         }
       }
+    case ActionTypes.REMOVE_SHAPE:
+      const listAfterRemove = filter(state.canvasData.shapeList, (shape) => {
+        if(shape.id !== payload){
+          return shape;
+        } 
+      })
+      return {
+        ...state,
+        canvasData: {
+          ...state.canvasData,
+          shapeList: listAfterRemove,
+        }
+      }
 
     //Current shape data
     case ActionTypes.CHANGE_SHAPE_WIDTH: 
@@ -230,12 +245,23 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         currentShapeType: payload.type
     }
-    case ActionTypes.CHANGE_SHAPE_COLOR:
+    case ActionTypes.CHANGE_SHAPE_FILL:
       updatedShape = updateCurrentShape(
         state.currentShape, 
         state.currentShapeType,
-        'color',
-        payload.color
+        'fill',
+        payload.fill
+      )
+      return {
+        ...state,
+        currentShape: updatedShape
+      }
+    case ActionTypes.CHANGE_SHAPE_STROKE:
+      updatedShape = updateCurrentShape(
+        state.currentShape, 
+        state.currentShapeType,
+        'stroke',
+        payload.stroke
       )
       return {
         ...state,

@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import { Menu, Tab, Accordion, Header, Label } from 'semantic-ui-react';
 import {connect} from 'react-redux'
 import Common from '../../../constants/common';
-import without from 'lodash/without';
-import { selectShape } from '../../../actions/canvasActions';
+import { without, indexOf, find } from 'lodash';
+import { selectShape, removeShape } from '../../../actions/canvasActions';
 import Aux from '../../../utils/Aux';
 import AccordionIcon from '../../AccordionIcon';
 
@@ -12,10 +12,21 @@ class LayerMenu extends Component {
         super(props);
         this.state = {
             openList: [],
-            selection: ''
+            selection: '',
+            selectionIndex: null,
         }
 
     }
+
+    componentDidUpdate(prevProps){
+        if(this.props.selectedShape !== prevProps.selectedShape){
+            this.setState((state) => ({
+                ...state,
+                selection: this.props.selectedShape
+            }))
+        }
+    }
+
     handleOpen = (id) => {
         this.setState(state => {
             const indexIncluded = state.openList.includes(id);
@@ -30,14 +41,33 @@ class LayerMenu extends Component {
             }
         })
     }
-    handleSelect = (newSelection) => {
+
+    handleSelect = (newSelection, index) => {
         const selection = newSelection === this.state.selection ? '' : newSelection
         this.props.dispatch(selectShape(selection));
         this.setState(state => ({
             ...state,
-            selection
-        }))
+            selection,
+            selectionIndex: index,
+        }));
     }
+
+    handleRemove = async (selection) => {
+        const { selectionIndex } = this.state;
+        await this.props.dispatch(removeShape(selection));
+        const nextShape = this.props.shapeList[selectionIndex];
+        const prevShape = this.props.shapeList[selectionIndex - 1];
+        if(nextShape){
+            this.props.dispatch(selectShape(nextShape.id))
+        } else if (prevShape) {
+            this.props.dispatch(selectShape(prevShape.id))
+            this.setState(state => ({
+                ...state,
+                selectionIndex: selectionIndex - 1
+            }))
+        }
+    }
+
     createShapeItem = (shape) => {
         const type = shape.type;
         switch(type){
@@ -104,6 +134,7 @@ class LayerMenu extends Component {
                 return;
         }
     }
+
     determineShapeDisplay = (shape) => {
         switch(shape.type){
             case Common.square:
@@ -138,6 +169,7 @@ class LayerMenu extends Component {
                 break;
         }
     }
+
     createShapeList = () => {
         const { shapeList, inverted } = this.props;
         const { openList, selection } = this.state;
@@ -169,7 +201,7 @@ class LayerMenu extends Component {
                                 width='15px'
                                 height='15px'
                                 disabled={false}
-                                onClick={() => this.handleSelect(shape.id)}
+                                onClick={() => this.handleSelect(shape.id, index)}
                                 color='teal'
                                 hideIcon={selection !== shape.id}
                                 icon='check'
@@ -184,6 +216,7 @@ class LayerMenu extends Component {
         })
         return newList;
     }
+
     render(){
         const { inverted, modal } = this.props;
         const wrapHeight = modal ? '433px' : 'calc(100vh - 90px)';
@@ -203,14 +236,24 @@ class LayerMenu extends Component {
                     </Tab.Pane>
                 </div>
                 <div style={{height: '50px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px'}}>
-                     <AccordionIcon
+                    <AccordionIcon
+                        icon='trash'
+                        width='20px'
+                        height='20px'
+                        onClick={() => this.handleRemove(selection)}
+                        disabled={selection === ''}
+                    />
+                    <AccordionIcon
                         icon='angle down'
                         width='20px'
                         height='20px'
+                        style={{
+                            marginLeft: '7px'
+                        }}
                         onClick={() => this.handleMove('down')}
                         disabled={selection === ''}
-                     />
-                     <AccordionIcon
+                    />
+                    <AccordionIcon
                         icon='angle up'
                         width='20px'
                         height='20px'
@@ -219,17 +262,19 @@ class LayerMenu extends Component {
                         }}
                         disabled={selection === ''}
                         onClick={() => this.handleMove('up')}
-                     />
+                    />
                 </div>
             </div> 
         )
     }
+
 }
 
 const mapStateToProps = state => {
-    const { collectionList, currentShape } = state.canvas;
+    const { collectionList, currentShape, canvasData } = state.canvas;
     return {
         collectionList,
+        selectedShape: canvasData.selectedShape,
         currentShape
     }
 }

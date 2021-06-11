@@ -51,11 +51,19 @@ changeShapeType = type => {
         }
     }
 },
-changeShapeColor = color => {
+changeShapeFill = fill => {
     return {
-        type: ActionTypes.CHANGE_SHAPE_COLOR,
+        type: ActionTypes.CHANGE_SHAPE_FILL,
         payload: {
-            color
+            fill
+        }
+    }
+},
+changeShapeStroke = stroke => {
+    return {
+        type: ActionTypes.CHANGE_SHAPE_STROKE,
+        payload: {
+            stroke
         }
     }
 },
@@ -119,6 +127,12 @@ selectShape = (id) => {
         payload: id
     }
 },
+removeShape = (id) => {
+    return {
+        type: ActionTypes.REMOVE_SHAPE,
+        payload: id
+    }
+},
 removeColorFromPalette = newColorPalette => {
     return {
         type: ActionTypes.REPLACE_PALETTE,
@@ -162,7 +176,8 @@ export {
     addShapeToCollection, 
     createCollection,
     changeShapeType, 
-    changeShapeColor,
+    changeShapeFill,
+    changeShapeStroke,
     changeShapeOpacity, 
     changeShapeWidth, 
     changeShapeRotation,
@@ -172,6 +187,7 @@ export {
     changeShapeHeight, 
     changeShapeRadius, 
     selectShape, 
+    removeShape,
     changeBackgroundColor, 
     addColorToPalette, 
     clearCanvasData,

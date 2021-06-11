@@ -32,8 +32,7 @@ class PanelButton extends Component {
         const { icon, fa, onClick } = this.props;
          return (
             <Popup
-                style={{margin: '0', borderRadius: '0', height: '40px', display: 'flex', padding: '0', alignItems: 'center', justifyContent: 'center', border: '1px solid green'}}
-                basic
+                inverted
                 trigger={
                     <Menu.Item onClick={onClick}>
                         {fa ? (
@@ -43,7 +42,7 @@ class PanelButton extends Component {
                         )}
                     </Menu.Item>
                 }
-                content={<div style={{border: '1px solid black', margin: '0'}}>{this.props.tooltip}</div>}
+                content={<div>{this.props.tooltip}</div>}
                 position='right center'
             />
         )
