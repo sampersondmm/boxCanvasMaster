@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import { Menu } from 'semantic-ui-react';
+import { Menu, Input, Icon } from 'semantic-ui-react';
 import ColorPicker from '../../ColorPicker';
 import AccordionCard from '../../../AccordionCard';
 import { 
-    changeShapeFill,
-    changeBackgroundColor
+    changeShapeStroke,
+    changeShapeStrokeWidth
 } from '../../../../actions/canvasActions';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
@@ -13,11 +13,9 @@ class ShapeColorCard extends Component {
     constructor(props){
         super(props);
         this.state = {
-            shapeFillValue: '',
-            backgroundColorValue: '',
-            shapeFillOpen: false,
-            fillColorOpen: false,
-            backgroundColorOpen: false
+            strokeColorValue: '',
+            strokeColor: '',
+            strokeColorOpen: false,
         }
         this.style = {
             colorIcon: {
@@ -28,20 +26,29 @@ class ShapeColorCard extends Component {
             }
         }
     }
+    
+    handleStrokeWidthChange = (data) => {
+        const value = parseInt(data.value, 10);
+        this.props.dispatch(changeShapeStrokeWidth(value))
+    }
+
+    incrementStrokeWidth = (value) => {
+        const { currentShapeType, currentShape } = this.props;
+        const shape = currentShape[currentShapeType.toLowerCase()];
+        const newValue = value === 'down' ? (shape.strokeWidth - 1 <= 0 ? 0 : shape.strokeWidth - 1) : shape.strokeWidth + 1;
+        this.props.dispatch(changeShapeStrokeWidth(newValue))
+    }
 
     handleColorChange = (value, color) => {
-        const { shapeFillOpen } = this.state;
+        const { strokeColorOpen } = this.state;
         const rgbString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`
-        if(shapeFillOpen){
-            this.props.dispatch(changeShapeFill(rgbString));
-        } else {
-            this.props.dispatch(changeBackgroundColor(rgbString));
-        }
+        if(strokeColorOpen){
+            this.props.dispatch(changeShapeStroke(rgbString));
+        } 
         this.setState(state => ({
             ...state, 
             dirty: true,
-            shapeFillValue: state.shapeFillOpen ? value : state.shapeFillValue,
-            backgroundColorValue: state.backgroundColorOpen ? value : state.backgroundColorValue,
+            strokeColorValue: state.strokeColorOpen ? value : state.strokeColorValue,
             value
         }));
     }
@@ -56,21 +63,11 @@ class ShapeColorCard extends Component {
 
     toggleColorPicker = (type, value) => {
         this.setState((state) => {
-            let { shapeFillOpen, backgroundColorOpen } = this.state;
-            switch(type){
-                case Common.shapeFill:
-                    shapeFillOpen = value;
-                    break;
-                case Common.background:
-                    backgroundColorOpen = value;
-                    break;
-                default:
-                    break
-            }
+            let { strokeColorOpen } = this.state;
+            strokeColorOpen = value
             return {
                 ...state,
-                shapeFillOpen,
-                backgroundColorOpen
+                strokeColorOpen
             }
         })
     }
@@ -109,14 +106,27 @@ class ShapeColorCard extends Component {
     }
 
     cardShapeContent = () => {
-        const { shapeFillOpen, backgroundColorOpen, shapeFillValue, backgroundColorValue } = this.state;
-        const { inverted, currentShape, currentShapeType, selectedShape } = this.props;
-        const { backgroundColor } = this.props.canvasData;
-        const shapeFill = selectedShape ? selectedShape.fill : currentShape[currentShapeType.toLowerCase()].fill;
+        const { strokeColorOpen, strokeColorValue } = this.state;
+        const { inverted, currentShape, currentShapeType } = this.props;
+        const strokeColor = currentShape[currentShapeType.toLowerCase()].stroke;
+        const strokeWidth = currentShape[currentShapeType.toLowerCase()].strokeWidth;
         return (
             <Menu.Menu inverted={inverted} vertical>
-                {this.contentRow(Common.shapeFill, shapeFill, shapeFillValue, shapeFillOpen)}
-                {this.contentRow(Common.background, backgroundColor, backgroundColorValue, backgroundColorOpen)}
+                {this.contentRow(Common.strokeColor, strokeColor, strokeColorValue, strokeColorOpen)}
+                <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
+                    <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementStrokeWidth('down')}/>
+                    <Menu.Header style={{margin: '0'}}>{Common.strokeWidth}</Menu.Header>
+                    <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementStrokeWidth('up')}/>
+                </Menu.Item>
+                <Menu.Item>
+                    <Input
+                        inverted={inverted}
+                        type='number'
+                        value={strokeWidth}
+                        onChange={(e, data) => this.handleStrokeWidthChange(data)}
+                        placeholder='Stoke Width'
+                    />
+                </Menu.Item>
             </Menu.Menu>
         )
     }
@@ -130,7 +140,7 @@ class ShapeColorCard extends Component {
                 handleSelect={handleSelect}
                 handleOpen={this.props.handleOpen}
                 index={2}
-                header={Common.color}
+                header={Common.stroke}
                 content={this.cardShapeContent()}
             />
         )
@@ -139,12 +149,10 @@ class ShapeColorCard extends Component {
 
 const mapStateToProps = (state) => {
     const { currentShape, canvasData, currentShapeType } = state.canvas;
-    const { selectedShape } = state.canvas.canvasData;
     return {
         canvasData,
         currentShape,
-        currentShapeType,
-        selectedShape
+        currentShapeType
     }
 }
 

@@ -6,7 +6,7 @@ import Common from '../../constants/common';
 import uuid from 'react-uuid';
 import {connect} from 'react-redux';
 import cloneDeep from 'lodash/cloneDeep';
-import { map } from 'lodash';
+import { map, filter } from 'lodash';
 
 class ShapeCanvas extends Component {
     /**
@@ -31,7 +31,7 @@ class ShapeCanvas extends Component {
     }
 
     componentDidUpdate(prevProps){
-        const { selectedShape, shapeList } = this.props.canvasData;
+        const { selectedShapeId, shapeList } = this.props.canvasData;
         const { currentShapeType, currentShape } = this.props;
         const { square, circle, line } = currentShape;
 
@@ -52,6 +52,9 @@ class ShapeCanvas extends Component {
                 if(square.stroke !== prevProps.currentShape.square.stroke){
                     this.changeShapeStroke(square.stroke)
                 }
+                if(square.strokeWidth !== prevProps.currentShape.square.strokeWidth){
+                    this.changeShapeStrokeWidth(square.strokeWidth)
+                }
                 if(square.opacity !== prevProps.currentShape.square.opacity){
                     this.changeShapeOpacity(square.opacity)
                 }
@@ -67,6 +70,9 @@ class ShapeCanvas extends Component {
                 if(circle.stroke !== prevProps.currentShape.circle.stroke){
                     this.changeShapeStroke(circle.stroke)
                 }
+                if(circle.strokeWidth !== prevProps.currentShape.circle.strokeWidth){
+                    this.changeShapeStrokeWidth(circle.strokeWidth)
+                }
                 if(circle.opacity !== prevProps.currentShape.circle.opacity){
                     this.changeShapeOpacity(circle.opacity)
                 }
@@ -76,20 +82,23 @@ class ShapeCanvas extends Component {
                 if(line.stroke !== prevProps.currentShape.line.stroke){
                     this.changeShapeStroke(line.stroke)
                 }
+                if(line.strokeWidth !== prevProps.currentShape.line.strokeWidth){
+                    this.changeShapeStrokeWidth(line.strokeWidth)
+                }
                 break;
             default:
                 break;
         }
         if(shapeList !== prevProps.canvasData.shapeList){
             if(shapeList.length < prevProps.canvasData.shapeList.length){
-                this.removeShape(selectedShape);
+                this.removeShape(selectedShapeId);
             }
         }
         if(currentShapeType !== prevProps.currentShapeType){
             this.changeShapeType(currentShapeType)
         }
-        if(selectedShape !== prevProps.canvasData.selectedShape){
-            this.selectShape(selectedShape)
+        if(selectedShapeId !== prevProps.canvasData.selectedShapeId){
+            this.selectShape(selectedShapeId)
         }
     }
 
@@ -125,6 +134,8 @@ class ShapeCanvas extends Component {
                     .append('rect')
                     .attr('class', 'stamp')
                     .attr('fill', obj => obj.fill)
+                    .attr('stroke', obj => obj.stroke)
+                    .attr('stroke-width', obj => obj.strokeWidth)
                     .attr('opacity', obj => obj.opacity)
                     .attr('width', obj => obj.width)
                     .attr('height', obj => obj.height)
@@ -171,8 +182,8 @@ class ShapeCanvas extends Component {
     }
 
     moveShape = () => {
-        const { currentShapeType } = this.props;
-        const { selectedShape } = this.props.canvasData;
+        const { currentShapeType, currentShape } = this.props;
+        const { selectedShapeId } = this.props.canvasData;
         const { square, line } = this.props.currentShape;
         const canvasElement = document.getElementById('canvas').getBoundingClientRect();
 
@@ -185,8 +196,11 @@ class ShapeCanvas extends Component {
             .selectAll('.shape-highlight')
             .remove();
 
-        if(selectedShape){
+        if(selectedShapeId){
             this.props.dispatch(selectShape(''))
+        } else {
+            stamp
+                .attr('opacity', currentShape.opacity)
         }
 
         let newX = 0;
@@ -217,7 +231,6 @@ class ShapeCanvas extends Component {
                     .attr('cy', () => (newY) * this.scalePosY);
                 break;
             case Common.line:
-                let closeShape = false;
                 const firstPoint = this.linePoints[0];
                 newX = event.x - canvasElement.left;
                 newY = event.y - canvasElement.top;
@@ -326,7 +339,6 @@ class ShapeCanvas extends Component {
     }
 
     selectShape = (id) => {
-        const { canvasWidth, canvasHeight } = this.props.canvasData
         select(this.node)
             .selectAll('.shape-highlight')
             .remove();
@@ -336,14 +348,14 @@ class ShapeCanvas extends Component {
             .attr('opacity', '0')
 
         if(id !== ''){
-            const selectedShape = select(this.node)
+            const selectedShapeId = select(this.node)
                 .selectAll('.shape')
                 .filter(obj => obj.id === id)
-            const shapeData = selectedShape.data();
+            const shapeData = selectedShapeId.data();
 
             switch(shapeData[0].type){
                 case Common.square:
-                    const shapeTransform = selectedShape.attr('transform')
+                    const shapeTransform = selectedShapeId.attr('transform')
                     select(this.node)
                         .selectAll('.shape-highlight')
                         .data(shapeData)
@@ -394,6 +406,9 @@ class ShapeCanvas extends Component {
     }
 
     removeShape = (id) => {
+
+        this.shapeArr = this.shapeArr.filter(shape => shape.id !== id);
+
         select(this.node)
             .selectAll('.shape')
             .filter((obj) => obj.id === id)
@@ -430,6 +445,8 @@ class ShapeCanvas extends Component {
                     .append('rect')
                     .attr('class', 'shape')
                     .attr('fill', obj => obj.fill)
+                    .attr('stroke', obj => obj.stroke)
+                    .attr('stroke-width', obj => obj.strokeWidth)
                     .attr('opacity', obj => obj.opacity)
                     .attr('width', obj => obj.width)
                     .attr('height', obj => obj.height)
@@ -444,6 +461,8 @@ class ShapeCanvas extends Component {
                     .append('rect')
                     .attr('class', 'stamp')
                     .attr('fill', obj => obj.fill)
+                    .attr('stroke', obj => obj.stroke)
+                    .attr('stroke-width', obj => obj.strokeWidth)
                     .attr('opacity', obj => obj.opacity)
                     .attr('width', obj => obj.width)
                     .attr('height', obj => obj.height)
@@ -464,6 +483,8 @@ class ShapeCanvas extends Component {
                     .append('circle')
                     .attr('class', 'shape')
                     .attr('fill', obj => obj.fill)
+                    .attr('stroke', obj => obj.stroke)
+                    .attr('stroke-width', obj => obj.strokeWidth)
                     .attr('opacity', obj => obj.opacity)
                     .attr('r', obj => obj.radius)
                     .attr('cx', this.posX)
@@ -476,6 +497,8 @@ class ShapeCanvas extends Component {
                     .append('circle')
                     .attr('class', 'stamp')
                     .attr('fill', obj => obj.fill)
+                    .attr('stroke', obj => obj.stroke)
+                    .attr('stroke-width', obj => obj.strokeWidth)
                     .attr('opacity', obj => obj.opacity)
                     .attr('r', obj => obj.radius)
                     .attr('cx', this.posX)
@@ -633,13 +656,50 @@ class ShapeCanvas extends Component {
 
     changeShapeStroke = (newStroke) => {
         const {currentShapeType} = this.props;
-        if(currentShapeType === Common.line){
-            select(this.node)
-                .selectAll('.stamp')
-                .attr('fill', newStroke)
-            select(this.node)
-                .selectAll('.line-stamp')
-                .attr('stroke', newStroke)
+        switch(currentShapeType){
+            case Common.square:
+                select(this.node)
+                    .selectAll('.stamp')
+                    .attr('stroke', newStroke)
+                break;
+            case Common.circle:
+                select(this.node)
+                    .selectAll('.stamp')
+                    .attr('stroke', newStroke)
+                break;
+            case Common.line:
+                select(this.node)
+                    .selectAll('.stamp')
+                    .attr('fill', newStroke)
+                select(this.node)
+                    .selectAll('.line-stamp')
+                    .attr('stroke', newStroke);
+                break;
+            default:
+                break;    
+        }
+    }
+
+    changeShapeStrokeWidth = (newWidth) => {
+        const {currentShapeType} = this.props;
+        switch(currentShapeType){
+            case Common.square:
+                select(this.node)
+                    .selectAll('.stamp')
+                    .attr('stroke-width', newWidth)
+                break;
+            case Common.circle:
+                select(this.node)
+                    .selectAll('.stamp')
+                    .attr('stroke-width', newWidth)
+                break;
+            case Common.line:
+                select(this.node)
+                    .selectAll('.line-stamp')
+                    .attr('stroke-width', newWidth);
+                break;
+            default:
+                break;    
         }
     }
     
@@ -667,6 +727,8 @@ class ShapeCanvas extends Component {
                     .append('rect')
                     .attr('class', 'stamp')
                     .attr('fill', obj => obj.fill)
+                    .attr('stroke', obj => obj.stroke)
+                    .attr('stroke-width', obj => obj.strokeWidth)
                     .attr('width', obj => obj.width)
                     .attr('opacity', obj => obj.opacity)
                     .attr('height', obj => obj.height)
@@ -681,6 +743,8 @@ class ShapeCanvas extends Component {
                     .append('circle')
                     .attr('class', 'stamp')
                     .attr('fill', obj => obj.fill)
+                    .attr('stroke', obj => obj.stroke)
+                    .attr('stroke-width', obj => obj.strokeWidth)
                     .attr('opacity', obj => obj.opacity)
                     .attr('r', obj => obj.radius)
                     .attr('cx', obj => obj.posX * this.scalePosX)

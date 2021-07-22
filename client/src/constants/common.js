@@ -8,6 +8,8 @@ const Common = {
     shape: 'Shape',
     shapeFill: 'Shape Fill',
     shapeStroke: 'Shape Stroke',
+    strokeColor: 'Stroke Color',
+    strokeWidth: 'Stroke Width',
     display: 'Display',
     shapes: 'Shapes',
     background: 'Background',
@@ -34,7 +36,9 @@ const Common = {
     line: 'Line',
     stroke: 'Stroke',
     strokeWidth: 'Stroke Width',
-    numberOfPoints: 'Number of Points'
+    numberOfPoints: 'Number of Points',
+    createShape: 'Create Shape',
+    editShape: 'Edit Shape'
 }
 
 export default Common;

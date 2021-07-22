@@ -19,10 +19,10 @@ class LayerMenu extends Component {
     }
 
     componentDidUpdate(prevProps){
-        if(this.props.selectedShape !== prevProps.selectedShape){
+        if(this.props.selectedShapeId !== prevProps.selectedShapeId){
             this.setState((state) => ({
                 ...state,
-                selection: this.props.selectedShape
+                selection: this.props.selectedShapeId
             }))
         }
     }
@@ -125,7 +125,7 @@ class LayerMenu extends Component {
                             {Common.strokeWidth}
                         </Menu.Item>
                         <Menu.Item >
-                            <Label color='teal'>{shape.points.length}</Label>
+                            <Label color='teal'>{shape.pointData.length}</Label>
                             {Common.numberOfPoints}
                         </Menu.Item>
                     </Aux>
@@ -274,7 +274,7 @@ const mapStateToProps = state => {
     const { collectionList, currentShape, canvasData } = state.canvas;
     return {
         collectionList,
-        selectedShape: canvasData.selectedShape,
+        selectedShapeId: canvasData.selectedShapeId,
         currentShape
     }
 }

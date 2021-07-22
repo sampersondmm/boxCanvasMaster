@@ -7,6 +7,7 @@ import ShapeSizeCard from './shapeCards/ShapeSizeCard';
 import ShapeColorCard from './shapeCards/ShapeColorCard';
 import ShapeTypeCard from './shapeCards/ShapeTypeCard';
 import ShapeRotationCard from './shapeCards/ShapeRotationCard';
+import ShapeStrokeCard from './shapeCards/ShapeStrokeCard';
 import AccordionIcon from '../../AccordionIcon';
 import findIndex from 'lodash/findIndex';
 
@@ -21,6 +22,7 @@ class ShapeMenu extends Component {
                 Common.type,
                 Common.color,
                 Common.size,
+                Common.stroke,
                 Common.rotation
             ],
             tabOpen: {
@@ -28,13 +30,14 @@ class ShapeMenu extends Component {
                 type: true,
                 color: true,
                 size: true,
+                stroke: true,
                 rotation: true
             },
         }
     }
     toggleAccordian = (selectedTab) => {
         this.setState(state => {
-            let { display, type, color, size, rotation } = state.tabOpen;
+            let { display, type, color, size, stroke, rotation } = state.tabOpen;
             switch(selectedTab){
                 case Common.display:
                     display = !display;
@@ -47,6 +50,9 @@ class ShapeMenu extends Component {
                     break;
                 case Common.size:
                     size = !size;
+                    break;
+                case Common.stroke:
+                    stroke = !stroke;
                     break;
                 case Common.rotation:
                     rotation = !rotation;
@@ -61,6 +67,7 @@ class ShapeMenu extends Component {
                     type,
                     color,
                     size,
+                    stroke,
                     rotation
                 }
             }
@@ -147,6 +154,16 @@ class ShapeMenu extends Component {
                             inverted={isInverted}
                         />
                     )  
+                case Common.stroke:
+                    return (
+                        <ShapeStrokeCard
+                            open={tabOpen.stroke}
+                            selection={selection}
+                            handleSelect={() => this.handleSelect(Common.stroke)}
+                            handleOpen={() => this.toggleAccordian(Common.stroke)}
+                            inverted={isInverted}
+                        />
+                    )
                 case Common.rotation:
                     if(currentShapeType === Common.square){
                         return (
@@ -167,16 +184,17 @@ class ShapeMenu extends Component {
         return listArr;
     }
     render(){
-        const { modal, inverted } = this.props;
+        const { modal, inverted, selectedShapeId } = this.props;
         const { selection } = this.state;
         const wrapHeight = modal ? '433px' : 'calc(100vh - 90px)';
         const scrollHeight = 'calc(100vh - 180px)';
         const scrollClass = modal ? 'scrollbar' : 'scrollbar-inverted'
+        const title = selectedShapeId ? Common.editShape : Common.createShape;
     
         return (
             <div style={{height: wrapHeight, overflow: 'hidden'}}>
                 <div style={{height: '40px', display: 'flex', alignItems: 'center', paddingLeft: '10px'}}>
-                    <Header style={{ color: 'white', margin: '0'}}>Create Shape</Header>
+                    <Header style={{ color: 'white', margin: '0'}}>{title}</Header>
                 </div>
                 <div className={`${scrollClass} tab-pane-wrap`} style={{height: scrollHeight, overflowY: 'scroll'}}>
                     <Tab.Pane inverted={inverted} style={{padding: '0', border: '0', display: 'flex', justifyContent: 'center', margin: '0'}}>
@@ -211,8 +229,10 @@ class ShapeMenu extends Component {
 
 const mapStateToProps = state => {
     const { currentShapeType } = state.canvas;
+    const { selectedShapeId } = state.canvas.canvasData
     return {
-        currentShapeType
+        currentShapeType,
+        selectedShapeId
     }
 }
 

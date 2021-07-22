@@ -107,6 +107,14 @@ changeShapeRadius = radius => {
         }
     }
 },
+changeShapeStrokeWidth = width => {
+    return {
+        type: ActionTypes.CHANGE_SHAPE_STROKE_WIDTH,
+        payload: {
+            width
+        }
+    }
+},
 changeBackgroundColor = color => {
     return {
         type: ActionTypes.CHANGE_BACKGROUND_COLOR,
@@ -181,6 +189,7 @@ export {
     changeShapeOpacity, 
     changeShapeWidth, 
     changeShapeRotation,
+    changeShapeStrokeWidth,
     changeCanvasScale, 
     createCanvas, 
     fetchCanvasList,

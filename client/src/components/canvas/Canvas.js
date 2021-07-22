@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import RightPanel from './RightPanel';
 import LeftPanel from './leftPanel/LeftPanel';
 import Size from '../../constants/size';
 import { Modal, Menu, Tab, Card } from 'semantic-ui-react';

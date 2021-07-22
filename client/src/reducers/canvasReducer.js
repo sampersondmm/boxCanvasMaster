@@ -12,7 +12,8 @@ const DEFAULT_STATE = {
     canvasScale: 1,
     shapeList: [],
     createdCollectionList: [],
-    selectedShape: '',
+    selectedShapeId: '',
+    selectedShape: {},
     selectShape: false,
     colorPalette: [
       {color: "#4771e8", uuid: "50ecc8b-23f5-dc2f-e06d-15e01b437a0"},
@@ -27,7 +28,8 @@ const DEFAULT_STATE = {
       id: '',
       type: Common.square,
       fill: 'rgba(106, 184, 197, 0.8)',
-      stroke: 'rgba(0,0,0,0)',
+      stroke: 'rgba(0,0,0)',
+      strokeWidth: 0,
       posX: 0,
       posY: 0,
       width: 60,
@@ -38,7 +40,8 @@ const DEFAULT_STATE = {
       id: '',
       type: Common.circle,
       fill: 'rgba(106, 184, 197, 0.8)',
-      stroke: 'rgba(0,0,0,0)',
+      stroke: 'rgba(0,0,0)',
+      strokeWidth: 0,
       posX: 0,
       posY: 0,
       radius: 30,
@@ -62,7 +65,7 @@ const DEFAULT_STATE = {
     shapeList: [],
     collectionList: [],
     shapeType: Common.square,
-    selectedShape: '',
+    selectedShapeId: '',
     selectShape: false,
     shapeWidth: 20,
     shapeHeight: 20,
@@ -174,11 +177,13 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         }
       }
     case ActionTypes.SELECT_SHAPE:
+      const selectedShapeData = state.canvasData.shapeList.find((shape) => shape.id === payload)
       return {
         ...state,
         canvasData: {
           ...state.canvasData,
-          selectedShape: payload
+          selectedShapeId: payload,
+          selectedShape: selectedShapeData
         }
       }
     case ActionTypes.REMOVE_SHAPE:
@@ -262,6 +267,17 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         state.currentShapeType,
         'stroke',
         payload.stroke
+      )
+      return {
+        ...state,
+        currentShape: updatedShape
+      }
+    case ActionTypes.CHANGE_SHAPE_STROKE_WIDTH:
+      updatedShape = updateCurrentShape(
+        state.currentShape,
+        state.currentShapeType,
+        'strokeWidth',
+        payload.width
       )
       return {
         ...state,

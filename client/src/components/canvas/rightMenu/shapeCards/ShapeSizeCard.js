@@ -3,7 +3,8 @@ import { Icon, Menu, Input, Accordion} from 'semantic-ui-react';
 import { 
     changeShapeRadius, 
     changeShapeWidth, 
-    changeShapeHeight
+    changeShapeHeight,
+    changeShapeStrokeWidth
 } from '../../../../actions/canvasActions';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
@@ -43,6 +44,18 @@ class ShapeSizeCard extends Component {
         const { sizeIncrement } = this.state;
         const newValue = value === 'down' ? (square.height - sizeIncrement <= 0 ? 0 : square.height - sizeIncrement) : square.height + sizeIncrement;
         this.props.dispatch(changeShapeHeight(newValue))
+    }
+    incrementStrokeWidth = (value) => {
+        const { line } = this.props.currentShape;
+        let newValue = value;
+        if(value === 'down'){
+            if(value !== 1){
+                newValue = value - 1;
+            }
+        } else if (value === 'up'){
+            newValue = value + 1;
+        }
+        this.props.dispatch(changeShapeStrokeWidth(newValue))
     }
     incrementRadius = (value) => {
         const { circle } = this.props.currentShape;
