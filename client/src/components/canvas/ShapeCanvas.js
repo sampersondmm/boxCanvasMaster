@@ -65,16 +65,16 @@ class ShapeCanvas extends Component {
                     this.changeShapeRadius(circle.radius)
                 }
                 if(circle.fill !== prevProps.currentShape.circle.fill){
-                    this.changeShapeFill(circle.fill)
+                    this.changeShapeFill(circle.fill);
                 }
                 if(circle.stroke !== prevProps.currentShape.circle.stroke){
-                    this.changeShapeStroke(circle.stroke)
+                    this.changeShapeStroke(circle.stroke);
                 }
                 if(circle.strokeWidth !== prevProps.currentShape.circle.strokeWidth){
-                    this.changeShapeStrokeWidth(circle.strokeWidth)
+                    this.changeShapeStrokeWidth(circle.strokeWidth);
                 }
                 if(circle.opacity !== prevProps.currentShape.circle.opacity){
-                    this.changeShapeOpacity(circle.opacity)
+                    this.changeShapeOpacity(circle.opacity);
                 }
                 break;
 
@@ -116,6 +116,7 @@ class ShapeCanvas extends Component {
             backgroundColor: backgroundColor
         }));
         window.addEventListener('resize', this.resize);
+        this.loadShapes();
         this.setupCanvas();
     }
 
@@ -328,14 +329,79 @@ class ShapeCanvas extends Component {
     }
 
     loadShapes = () => {
-        const squareArr = this.shapeArr.filter(shape => shape.type === Common.square ? shape : null),
-            circleArr = this.shapeArr.filter(shape => shape.type === Common.circle ? shape : null);
+        const { shapeList } = this.props.canvasData;
+        let shapeCopy = {}
+        
         select(this.node)
-            .selectAll('.shape')
-            .remove();
+        .selectAll('.stamp')
+        .remove();
 
-        select(this.node)
-            .selectAll('')
+        shapeList.map((shape) => {
+            switch(shape.type){
+                case Common.square:
+                    select(this.node)
+                    .selectAll('rect')
+                    .data([shape])
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'stamp')
+                    .attr('fill', obj => obj.fill)
+                    .attr('stroke', obj => obj.stroke)
+                    .attr('stroke-width', obj => obj.strokeWidth)
+                    .attr('opacity', obj => obj.opacity)
+                    .attr('width', obj => obj.width)
+                    .attr('height', obj => obj.height)
+                    .attr('x', obj => obj.posX)
+                    .attr('y', obj => obj.posY)
+        
+                    break;
+                case Common.circle:
+                    shapeCopy = cloneDeep(shape);
+                    select(this.node)
+                        .selectAll('.shape')
+                        .data(this.shapeArr)
+                        .enter()
+                        .append('circle')
+                        .attr('class', 'shape')
+                        .attr('fill', obj => obj.fill)
+                        .attr('stroke', obj => obj.stroke)
+                        .attr('stroke-width', obj => obj.strokeWidth)
+                        .attr('opacity', obj => obj.opacity)
+                        .attr('r', obj => obj.radius)
+                        .attr('cx', this.posX)
+                        .attr('cy', this.posY)
+        
+                    break;
+                case Common.line:
+                    this.shapeArr.push(shape)
+                    select(this.node)
+                        .selectAll('.shape')
+                        .data(this.shapeArr)
+                        .enter()
+                        .append('path')
+                        .attr('class', 'shape')
+                        .attr('stroke', shape.stroke)
+                        .attr('fill', shape.fill)
+                        .attr('stroke-width', shape.strokeWidth)
+                        .attr('d', shape.points);
+        
+        
+    
+        
+                    break;
+                default:
+                    break;
+            }
+            if(shape.type === Common.line){
+                if(this.closeShapeRange){
+                    this.props.addShape(shapeCopy);
+                    this.closeShapeRange = false;
+                }
+            } else {
+                this.props.addShape(shapeCopy);
+            }
+        })
+        
     }
 
     selectShape = (id) => {
@@ -393,8 +459,8 @@ class ShapeCanvas extends Component {
                         .enter()
                         .append('circle')
                         .attr('class', 'shape-highlight')
-                        .attr('fill', 'yellow')
-                        .attr('r', 5)
+                        .attr('fill', 'rgba(255,255,255,0.5)')
+                        .attr('r', 4)
                         .attr('cx', obj => obj.x)
                         .attr('cy', obj => obj.y)
 

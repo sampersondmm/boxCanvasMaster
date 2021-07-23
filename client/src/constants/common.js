@@ -37,6 +37,8 @@ const Common = {
     stroke: 'Stroke',
     strokeWidth: 'Stroke Width',
     numberOfPoints: 'Number of Points',
+    points: 'Points',
+    point: 'Point',
     createShape: 'Create Shape',
     editShape: 'Edit Shape'
 }

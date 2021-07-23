@@ -10,6 +10,7 @@ import ShapeRotationCard from './shapeCards/ShapeRotationCard';
 import ShapeStrokeCard from './shapeCards/ShapeStrokeCard';
 import AccordionIcon from '../../AccordionIcon';
 import findIndex from 'lodash/findIndex';
+import ShapePointCard from './shapeCards/ShapePointCard';
 
 class ShapeMenu extends Component {
     constructor(props){
@@ -20,6 +21,7 @@ class ShapeMenu extends Component {
             cardOrder: [
                 Common.display,
                 Common.type,
+                Common.points,
                 Common.color,
                 Common.size,
                 Common.stroke,
@@ -28,6 +30,7 @@ class ShapeMenu extends Component {
             tabOpen: {
                 display: true,
                 type: true,
+                points: true,
                 color: true,
                 size: true,
                 stroke: true,
@@ -37,7 +40,7 @@ class ShapeMenu extends Component {
     }
     toggleAccordian = (selectedTab) => {
         this.setState(state => {
-            let { display, type, color, size, stroke, rotation } = state.tabOpen;
+            let { display, type, points, color, size, stroke, rotation } = state.tabOpen;
             switch(selectedTab){
                 case Common.display:
                     display = !display;
@@ -53,6 +56,8 @@ class ShapeMenu extends Component {
                     break;
                 case Common.stroke:
                     stroke = !stroke;
+                case Common.points:
+                    points = !points;
                     break;
                 case Common.rotation:
                     rotation = !rotation;
@@ -65,6 +70,7 @@ class ShapeMenu extends Component {
                 tabOpen: {
                     display,
                     type,
+                    points,
                     color,
                     size,
                     stroke,
@@ -134,6 +140,20 @@ class ShapeMenu extends Component {
                             inverted={isInverted}
                             />
                         )
+                case Common.points:
+                    if(currentShapeType === Common.line){
+                        return (
+                            <ShapePointCard
+                                open={tabOpen.type}
+                                selection={selection}
+                                handleSelect={() => this.handleSelect(Common.type)}
+                                handleOpen={() => this.toggleAccordian(Common.type)}
+                                inverted={isInverted}
+                            />
+                        )
+                    } else {
+                        return null;
+                    }
                 case Common.color:
                     return (
                         <ShapeColorCard

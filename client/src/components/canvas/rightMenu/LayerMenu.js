@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import Common from '../../../constants/common';
 import { without, indexOf, find } from 'lodash';
 import { selectShape, removeShape } from '../../../actions/canvasActions';
-import Aux from '../../../utils/Aux';
+import Aux from '../../../utils/AuxComponent';
 import AccordionIcon from '../../AccordionIcon';
 
 class LayerMenu extends Component {
