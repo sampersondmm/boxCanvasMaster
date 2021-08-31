@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {event, select} from 'd3-selection';
 import { transition } from 'd3-transition'
-import { selectShape } from '../../actions/canvasActions';
+import { selectShape, updateLine } from '../../actions/canvasActions';
 import Common from '../../constants/common';
 import uuid from 'react-uuid';
 import {connect} from 'react-redux';
@@ -606,7 +606,10 @@ class ShapeCanvas extends Component {
                         .attr('d', '')
 
                 } else {
-                    this.linePoints.push({x: this.posX, y: this.posY})
+                    shapeCopy = cloneDeep(line);
+                    this.linePoints.push({x: this.posX, y: this.posY});
+                    shapeCopy.pointData = this.linePoints;
+                    this.props.dispatch(updateLine(shapeCopy))
                 }
 
                 select(this.node)

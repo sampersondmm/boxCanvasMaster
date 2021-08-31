@@ -10,7 +10,8 @@ const AccordionCard = ({
     index,
     selection,
     content,
-    handleSelect
+    handleSelect,
+    additionalText
 }) => {
     return (
             <Menu.Item className='shape-accordian-option' style={{margin: '0 2px'}}>
@@ -32,7 +33,12 @@ const AccordionCard = ({
                             onClick={handleOpen}
                             icon={open ? 'plus' : 'minus'}
                         />
-                        {header}
+                        <div>
+                            {header}
+                        </div>
+                        <div style={{marginLeft: '15px'}}>
+                            {additionalText}
+                        </div>
                     </div>
                     <AccordionIcon
                         width='15px'

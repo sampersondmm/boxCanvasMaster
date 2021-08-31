@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
-import { isEmpty } from 'lodash';
 import AccordionCard from '../../../AccordionCard';
 
 class PointDisplayCard extends Component {
@@ -110,7 +109,8 @@ class PointDisplayCard extends Component {
             return (
                 <AccordionCard
                     open={false}
-                    header={`${Common.point}${index + 1}`}
+                    header={`${Common.point} ${index + 1}`}
+                    additionalText={`pos x: ${Math.floor(point.x)} pos y: ${Math.floor(point.y)}`}
                     selection={null}
                     handleSelect={this.handleSelectPoint}
                     handleOpen={this.handleOpenPoint}

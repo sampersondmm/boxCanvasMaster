@@ -744,6 +744,7 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
   const {type, payload} = action,
     result = payload || {};
   let updatedShape = {};
+  let replacedShape = {};
   switch(type){
     // Changes to canvas
     case ActionTypes.UPDATE_CANVAS_DATA:
@@ -801,6 +802,15 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         collectionCanvasData: {
           ...state.canvasData,
           collectionList: newCollectionList
+        }
+      }
+    case ActionTypes.UPDATE_LINE:
+      replacedShape = cloneDeep(payload.newLine);
+      return {
+        ...state,
+        currentShape: {
+          ...state.currentShape,
+          line: replacedShape
         }
       }
     case ActionTypes.CHANGE_CANVAS_SCALE:

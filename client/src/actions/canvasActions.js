@@ -27,6 +27,14 @@ addShapeToCollection = newShape => {
         }
     }
 },
+updateLine = newLine => {
+    return {
+        type: ActionTypes.UPDATE_LINE,
+        payload: {
+            newLine
+        }
+    }
+},
 createCollection = newCollection => {
     return {
         type: ActionTypes.CREATE_COLLECTION,
@@ -183,6 +191,7 @@ export {
     addShapeToCanvas, 
     addShapeToCollection, 
     createCollection,
+    updateLine,
     changeShapeType, 
     changeShapeFill,
     changeShapeStroke,
