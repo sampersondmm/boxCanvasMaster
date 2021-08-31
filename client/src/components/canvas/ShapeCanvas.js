@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {event, select} from 'd3-selection';
+import {event, select, selectAll} from 'd3-selection';
 import { transition } from 'd3-transition'
 import { selectShape, updateLine } from '../../actions/canvasActions';
 import Common from '../../constants/common';
@@ -235,9 +235,20 @@ class ShapeCanvas extends Component {
                 const firstPoint = this.linePoints[0];
                 newX = event.x - canvasElement.left;
                 newY = event.y - canvasElement.top;
-                stamp
+                select(this.node)
+                    .selectAll('.line-stamp-circle')
                     .attr('cx', () => (newX) * this.scalePosX)
                     .attr('cy', () => (newY) * this.scalePosY)
+
+                select(this.node)
+                    .selectAll('.crosshair-vertical')
+                    .attr('x1', () => (newX) * this.scalePosX)
+                    .attr('x2', () => (newX) * this.scalePosX)
+
+                select(this.node)
+                    .selectAll('.crosshair-horizontal')
+                    .attr('y1', () => (newY) * this.scalePosY)
+                    .attr('y2', () => (newY) * this.scalePosY)
 
                 if(firstPoint){
                     if(newX > (firstPoint.x - 10) && newX < (firstPoint.x + 10) && newY > (firstPoint.y - 10) && newY < (firstPoint.y + 10) && this.linePoints.length > 1){
@@ -318,9 +329,26 @@ class ShapeCanvas extends Component {
                 centerX = (canvasWidth / 2);
                 centerY = (canvasHeight / 2);
 
-                stamp
+                select(this.node)
+                    .selectAll('.line-stamp-circle')
                     .attr('cx', centerX)
                     .attr('cy', centerY);
+
+                select(this.node)
+                    .selectAll('.crosshair-vertical')
+                    .attr('x1', canvasWidth/2)
+                    .attr('x2', canvasWidth/2)
+                    .attr('y1', 0)
+                    .attr('y2', canvasHeight)
+                    .attr('stroke', 'rgb(150,150,150)')
+
+                select(this.node)
+                    .selectAll('.crosshair-horizontal')
+                    .attr('x1', 0)
+                    .attr('x2', canvasWidth)
+                    .attr('y1', canvasHeight/2)
+                    .attr('y2', canvasHeight/2)
+                    .attr('stroke', 'rgb(150,150,150)')
 
                 break;
             default:
@@ -780,7 +808,7 @@ class ShapeCanvas extends Component {
     }
 
     changeShapeType = (newType) => {
-        const { currentShape } = this.props;
+        const { currentShape, canvasData } = this.props;
         const { square, circle, line} = currentShape;
 
         select(this.node)
@@ -822,15 +850,34 @@ class ShapeCanvas extends Component {
             case Common.line:
                 select(this.node)
                     .selectAll('.stamp')
-                    .data([circle])
+                    .append('g')
+                    .attr('class', 'stamp')
+
+                select(this.node)
+                    .selectAll('.stamp')
+                    .data([line])
                     .enter()
                     .append('circle')
-                    .attr('class', 'stamp')
+                    .attr('class', 'line-stamp-circle')
                     .attr('fill', '#6ab8c5')
                     .attr('opacity', 0.5)
                     .attr('r', 5)
                     .attr('cx', 0)
                     .attr('cy', 0);
+
+                select(this.node)
+                    .selectAll('.stamp')
+                    .data([line])
+                    .enter()
+                    .append('line')
+                    .attr('class', 'crosshair-vertical')
+
+                select(this.node)
+                    .selectAll('.stamp')
+                    .data([line])
+                    .enter()
+                    .append('line')
+                    .attr('class', 'crosshair-horizontal')
 
                 select(this.node)
                     .selectAll('.line-stamp')
