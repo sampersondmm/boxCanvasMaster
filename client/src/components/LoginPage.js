@@ -9,17 +9,17 @@ class LoginPage extends Component {
         this.submitForm = this.submitForm.bind(this);
         this.onChange = this.onChange.bind(this);
         this.state = {
-            email: '',
+            username: '',
             password: '',
             rememberMe: false
         }
     }
     onChange(field, event){ 
         const {value} = event.target;
-        let {email, password, rememberMe} = this.state;
+        let {username, password, rememberMe} = this.state;
         switch(field){
-            case 'email':
-                email = value;
+            case 'username':
+                username = value;
                 break;
             case 'password':
                 password = value;
@@ -32,14 +32,14 @@ class LoginPage extends Component {
         }
         this.setState(state => ({
             ...state,
-            email,
+            username,
             password
         }))
     }
     submitForm() {
-        const {email, password} = this.state,
+        const {username, password} = this.state,
             {authType} = this.props;
-        this.props.onAuth(authType, {email, password})
+        this.props.onAuth(authType, {username, password})
             .then(() => {
                 this.props.history.push('/')
             })
@@ -48,7 +48,7 @@ class LoginPage extends Component {
             })
     }
     render(){
-        const {email, password} = this.state,
+        const {username, password} = this.state,
             {authType, error, history, removeError} = this.props,
             buttonLink = authType === 'signup' ? '/signin' : '/signup';
 
@@ -68,11 +68,11 @@ class LoginPage extends Component {
                     <Form className='login-page-wrap'>
                         {error.message && <div className='login-page-error'>{error.message}</div>}
                         <Form.Group controlId="formBasicEmail">
-                            <Form.Label>Email</Form.Label>
+                            <Form.Label>Username</Form.Label>
                             <Form.Control 
                                 type="email" 
                                 placeholder="Email" 
-                                value={email} 
+                                value={username} 
                                 onChange={e => this.onChange('email', e)}
                             />
                         </Form.Group>
@@ -101,7 +101,7 @@ class LoginPage extends Component {
                         <div className='login-page-button-wrap'>
                             <Button 
                                 variant="outline-primary" 
-                                disabled={!email && !password}
+                                disabled={!username && !password}
                                 onClick={this.submitForm}
                             >
                                 {authType === 'signup' ? 'Sign Up' : 'Login'}
