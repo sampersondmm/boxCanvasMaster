@@ -6,15 +6,15 @@ import logo from '../images/newLogo.png';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router-dom';
 import {logoutUser} from '../actions/userActions';
+import { Icon } from 'semantic-ui-react'
 
 class NavBar extends Component {
     constructor(props){
         super(props);
-        this.logout = this.logout.bind(this);
     }
     logout(e){
         e.preventDefault();
-        this.props.logoutUser();
+        logoutUser();
     }
     render(){
         return (
@@ -73,7 +73,9 @@ class NavBar extends Component {
                 <Menu.Item >
                     <Link className='button-link' to='/'>Help</Link>
                 </Menu.Item>
-
+                <Menu.Item onClick={this.logout}>
+                    <Icon name="sign-out"/>
+                </Menu.Item>
             </Menu>
         )
     }

@@ -3,13 +3,12 @@ import LoginPage from './LoginPage';
 import HomePage from './HomePage';
 import Canvas from './canvas/Canvas';
 import {Switch, Route, withRouter, Redirect} from 'react-router-dom';
-import {authorizeUser} from '../actions/userActions';
 import {removeError} from '../actions/errorActions';
 import {connect} from 'react-redux';
 import withAuth from '../hocs/withAuth';
 
 const App = props => {
-  const {authorizeUser, error, isAuthenticated, currentUser} = props;
+  const { error, isAuthenticated, currentUser} = props;
   return (
     <div>
       <Switch>
@@ -27,7 +26,6 @@ const App = props => {
                 error={error}
                 authType='signup'
                 removeError={removeError}
-                onAuth={authorizeUser}
                 {...props}
               />
             )
@@ -36,14 +34,12 @@ const App = props => {
         <Route
           exact
           path='/signin'
-          onAuth={authorizeUser}
           render={props => {
             return (
               <LoginPage 
                 error={error}
                 authType='signin'
                 removeError={removeError}
-                onAuth={authorizeUser}
               {...props}
             />
             )
@@ -63,4 +59,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default withRouter(connect(mapStateToProps, {authorizeUser})(App));
+export default withRouter(connect(mapStateToProps)(App));

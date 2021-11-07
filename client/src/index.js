@@ -5,7 +5,8 @@ import {Provider} from 'react-redux';
 import {BrowserRouter} from 'react-router-dom';
 import rootReducer from './reducers';
 import {createStore, applyMiddleware, compose} from 'redux';
-import {setAuthorizationToken, setCurrentUser} from './actions/userActions';
+import { setCurrentUser } from './actions/userActions';
+import { setTokenHeader } from './actions/api'
 import thunk from 'redux-thunk';
 import jwtDecode from 'jwt-decode';
 
@@ -34,7 +35,7 @@ import './css/canvasList.css';
 
 import 'semantic-ui-css/semantic.min.css';
 
-export const store = createStore(
+const store = createStore(
     rootReducer,
     compose(
         applyMiddleware(thunk),
@@ -43,7 +44,7 @@ export const store = createStore(
   );
 
 if(sessionStorage.jwtToken) {
-    setAuthorizationToken(sessionStorage.jwtToken);
+    setTokenHeader(sessionStorage.jwtToken);
     //prevent tampering of jwtToken key in sessionStorage
     try {
         store.dispatch(setCurrentUser(jwtDecode(sessionStorage.jwtToken)))
@@ -59,4 +60,6 @@ ReactDOM.render(
         </BrowserRouter>
     </Provider>
 , document.getElementById('root'));
+
+export default store;
 

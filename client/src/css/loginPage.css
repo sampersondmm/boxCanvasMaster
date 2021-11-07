@@ -13,16 +13,6 @@
     align-items: center;
     flex-direction:column;
 }
-.login-page-design {
-    width: 50%;
-    height: 100vh;
-    background-color: rgb(184, 226, 247);
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction:column;
-}
 .login-page-main {
     width: 100vw;
     height: 100vh;

@@ -2,6 +2,10 @@ import React, {Component} from 'react';
 import {Form, Button} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
 import logo from '../images/newLogo.png';
+import UserAPI from '../api/userApi';
+import { connect } from 'react-redux';
+
+const userApi = new UserAPI();
 
 class LoginPage extends Component {
     constructor(props){
@@ -9,17 +13,17 @@ class LoginPage extends Component {
         this.submitForm = this.submitForm.bind(this);
         this.onChange = this.onChange.bind(this);
         this.state = {
-            email: '',
+            username: '',
             password: '',
             rememberMe: false
         }
     }
     onChange(field, event){ 
         const {value} = event.target;
-        let {email, password, rememberMe} = this.state;
+        let {username, password, rememberMe} = this.state;
         switch(field){
-            case 'email':
-                email = value;
+            case 'username':
+                username = value;
                 break;
             case 'password':
                 password = value;
@@ -32,23 +36,26 @@ class LoginPage extends Component {
         }
         this.setState(state => ({
             ...state,
-            email,
+            username,
             password
         }))
     }
-    submitForm() {
-        const {email, password} = this.state,
-            {authType} = this.props;
-        this.props.onAuth(authType, {email, password})
-            .then(() => {
-                this.props.history.push('/')
-            })
-            .catch(() => {
-                return;
-            })
+    submitForm = async () => {
+        const {username, password} = this.state;
+        const { authType } = this.props;
+        try {
+            if(authType === 'signin'){
+                await userApi.loginUser({username, password})
+            } else if (authType === 'signup'){
+                await userApi.createNewUser({username, password});
+            }
+            this.props.history.push('/')
+        } catch (error) {
+            console.log(error)
+        }
     }
     render(){
-        const {email, password} = this.state,
+        const {username, password} = this.state,
             {authType, error, history, removeError} = this.props,
             buttonLink = authType === 'signup' ? '/signin' : '/signup';
 
@@ -67,13 +74,13 @@ class LoginPage extends Component {
                     <h2 className='login-page-header'>{authType === 'signup' ? 'Sign Up' : 'Login'}</h2>
                     <Form className='login-page-wrap'>
                         {error.message && <div className='login-page-error'>{error.message}</div>}
-                        <Form.Group controlId="formBasicEmail">
-                            <Form.Label>Email</Form.Label>
+                        <Form.Group>
+                            <Form.Label>Username</Form.Label>
                             <Form.Control 
-                                type="email" 
-                                placeholder="Email" 
-                                value={email} 
-                                onChange={e => this.onChange('email', e)}
+                                type="string" 
+                                placeholder="Username" 
+                                value={username} 
+                                onChange={e => this.onChange('username', e)}
                             />
                         </Form.Group>
 
@@ -101,7 +108,7 @@ class LoginPage extends Component {
                         <div className='login-page-button-wrap'>
                             <Button 
                                 variant="outline-primary" 
-                                disabled={!email && !password}
+                                disabled={!username && !password}
                                 onClick={this.submitForm}
                             >
                                 {authType === 'signup' ? 'Sign Up' : 'Login'}
@@ -116,10 +123,13 @@ class LoginPage extends Component {
                         </div>
                     </Form>
                 </div>
-                <div className='login-page-design'></div>    
             </div>
         )
     }
 }
 
-export default LoginPage;
+const mapStateToProps = (state) => {
+    return {}
+}
+
+export default connect()(LoginPage);

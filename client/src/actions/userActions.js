@@ -1,36 +1,14 @@
 import ActionTypes from './ActionTypes';
-import {apiCall, setTokenHeader} from './api';
+import { setTokenHeader} from './api';
 import {addError, removeError} from './errorActions';
+import store from '../';
 
-const authorizeUser = (type, userData) => {
-    return dispatch => {
-        return new Promise((resolve, reject) => {
-            return apiCall('post', `/api/auth/${type}`, userData)
-            .then(({token, ...user}) => {
-                sessionStorage.setItem('jwtToken', token);
-                setAuthorizationToken(token)
-                dispatch(setCurrentUser(user));
-                dispatch(removeError());
-                resolve();
-            })
-            .catch(err => {
-                dispatch(addError(err.message));
-                reject();
-            })
-        })
-    }
-}
 
-const setAuthorizationToken = token => {
-    setTokenHeader(token)
-}
 
 const logoutUser = () => {
-    return dispatch => {
-        sessionStorage.clear();
-        setAuthorizationToken(false);
-        dispatch(setCurrentUser({}))
-    }
+    sessionStorage.clear();
+    setTokenHeader(false);
+    store.dispatch(setCurrentUser({}))
 }
 
 const setCurrentUser = user => {
@@ -40,4 +18,4 @@ const setCurrentUser = user => {
     }
 }
 
-export {setCurrentUser, authorizeUser, logoutUser, setAuthorizationToken};
+export {setCurrentUser, logoutUser };

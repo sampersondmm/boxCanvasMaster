@@ -1,65 +1,64 @@
 const db = require('../models');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt')
 
-exports.signup = async (req, res, next) => {
-    console.log(req.body)
+const signup = async (req, res, next) => {
     try {
         let user = await db.User.create(req.body);
-        let {id, email, profileImageUrl} = user;
+        const {_id, username} = user;
         let token = jwt.sign(
             {
-                id,
-                email
-            }, 
+                _id,
+                username
+            },
             process.env.SECRET_KEY
-        );
+        )
         return res.status(200).json({
-            id,
-            email,
-            token
+            user,
+            token 
         });
     } catch(err) {
-        // if validation fails
         if(err.code === 11000){
-            err.message = 'Sorry, that email is already taken';
+            err.message = 'Sorry, that username is already taken';
         }
         return next({
-            status: 400,
+            status: 400, 
             message: err.message
         })
     }
-
 }
-
-exports.signin = async (req, res, next) => {
+    
+const signin = async (req, res, next) => {
+    const { body } = req;
     try {
-       let user = await db.User.findOne({
-            email: req.body.email
-        });
-        let {id, email, profileImageUrl} = user;
-        let isMatch = await user.comparePassword(req.body.password);
+        let user = await db.User.findOne({username: body.username});
+        const {_id, username} = user;
+        let isMatch = await user.comparePassword(body.password);
         if(isMatch){
             let token = jwt.sign(
                 {
-                    id,
-                    email,
-                    profileImageUrl
-                }, 
+                    _id,
+                    username
+                },
                 process.env.SECRET_KEY
-            );
+            )
             return res.status(200).json({
-                id, 
-                email,
-                profileImageUrl,
-                token
+                user,
+                token 
             });
         } else {
-            return next({
+            return res.err({
                 status: 400,
-                message: 'Invalid Email/Password'
+                message: 'Invalid Username/Password'
             })
         }
     } catch(err) {
-        return next({status: 400, message: 'Invalid Email/Password'});
+        console.log('Request failed')
+        return next({status: 400, message: 'Invalid Username/Password'});
     }
+}
+
+module.exports = {
+    signup, 
+    signin
 }
