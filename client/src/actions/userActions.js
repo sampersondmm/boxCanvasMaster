@@ -3,8 +3,6 @@ import { setTokenHeader} from './api';
 import {addError, removeError} from './errorActions';
 import store from '../';
 
-
-
 const logoutUser = () => {
     sessionStorage.clear();
     setTokenHeader(false);
