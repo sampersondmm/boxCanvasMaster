@@ -33,9 +33,8 @@ class ShapeColorCard extends Component {
     }
 
     incrementStrokeWidth = (value) => {
-        const { currentShapeType, currentShape } = this.props;
-        const shape = currentShape[currentShapeType.toLowerCase()];
-        const newValue = value === 'down' ? (shape.strokeWidth - 1 <= 0 ? 0 : shape.strokeWidth - 1) : shape.strokeWidth + 1;
+        const { currentShape } = this.props;
+        const newValue = value === 'down' ? (currentShape.strokeWidth - 1 <= 0 ? 0 : currentShape.strokeWidth - 1) : currentShape.strokeWidth + 1;
         this.props.dispatch(changeShapeStrokeWidth(newValue))
     }
 
@@ -92,7 +91,7 @@ class ShapeColorCard extends Component {
                         <ColorPicker 
                             color={color} 
                             colorChange={this.handleColorChange}
-                            shapeColor={currentShape.color}
+                            shapeColor={currentShape.fill}
                             backgroundColor={backgroundColor}
                         />
                     </div>
@@ -107,9 +106,9 @@ class ShapeColorCard extends Component {
 
     cardShapeContent = () => {
         const { strokeColorOpen, strokeColorValue } = this.state;
-        const { inverted, currentShape, currentShapeType } = this.props;
-        const strokeColor = currentShape[currentShapeType.toLowerCase()].stroke;
-        const strokeWidth = currentShape[currentShapeType.toLowerCase()].strokeWidth;
+        const { inverted, currentShape } = this.props;
+        const strokeColor = currentShape.stroke;
+        const strokeWidth = currentShape.strokeWidth;
         return (
             <Menu.Menu inverted={inverted} vertical>
                 {this.contentRow(Common.strokeColor, strokeColor, strokeColorValue, strokeColorOpen)}
@@ -148,11 +147,12 @@ class ShapeColorCard extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { currentShape, canvasData, currentShapeType } = state.canvas;
+    const { canvas } = state;
+    const { canvasData, editor } = canvas;
+    const { currentShape } = editor;
     return {
         canvasData,
-        currentShape,
-        currentShapeType
+        currentShape
     }
 }
 

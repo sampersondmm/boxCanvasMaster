@@ -6,7 +6,7 @@ import currentUser from './userReducer';
 const rootReducer = combineReducers({
     canvas,
     error,
-    currentUser
+    user: currentUser
 })
 
 

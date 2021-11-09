@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Menu, Tab, Accordion, Header, Label } from 'semantic-ui-react';
+import { Menu, Tab, Accordion, Header, Message, Label } from 'semantic-ui-react';
 import {connect} from 'react-redux'
 import Common from '../../../constants/common';
 import { without, indexOf, find } from 'lodash';
@@ -170,6 +170,35 @@ class LayerMenu extends Component {
         }
     }
 
+    renderContents = () => {
+        const { 
+            shapeList,
+            inverted
+         } = this.props;
+        if(shapeList.length){
+            return (
+                <Accordion inverted={inverted} as={Menu} vertical style={{border: '0', paddingTop: '0'}} fluid >
+                    {this.createShapeList()}
+                </Accordion>
+            );
+        } else {
+            return (
+                <div style={{width: '100%', padding: '0 2px'}}>
+                    <Message
+                        style={{
+                            backgroundColor: '#1b1c1d',
+                            color: 'rgba(255,255,255,.9)',
+                            margin: '0',
+                            border: '1px solid rgb(120, 120, 120)'
+                        }}
+                        content='No Layers'
+                    />
+
+                </div>
+            )
+        }
+    }
+
     createShapeList = () => {
         const { shapeList, inverted } = this.props;
         const { openList, selection } = this.state;
@@ -214,14 +243,14 @@ class LayerMenu extends Component {
                 </Menu.Item>
             )
         })
-        return newList;
+        return newList
     }
 
     render(){
-        const { inverted, modal } = this.props;
-        const wrapHeight = modal ? '433px' : 'calc(100vh - 90px)';
+        const { inverted, modal, shapeList } = this.props;
+        const wrapHeight = modal ? '433px' : 'calc(100vh - 100px)';
         const { selection } = this.state;
-        const scrollHeight = 'calc(100vh - 180px)';
+        const scrollHeight = 'calc(100vh - 190px)';
         const scrollClass = !inverted ? 'scrollbar' : 'scrollbar-inverted';
         return (
             <div style={{height: wrapHeight, overflow: 'hidden'}}>
@@ -230,12 +259,11 @@ class LayerMenu extends Component {
                 </div>
                 <div className={`${scrollClass} tab-pane-wrap`} style={{height: scrollHeight, overflowY: 'scroll'}}>
                     <Tab.Pane inverted={inverted} style={{padding: '0', border: '0', display: 'flex', justifyContent: 'center', margin: '0'}}>
-                        <Accordion inverted={inverted} as={Menu} vertical style={{border: '0', paddingTop: '0'}} fluid >
-                            {this.createShapeList()}
-                        </Accordion>
+                        {this.renderContents()}
+
                     </Tab.Pane>
                 </div>
-                <div style={{height: '50px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px'}}>
+                <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px'}}>
                     <AccordionIcon
                         icon='trash'
                         width='20px'
@@ -271,10 +299,10 @@ class LayerMenu extends Component {
 }
 
 const mapStateToProps = state => {
-    const { collectionList, currentShape, canvasData } = state.canvas;
+    const { editor } = state.canvas;
+    const { currentShape, selectedShapeId } = editor;
     return {
-        collectionList,
-        selectedShapeId: canvasData.selectedShapeId,
+        selectedShapeId,
         currentShape
     }
 }

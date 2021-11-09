@@ -1,3 +1,76 @@
+/** Home page **/
+.homepage {
+    background-color: rgb(200,200,200);
+}
+.homepage-body {
+    width: 100%;
+    display: flex;
+    height: calc(100vh - 100px);
+    border: 1px solid red;
+    justify-content: center;
+}
+
+.canvaslist-section {
+    width: 100%;
+    height: 100%;
+    border-bottom: 1px solid rgb(100,100,100);
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    overflow-y: hidden;
+    align-items: center;
+    justify-content: center;
+}
+.canvaslist-header {
+    height: 100px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.canvas-list-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 20px;
+    height: calc(100vh - 200px);
+    overflow-y: scroll;
+    width: 100%;
+    justify-content: center;
+    /* padding: 10px; */
+}
+
+.canvas-item-wrap {
+    display: flex;
+    justify-content: center;
+    border: 1px solid red;
+}
+
+
+.homepage-footer {
+    height: 50px;
+    background-color: #1b1c1d;
+}
+
+/** Navbar **/
+.navbar-logo { 
+    width: 50px;
+    height: 40px;
+}
+.navbar-logo-icon {
+    height: 40px;
+    width: 40px;
+}
+
+.navbar-link {
+    height: 100%;
+}
+
+.checkbox label {
+    margin: 0;
+}
+
+
+/** Login page **/
 .center {
     display: flex;
     justify-content: center;

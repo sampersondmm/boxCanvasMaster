@@ -17,9 +17,9 @@ app.use(bodyParser.json());
 //Routes
 app.use('/api/auth', authRoutes)
 app.use(
-    '/api/users/:id/canvas', 
-    loginRequired,
-    ensureCorrectUser,
+    '/api/canvas', 
+    // loginRequired,
+    // ensureCorrectUser,
     canvasRoutes
 )
 

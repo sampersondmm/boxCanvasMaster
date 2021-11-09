@@ -1,27 +1,23 @@
+import { isEmpty } from 'lodash';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-export default function withAuth(ComponentToBeRendered) {
-    class Authenticate extends Component {
-        componentWillMount(){
-            if(!this.props.isAuthenticated){
-                this.props.history.push('/signin');
-            }
-        }
-        componentWillReceiveProps(nextProps){
-            if(!nextProps.isAuthenticated){
-                this.props.history.push('/signin')
-            }
-        }
-        render() {
-            return <ComponentToBeRendered {...this.props}/>
+class WithAuth extends Component {
+    constructor(props){
+        super(props)
+    }
+    returnComponent = () => {
+        const { userProfile } = this.props;
+        if(!isEmpty(userProfile)){
+            return {...this.props.children}
+        } else {
+            this.props.history.push('/signin')
+            return null
         }
     }
-    const mapStateToProps = state => {
-        return {
-            isAuthenticated: state.currentUser.isAuthenticated
-        }
+    render(){
+        return this.returnComponent();
     }
-    
-    return connect(mapStateToProps)(Authenticate);
 }
+
+export default WithAuth;

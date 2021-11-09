@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+ import React, {Component} from 'react';
 import { Icon, Menu, Input, Accordion} from 'semantic-ui-react';
 import { 
     changeShapeRadius, 
@@ -79,9 +79,9 @@ class ShapeSizeCard extends Component {
     cardContent = () => {
         const { inverted } = this.props;
         const { sizeIncrement, radiusIncrement } = this.state;
-        const { currentShape, currentShapeType } = this.props;
-        const { square, circle } = currentShape;
-        switch(currentShapeType){
+        const { currentShape, defaultShape } = this.props;
+        const { square, circle } = defaultShape;
+        switch(currentShape.type){
             case Common.square:
                 return (
                     <Menu.Menu inverted={inverted} vertical >
@@ -176,10 +176,10 @@ class ShapeSizeCard extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { currentShape, currentShapeType } = state.canvas;
+    const { currentShape, defaultShape } = state.canvas.editor;
     return {
         currentShape,
-        currentShapeType
+        defaultShape
     }
 }
 

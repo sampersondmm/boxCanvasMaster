@@ -3,6 +3,7 @@ import Common from '../../constants/common';
 import { Menu, Icon, Popup } from 'semantic-ui-react';
 import {Link} from 'react-router-dom';
 import TooltipPositions from '../../constants/tooltips';
+import CustomTooltip from '../CustomTooltip';
 
 class PanelButton extends Component {
     constructor(props){
@@ -31,8 +32,11 @@ class PanelButton extends Component {
     render(){
         const { icon, fa, onClick } = this.props;
          return (
-            <Popup
-                inverted
+
+            <CustomTooltip
+                inverted={true}
+                position='right center'
+                content={this.props.tooltip}
                 trigger={
                     <Menu.Item onClick={onClick}>
                         {fa ? (
@@ -42,8 +46,6 @@ class PanelButton extends Component {
                         )}
                     </Menu.Item>
                 }
-                content={<div>{this.props.tooltip}</div>}
-                position='right center'
             />
         )
     }

@@ -1,5 +1,5 @@
 import ActionTypes from './ActionTypes';
-import { setTokenHeader} from './api';
+import { setTokenHeader} from '../utils/apiUtils';
 import {addError, removeError} from './errorActions';
 import store from '../';
 

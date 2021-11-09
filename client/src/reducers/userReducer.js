@@ -3,7 +3,7 @@ import isEmpty from 'lodash';
 
 const DEFAULT_STATE = {
     isAuthenticated: false,
-    user: {}
+    userProfile: {}
 }
 
 const userReducer = (state = DEFAULT_STATE, action) => {
@@ -14,7 +14,7 @@ const userReducer = (state = DEFAULT_STATE, action) => {
         case ActionTypes.SET_CURRENT_USER:
             return {
                 isAuthenticated,
-                user: result
+                userProfile: result
             }
         default: 
             return state;

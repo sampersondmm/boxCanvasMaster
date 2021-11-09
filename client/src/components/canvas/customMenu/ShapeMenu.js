@@ -206,8 +206,8 @@ class ShapeMenu extends Component {
     render(){
         const { modal, inverted, selectedShapeId } = this.props;
         const { selection } = this.state;
-        const wrapHeight = modal ? '433px' : 'calc(100vh - 90px)';
-        const scrollHeight = 'calc(100vh - 180px)';
+        const wrapHeight = modal ? '433px' : 'calc(100vh - 100px)';
+        const scrollHeight = 'calc(100vh - 190px)';
         const scrollClass = modal ? 'scrollbar' : 'scrollbar-inverted'
         const title = selectedShapeId ? Common.editShape : Common.createShape;
     
@@ -223,7 +223,7 @@ class ShapeMenu extends Component {
                         </Accordion>
                     </Tab.Pane>
                 </div>
-                <div style={{height: '50px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px'}}>
+                <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px'}}>
                      <AccordionIcon
                         icon='angle down'
                         width='20px'
@@ -249,10 +249,8 @@ class ShapeMenu extends Component {
 
 const mapStateToProps = state => {
     const { currentShapeType } = state.canvas;
-    const { selectedShapeId } = state.canvas.canvasData
     return {
-        currentShapeType,
-        selectedShapeId
+        canvas: state.canvas
     }
 }
 

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Form, Button} from 'react-bootstrap';
+import { Form, Header, Checkbox, Message } from 'semantic-ui-react'
 import {Link} from 'react-router-dom';
 import logo from '../images/newLogo.png';
 import UserAPI from '../api/userApi';
@@ -10,16 +10,14 @@ const userApi = new UserAPI();
 class LoginPage extends Component {
     constructor(props){
         super(props);
-        this.submitForm = this.submitForm.bind(this);
-        this.onChange = this.onChange.bind(this);
         this.state = {
             username: '',
             password: '',
-            rememberMe: false
+            rememberMe: false,
+            error: ''
         }
     }
-    onChange(field, event){ 
-        const {value} = event.target;
+    onChange = (field, value) => { 
         let {username, password, rememberMe} = this.state;
         switch(field){
             case 'username':
@@ -43,20 +41,37 @@ class LoginPage extends Component {
     submitForm = async () => {
         const {username, password} = this.state;
         const { authType } = this.props;
+        let response = null;
         try {
             if(authType === 'signin'){
-                await userApi.loginUser({username, password})
+                response = await userApi.loginUser({username, password})
+                this.props.addNotification({
+                    type: 'success',
+                    message: `Successfully logged in as ${username}!`
+                })
             } else if (authType === 'signup'){
-                await userApi.createNewUser({username, password});
+                response = await userApi.createNewUser({username, password});
+                this.props.addNotification({
+                    type: 'success',
+                    message: `Successfully created new user ${username}!`
+                })
             }
             this.props.history.push('/')
         } catch (error) {
-            console.log(error)
+            this.setState((state) => ({
+                ...state,
+                error: error.message
+            }))
         }
     }
+    changeAuthType = () => {
+        const { authType } = this.props;
+        const url = authType === 'signin' ? '/signup' : '/signin'
+        this.props.history.push(url)
+    }
     render(){
-        const {username, password} = this.state,
-            {authType, error, history, removeError} = this.props,
+        const {username, password, error} = this.state,
+            {authType, history, removeError} = this.props,
             buttonLink = authType === 'signup' ? '/signin' : '/signup';
 
             //Remove error on route change
@@ -71,42 +86,54 @@ class LoginPage extends Component {
                         <img className='login-page-logo' src={logo}/>
                         <h4 className='login-page-title'>Box Canvas</h4>
                     </div>
-                    <h2 className='login-page-header'>{authType === 'signup' ? 'Sign Up' : 'Login'}</h2>
-                    <Form className='login-page-wrap'>
-                        {error.message && <div className='login-page-error'>{error.message}</div>}
-                        <Form.Group>
-                            <Form.Label>Username</Form.Label>
-                            <Form.Control 
-                                type="string" 
-                                placeholder="Username" 
-                                value={username} 
-                                onChange={e => this.onChange('username', e)}
+                    <Header>{authType === 'signup' ? 'SIGN UP' : 'SIGN IN'}</Header>
+                    <Form style={{ width: '300px'}}>
+                        {error && (
+                            <Message
+                                negative
+                                content={error}
                             />
-                        </Form.Group>
-
-                        <Form.Group controlId="formBasicPassword">
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control 
-                                type="password" 
-                                placeholder="Password" 
-                                value={password} 
-                                onChange={e => this.onChange('password', e)}
+                        )}
+                        <Form.Input
+                            label='Username'
+                            onChange={(e) => this.onChange('username', e.target.value)}
+                            value={username}
+                            placeholder='Username...'
+                        />
+                        <Form.Input
+                            label='Password'
+                            type='password'
+                            onChange={(e) => this.onChange('password', e.target.value)}
+                            value={password}
+                            placeholder='Password...'
+                        />
+                        <Form.Button 
+                            fluid
+                            primary
+                            onClick={() => this.submitForm()}
+                            content={authType === 'signup' ? 'Sign Up' : 'Login'}
+                        />
+                        <Form.Field style={{display: 'flex', alignItems: 'center', justifyContent: 'space-evenly'}}>
+                            <Checkbox
+                                className='checkbox'
+                                style={{margin: '0', padding: '0'}}
+                                label='Remember me'
                             />
-                        </Form.Group>
+                            <div 
+                                style={{cursor: 'pointer'}}
+                                onClick={this.changeAuthType}
+                            >
+                                {authType === 'signup' ? 'Already a member?' : 'Become a new user.'}
+                            </div>
+                        </Form.Field>
+                    </Form>
+                </div>
+            </div>
+        )
+    }
+}
 
-                        <div className='login-page-button-wrap'>
-                            <Form.Group controlId="formBasicCheckbox">
-                                <Form.Check 
-                                    type="checkbox" 
-                                    label="Remember Me" 
-                                    value={this.state.rememberMe} 
-                                    onChange={e => this.onChange('rememberMe', e)}
-                                />
-                            </Form.Group>
-                            <div>Forgot Password?</div>
-                        </div>
-                        <div className='login-page-button-wrap'>
-                            <Button 
+                            {/* <Button 
                                 variant="outline-primary" 
                                 disabled={!username && !password}
                                 onClick={this.submitForm}
@@ -119,14 +146,7 @@ class LoginPage extends Component {
                                 >
                                     {authType === 'signup' ? 'Returning User?' : 'New User?'}
                                 </Button>
-                            </Link>
-                        </div>
-                    </Form>
-                </div>
-            </div>
-        )
-    }
-}
+                            </Link> */}
 
 const mapStateToProps = (state) => {
     return {}

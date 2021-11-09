@@ -4,7 +4,8 @@ import ColorPicker from '../../ColorPicker';
 import AccordionCard from '../../../AccordionCard';
 import { 
     changeShapeFill,
-    changeBackgroundColor
+    changeBackgroundColor,
+    changeShapeOpacity
 } from '../../../../actions/canvasActions';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
@@ -31,9 +32,10 @@ class ShapeColorCard extends Component {
 
     handleColorChange = (value, color) => {
         const { shapeFillOpen } = this.state;
-        const rgbString = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`
+        const rgbString = `rgb(${color.r}, ${color.g}, ${color.b})`
         if(shapeFillOpen){
             this.props.dispatch(changeShapeFill(rgbString));
+            this.props.dispatch(changeShapeOpacity(color.a))
         } else {
             this.props.dispatch(changeBackgroundColor(rgbString));
         }
@@ -75,15 +77,15 @@ class ShapeColorCard extends Component {
         })
     }
 
-    contentRow = (type, colorString, colorValue, open) => {
+    contentRow = (type, colorString, colorValue, colorOpacity, open) => {
         const color = colorValue ? colorValue : colorString;
-        const { currentShape } = this.props;
-        const { backgroundColor } = this.props.canvasData;
+        const { currentShape, canvasData } = this.props;
+        const fill = type === Common.background ? canvasData.fill : currentShape.fill;
         return (
             <Menu.Item style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                 <Menu.Header>{type}</Menu.Header>
                 <div 
-                    style={{...this.style.colorIcon, backgroundColor: colorString}}
+                    style={{...this.style.colorIcon, backgroundColor: colorString, opacity: colorOpacity}}
                     onClick={() => this.toggleColorPicker(type, true)}
                 >
                 </div>
@@ -95,8 +97,8 @@ class ShapeColorCard extends Component {
                         <ColorPicker 
                             color={color} 
                             colorChange={this.handleColorChange}
-                            shapeColor={currentShape.color}
-                            backgroundColor={backgroundColor}
+                            shapeColor={fill}
+                            backgroundColor={fill}
                         />
                     </div>
                 )}
@@ -110,13 +112,12 @@ class ShapeColorCard extends Component {
 
     cardShapeContent = () => {
         const { shapeFillOpen, backgroundColorOpen, shapeFillValue, backgroundColorValue } = this.state;
-        const { inverted, currentShape, currentShapeType, selectedShape } = this.props;
+        const { inverted, currentShape, selectedShapeId } = this.props;
         const { backgroundColor } = this.props.canvasData;
-        const shapeFill = selectedShape ? selectedShape.fill : currentShape[currentShapeType.toLowerCase()].fill;
         return (
             <Menu.Menu inverted={inverted} vertical>
-                {this.contentRow(Common.shapeFill, shapeFill, shapeFillValue, shapeFillOpen)}
-                {this.contentRow(Common.background, backgroundColor, backgroundColorValue, backgroundColorOpen)}
+                {this.contentRow(Common.shapeFill, currentShape.fill, shapeFillValue, currentShape.opacity, shapeFillOpen)}
+                {this.contentRow(Common.background, backgroundColor, backgroundColorValue,1 ,backgroundColorOpen)}
             </Menu.Menu>
         )
     }
@@ -138,13 +139,12 @@ class ShapeColorCard extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { currentShape, canvasData, currentShapeType } = state.canvas;
-    const { selectedShape } = state.canvas.canvasData;
+    const { editor, canvasData } = state.canvas;
+    const { selectedShapeId, currentShape } = editor;
     return {
         canvasData,
         currentShape,
-        currentShapeType,
-        selectedShape
+        selectedShapeId
     }
 }
 

@@ -8,12 +8,12 @@ const setTokenHeader = (token) => {
   }
 }
 
-const apiCall = async (method, path, data) => {
+const apiCall = async ({method, url, data = {}}) => {
   try {
-    const response = await axios[method.toLowerCase()](path, data);
+    const response = await axios[method.toLowerCase()](url, data);
     return response.data;
   } catch (error) {
-    throw error
+    throw error.response
   }
 }
 

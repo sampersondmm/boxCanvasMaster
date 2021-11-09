@@ -10,9 +10,9 @@ class ShapeDisplayCard extends Component {
     }
 
     returnNewShape = () => {
-        const { currentShape, currentShapeType } = this.props;
-        const { square, circle, line } = currentShape;
-        switch(currentShapeType){
+        const { currentShape, defaultShape } = this.props;
+        const { square, circle, line } = defaultShape;
+        switch(currentShape.type){
             case Common.square:
                 return (
                     <rect 
@@ -95,8 +95,7 @@ class ShapeDisplayCard extends Component {
     }
 
     cardContent = () => {
-        const { canvasData, selectedShape } = this.props;
-        const hasSelectedShape = !isEmpty(selectedShape)
+        const { canvasData, selectedShapeId } = this.props;
         return (
             <div style={{
                 height: '120px', 
@@ -106,7 +105,7 @@ class ShapeDisplayCard extends Component {
                 justifyContent: 'center',
             }}>
                 <svg width='120' height='120'>
-                    {hasSelectedShape ? this.returnExistingShape() : this.returnNewShape()}
+                    {selectedShapeId ? this.returnExistingShape() : this.returnNewShape()}
                 </svg>
             </div>
         )
@@ -130,14 +129,13 @@ class ShapeDisplayCard extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { currentShape, canvasData, currentShapeType } = state.canvas;
-    const { selectedShape } = state.canvas.canvasData;
-
+    const { shapeList, canvasData } = state.canvas;
+    const { currentShape, defaultShape, selectedShapeId } = state.canvas.editor;
     return {
-        canvasData,
-        currentShapeType,
-        selectedShape,
-        currentShape
+        currentShape,
+        defaultShape,
+        selectedShapeId,
+        canvasData
     }
 }
 

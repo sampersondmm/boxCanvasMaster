@@ -1,17 +1,17 @@
 import Common from '../constants/common';
 import cloneDeep from 'lodash/cloneDeep';
 
-const updateCurrentShape = (currentShape, type, field, value) => {
+const updateCurrentShape = (currentShape, field, value) => {
     const shapeCopy = cloneDeep(currentShape);
-    switch(type){
+    switch(shapeCopy.type){
         case Common.square:
-          shapeCopy.square[field] = value;
+          shapeCopy[field] = value;
           break;
         case Common.circle:
-          shapeCopy.circle[field] = value;
+          shapeCopy[field] = value;
           break;
         case Common.line:
-          shapeCopy.line[field] = value;
+          shapeCopy[field] = value;
           break;
         default:
           break;

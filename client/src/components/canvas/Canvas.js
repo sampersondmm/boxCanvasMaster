@@ -4,16 +4,41 @@ import LeftPanel from './leftPanel/LeftPanel';
 import Size from '../../constants/size';
 import { Modal, Menu, Tab, Card } from 'semantic-ui-react';
 import ShapeCanvas from './ShapeCanvas'
-import RightMenu from './rightMenu/RightMenu';
+import CustomMenu from './customMenu/CustomMenu';
 import NavBar from '../NavBar';
-import {addShapeToCanvas, createCanvas, clearCanvasData} from '../../actions/canvasActions';
+import ShapeMenu from '../canvas/customMenu/ShapeMenu';
+import LayerMenu from '../canvas/customMenu/LayerMenu';
+import {addShapeToCanvas, clearCanvasData, createCanvas, setCanvasData} from '../../actions/canvasActions';
+import CanvasAPI from '../../api/canvasApi';
+
+const canvasApi = new CanvasAPI();
 
 class Canvas extends Component {
     constructor(props){
         super(props);
         this.state = {
             rightPanelOpen: false,
-            leftPanelOpen: false
+            leftPanelOpen: false,
+            leftPanes: [
+                {
+                    type: 'shape',
+                    icon: 'circle'
+                }, 
+                {
+                    type: 'layers',
+                    icon: 'cogs'
+                },
+            ],
+            rightPanes: [
+                {
+                    type: 'layers',
+                    icon: 'list'
+                },
+                {
+                    type: 'settings',
+                    icon: 'cogs'
+                },
+            ],
         }
         this.handleRightMenu = this.handleRightMenu.bind(this);
         this.handleLeftMenu = this.handleLeftMenu.bind(this);
@@ -21,15 +46,34 @@ class Canvas extends Component {
         this.determineWidth = this.determineWidth.bind(this);
         this.createCanvas = this.createCanvas.bind(this);
     }
+    componentDidMount(){
+        this.fetchCanvasData();
+        console.log('MOUNTED')
+    }
+    componentDidUpdate(prevProps){
+        if(prevProps.canvasId !== this.props.canvasId){
+            this.fetchCanvasData();
+        }
+    }
     handleRightMenu(){
         this.setState(state => ({
             ...state,
             rightPanelOpen: !state.rightPanelOpen
         }))
     }
-    componentDidMount(){
-        this.props.dispatch(clearCanvasData())
-    }
+    fetchCanvasData = async () => {
+        const { currentCanvasId } = this.props;
+        // if(currentCanvasId){
+        //     try {
+        //         const response = await canvasApi.fetchCanvas(currentCanvasId)
+        //         this.props.dispatch(setCanvasData(response));
+        //     } catch (error) {
+        //         console.log(error)
+        //     }
+        // } else {
+        //     this.props.dispatch(clearCanvasData())
+        // }
+    } 
     handleLeftMenu(){
         this.setState(state => ({
             ...state,
@@ -60,44 +104,46 @@ class Canvas extends Component {
         return width;
     }
     render(){
-        const {canvasData} = this.props.canvas, 
-            width = this.determineWidth(),
-            style = {
-                canvasDisplay: {
-                    height: `calc(100vh - ${Size.topPanelHeight}px)`,
-                },
-                canvasDisplayInner: {
-                    width: `calc(100vw - ${width}px)`,
-                    height: `calc(100vh - ${Size.topPanelHeight}px)`,
-                    left: `${this.state.leftPanelOpen ? Size.sidePanelWidth + Size.sidePanelMenuWidth : Size.sidePanelWidth}px`,
-                    top: '0'
-                }
-            };
+        const {shapeList} = this.props.canvas;
+        const { leftPanes, rightPanes } = this.state;
+        const width = 350;
+        const newCanvas = true;
         
         return(
             <div className='canvas-wrap'>
-                <NavBar/>
+                <NavBar {...this.props}/>
                 <div className='canvas-display' style={{height: 'calc(100vh - 50px)'}}>
-                    <LeftPanel
+                    {/* <LeftPanel
                         handleMenu={this.handleLeftMenu}
                         isOpen={this.state.leftPanelOpen}
                         addShape={this.addShape}
                         canvasData={canvasData}
+                    /> */}
+                    <CustomMenu
+                        location='main'
+                        panes={leftPanes}
+                        newCanvas={newCanvas}
+                        width={width}
+                        addNotification={this.props.addNotification}
+                        canvasData={shapeList}
+                        shapeList={shapeList}
                     />
-                    <div className='canvas-display-inner'>
+                    <div className='canvas-display-inner' style={{width:`calc(100vw - ${width * 2}px)`, border: '2px solid red'}}>
                         <ShapeCanvas 
+                            idFromUrl={this.props.idFromUrl}
                             addShape={this.addShape}
                         />
                     </div>
-                    {/* <RightPanel
-                        canvasData={canvasData}
-                        handleMenu={this.handleRightMenu}
-                        isOpen={this.state.rightPanelOpen}
-                    /> */}
-                        <RightMenu
-                            width={`${Size.sidePanelMenuWidth + 100}px`}
-                            shapeList={canvasData.shapeList}
-                        />
+                    <CustomMenu
+                        location='main'
+                        panes={rightPanes}
+                        actions={[{type: 'save', icon:'save'}]}
+                        newCanvas={newCanvas}
+                        width={width}
+                        addNotification={this.props.addNotification}
+                        canvasData={shapeList}
+                        shapeList={shapeList}
+                    />
                 </div>
             </div>
         )
@@ -108,7 +154,7 @@ const mapStateToProps = state => {
     const {canvas} = state;
     return {
         ...state,
-        canvas
+        canvas,
     }
 }
 

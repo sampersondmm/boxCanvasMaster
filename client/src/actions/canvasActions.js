@@ -1,5 +1,5 @@
 import ActionTypes from './ActionTypes';
-import {apiCall} from './api';
+import {apiCall} from '../utils/apiUtils';
 import { addError } from './errorActions';
 
 const setCanvasSize = (canvasWidth, canvasHeight) => {
@@ -178,6 +178,12 @@ fetchCanvasList = () => {
             })
     }
 },
+setCanvasData = (canvas) => {
+    return {
+        type: ActionTypes.SET_CANVAS_DATA,
+        payload: canvas
+    }
+},
 createCanvas = canvasData => (dispatch, getState) => {
     let {currentUser} = getState();
     const {id} = currentUser.user;
@@ -201,6 +207,7 @@ export {
     changeShapeStrokeWidth,
     changeCanvasScale, 
     createCanvas, 
+    setCanvasData,
     fetchCanvasList,
     changeShapeHeight, 
     changeShapeRadius, 

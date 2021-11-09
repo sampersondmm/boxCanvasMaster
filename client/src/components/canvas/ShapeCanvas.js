@@ -1,12 +1,16 @@
 import React, {Component} from 'react';
 import {event, select, selectAll} from 'd3-selection';
 import { transition } from 'd3-transition'
-import { selectShape, updateLine } from '../../actions/canvasActions';
+import { clearCanvasData, selectShape, updateLine, setCanvasData } from '../../actions/canvasActions';
 import Common from '../../constants/common';
 import uuid from 'react-uuid';
 import {connect} from 'react-redux';
 import cloneDeep from 'lodash/cloneDeep';
-import { map, filter } from 'lodash';
+import { map, filter, isEqual, trim } from 'lodash';
+import { withRouter } from 'react-router-dom'
+import CanvasAPI from '../../api/canvasApi';
+
+const canvasApi = new CanvasAPI();
 
 class ShapeCanvas extends Component {
     /**
@@ -30,107 +34,223 @@ class ShapeCanvas extends Component {
         this.originY = 0;
     }
 
-    componentDidUpdate(prevProps){
-        const { selectedShapeId, shapeList } = this.props.canvasData;
-        const { currentShapeType, currentShape } = this.props;
-        const { square, circle, line } = currentShape;
-
-        switch(currentShapeType){
-            case Common.square:
-                if(square.width !== prevProps.currentShape.square.width){
-                    this.changeShapeWidth(square.width)
-                }
-                if(square.height !== prevProps.currentShape.square.height){
-                    this.changeShapeHeight(square.height)
-                }
-                if(square.rotation !== prevProps.currentShape.square.rotation){
-                    this.changeShapeRotation(square.rotation)
-                }
-                if(square.fill !== prevProps.currentShape.square.fill){
-                    this.changeShapeFill(square.fill)
-                }
-                if(square.stroke !== prevProps.currentShape.square.stroke){
-                    this.changeShapeStroke(square.stroke)
-                }
-                if(square.strokeWidth !== prevProps.currentShape.square.strokeWidth){
-                    this.changeShapeStrokeWidth(square.strokeWidth)
-                }
-                if(square.opacity !== prevProps.currentShape.square.opacity){
-                    this.changeShapeOpacity(square.opacity)
-                }
-                break;
-
-            case Common.circle:
-                if(circle.radius !== prevProps.currentShape.circle.radius){
-                    this.changeShapeRadius(circle.radius)
-                }
-                if(circle.fill !== prevProps.currentShape.circle.fill){
-                    this.changeShapeFill(circle.fill);
-                }
-                if(circle.stroke !== prevProps.currentShape.circle.stroke){
-                    this.changeShapeStroke(circle.stroke);
-                }
-                if(circle.strokeWidth !== prevProps.currentShape.circle.strokeWidth){
-                    this.changeShapeStrokeWidth(circle.strokeWidth);
-                }
-                if(circle.opacity !== prevProps.currentShape.circle.opacity){
-                    this.changeShapeOpacity(circle.opacity);
-                }
-                break;
-
-            case Common.line:
-                if(line.stroke !== prevProps.currentShape.line.stroke){
-                    this.changeShapeStroke(line.stroke)
-                }
-                if(line.strokeWidth !== prevProps.currentShape.line.strokeWidth){
-                    this.changeShapeStrokeWidth(line.strokeWidth)
-                }
-                break;
-            default:
-                break;
-        }
-        if(shapeList !== prevProps.canvasData.shapeList){
-            if(shapeList.length < prevProps.canvasData.shapeList.length){
-                this.removeShape(selectedShapeId);
-            }
-        }
-        if(currentShapeType !== prevProps.currentShapeType){
-            this.changeShapeType(currentShapeType)
-        }
-        if(selectedShapeId !== prevProps.canvasData.selectedShapeId){
-            this.selectShape(selectedShapeId)
-        }
-    }
-
     /**
      * Update the state based on the props.
      *
      * @returns {void}
      */
-    componentDidMount() {
-        const { backgroundColor } = this.props.canvasData;
-        const {shapeColor} = this.props.currentShape;
-        this.setState(state => ({
-            ...state,
-            shapeColor: shapeColor,
-            backgroundColor: backgroundColor
-        }));
+     componentDidMount() {
         window.addEventListener('resize', this.resize);
-        this.loadShapes();
         this.setupCanvas();
     }
 
-    setupCanvas = () => {
-        const { currentShape, currentShapeType } = this.props;
-        const { canvasWidth, canvasHeight } = this.props.canvasData;
-        this.centerX = canvasWidth / 2;
-        this.centerY = canvasHeight / 2;
+    // shouldComponentUpdate(nextProps, nextState){
+    //     return !isEqual(nextProps.canvas, this.props.canvas)
+    // }
 
-        switch(currentShapeType){
+    componentDidUpdate(prevProps){
+        const { currentShape, canvasId, selectedShapeId, idFromUrl } = this.props;
+        const { shapeList } = this.props;
+
+        switch(currentShape.type){
+            case Common.square:
+                if(currentShape.width !== prevProps.currentShape.width){
+                    this.changeShapeWidth(currentShape.width)
+                }
+                if(currentShape.height !== prevProps.currentShape.height){
+                    this.changeShapeHeight(currentShape.height)
+                }
+                if(currentShape.rotation !== prevProps.currentShape.rotation && prevProps.currentShape.rotation){
+                    this.changeShapeRotation(currentShape.rotation)
+                }
+                if(currentShape.fill !== prevProps.currentShape.fill){
+                    this.changeShapeFill(currentShape.fill)
+                }
+                if(currentShape.stroke !== prevProps.currentShape.stroke){
+                    this.changeShapeStroke(currentShape.stroke)
+                }
+                if(currentShape.strokeWidth !== prevProps.currentShape.strokeWidth){
+                    this.changeShapeStrokeWidth(currentShape.strokeWidth)
+                }
+                if(currentShape.opacity !== prevProps.currentShape.opacity){
+                    this.changeShapeOpacity(currentShape.opacity)
+                }
+                break;
+
+            case Common.circle:
+                if(currentShape.radius !== prevProps.currentShape.radius){
+                    this.changeShapeRadius(currentShape.radius)
+                }
+                if(currentShape.fill !== prevProps.currentShape.fill){
+                    this.changeShapeFill(currentShape.fill);
+                }
+                if(currentShape.stroke !== prevProps.currentShape.stroke){
+                    this.changeShapeStroke(currentShape.stroke);
+                }
+                if(currentShape.strokeWidth !== prevProps.currentShape.strokeWidth){
+                    this.changeShapeStrokeWidth(currentShape.strokeWidth);
+                }
+                if(currentShape.opacity !== prevProps.currentShape.opacity){
+                    this.changeShapeOpacity(currentShape.opacity);
+                }
+                break;
+
+            case Common.line:
+                if(currentShape.stroke !== prevProps.currentShape.stroke){
+                    this.changeShapeStroke(currentShape.stroke)
+                }
+                if(currentShape.strokeWidth !== prevProps.currentShape.strokeWidth){
+                    this.changeShapeStrokeWidth(currentShape.strokeWidth)
+                }
+                break;
+            default:
+                break;
+        }
+        if(shapeList.length !== prevProps.shapeList.length){
+            if(shapeList.length < prevProps.shapeList.length){
+                this.removeShape(selectedShapeId);
+            }
+            if(shapeList.length > prevProps.shapeList.length){
+                this.addShapeToCanvas();
+            }
+        }
+        if(currentShape.type !== prevProps.currentShape.type){
+            this.changeShapeType(currentShape.type)
+        }
+        if(selectedShapeId !== prevProps.selectedShapeId){
+            this.selectShape(selectedShapeId)
+        }
+        if(canvasId !== prevProps.canvasId && !canvasId){
+            this.loadShapes();
+            this.setupStamp();
+        }
+        if(idFromUrl !== prevProps.idFromUrl){
+            this.setupCanvas();
+        }
+    }
+
+    fetchCanvasData = async (id) => {
+        try {
+            const response = await canvasApi.fetchCanvas(id);
+            this.props.dispatch(setCanvasData(response))
+        } catch (error) {
+            
+        }
+    }
+
+    // clearCanvasData = () => {
+    //     this.props.dispatch(clearCanvasData())
+
+    //     select(this.node)
+    //         .selectAll('.stamp')
+    //         .remove();
+
+    //     select(this.node)
+    //         .selectAll('.shape')
+    //         .remove();
+    // }
+
+    setupCanvas = async () => {
+        const {idFromUrl, canvasId} = this.props;
+
+        this.props.dispatch(clearCanvasData())
+
+        if(idFromUrl){
+            await this.fetchCanvasData(idFromUrl);
+        }
+
+        this.loadShapes();
+        this.setupStamp();
+        
+    }
+
+    loadShapes = () => {
+        const { shapeList } = this.props;
+        let shapeCopy = {}
+        
+        select(this.node)
+        .selectAll('.stamp')
+        .remove();
+
+        select(this.node)
+        .selectAll('.shape')
+        .remove();
+
+        const shapeSelector = select(this.node)
+            .selectAll('.shape')
+
+        shapeList.map((shape) => {
+            switch(shape.type){
+                case Common.square:
+                    shapeSelector
+                        .data([shape])
+                        .enter()
+                        .append('rect')
+                        .attr('class', 'shape')
+                        .attr('fill', obj => obj.fill)
+                        .attr('stroke', obj => obj.stroke)
+                        .attr('stroke-width', obj => obj.strokeWidth)
+                        .attr('opacity', obj => obj.opacity)
+                        .attr('width', obj => obj.width)
+                        .attr('height', obj => obj.height)
+                        .attr('x', obj => obj.posX)
+                        .attr('y', obj => obj.posY)
+        
+                    break;
+                case Common.circle:
+                    shapeSelector
+                        .data([shape])
+                        .enter()
+                        .append('circle')
+                        .attr('class', 'shape')
+                        .attr('fill', obj => obj.fill)
+                        .attr('stroke', obj => obj.stroke)
+                        .attr('stroke-width', obj => obj.strokeWidth)
+                        .attr('opacity', obj => obj.opacity)
+                        .attr('r', obj => obj.radius)
+                        .attr('cx', obj => obj.posX)
+                        .attr('cy', obj => obj.posY)
+        
+                    break;
+                case Common.line:
+                    shapeSelector
+                        .data([shape])
+                        .enter()
+                        .append('path')
+                        .attr('class', 'shape')
+                        .attr('stroke', obj => obj.stroke)
+                        .attr('opacity', obj => obj.opacity)
+                        .attr('fill', obj => obj.fill)
+                        .attr('stroke-width', obj => obj.strokeWidth)
+                        .attr('d', obj => obj.points);
+        
+                    break;
+                default:
+                    break;
+            }
+            // if(shape.type === Common.line){
+            //     if(this.closeShapeRange){
+            //         this.props.addShape(shapeCopy);
+            //         this.closeShapeRange = false;
+            //     }
+            // } else {
+            //     this.props.addShape(shapeCopy);
+            // }
+        })
+        
+    }
+
+    setupStamp = () => {
+        const { currentShape } = this.props;
+        const { width, height } = this.props.canvasData;
+        this.centerX = width / 2;
+        this.centerY = height / 2;
+
+        switch(currentShape.type){
             case Common.square:
                 select(this.node)
-                    .selectAll('rect')
-                    .data([currentShape.square])
+                    .selectAll('.stamp')
+                    .data([currentShape])
                     .enter()
                     .append('rect')
                     .attr('class', 'stamp')
@@ -145,47 +265,109 @@ class ShapeCanvas extends Component {
                 break;
             case Common.circle:
                 select(this.node)
-                    .selectAll('rect')
-                    .data([currentShape.circle])
+                    .selectAll('.stamp')
+                    .data([currentShape])
                     .enter()
-                    .append('rect')
+                    .append('circle')
                     .attr('class', 'stamp')
                     .attr('fill', obj => obj.fill)
                     .attr('opacity', obj => obj.opacity)
                     .attr('r', obj => obj.radius)
                     .attr('cx', obj => obj.posX)
                     .attr('cy', obj => obj.posY)
-                break;
+                    break;
             case Common.line:
                 select(this.node)
-                    .selectAll('rect')
-                    .data([currentShape.square])
+                    .selectAll('.stamp')
+                    .data([currentShape])
                     .enter()
-                    .append('rect')
+                    .append('path')
                     .attr('class', 'stamp')
-                    .attr('fill', obj => obj.color)
+                    .attr('stroke', obj => obj.stroke)
                     .attr('opacity', obj => obj.opacity)
-                    .attr('width', obj => obj.width)
-                    .attr('height', obj => obj.height)
-                    .attr('x', obj => obj.posX)
-                    .attr('y', obj => obj.posY)
+                    .attr('fill', obj => obj.fill)
+                    .attr('stroke-width', obj => obj.strokeWidth)
+                    .attr('d', obj => this.createPointString(obj.pointData))
                 break;
             default:
                 break;
         }
 
         select(this.node)
-            .on('mousemove', () => this.moveShape())
+            .on('mousemove', () => this.moveStamp())
             .on('mouseleave', () => this.centerStamp())
             .on('click', (obj, index, arr) => this.addShape(index, arr))
 
         this.centerStamp();
     }
 
-    moveShape = () => {
-        const { currentShapeType, currentShape } = this.props;
-        const { selectedShapeId } = this.props.canvasData;
-        const { square, line } = this.props.currentShape;
+    centerStamp = () => {
+        const { width, height } = this.props.canvasData;
+        const { currentShape } = this.props;
+        const stamp = select(this.node)
+            .selectAll('.stamp');
+        const lineStamp = select(this.node)
+            .selectAll('.line-stamp');
+
+        let centerX = null;
+        let centerY = null;
+
+        switch(currentShape.type){
+            case Common.square:
+                centerX = (width / 2) - (currentShape.width/2);
+                centerY = (height / 2) - (currentShape.height/2);
+
+                stamp
+                    .attr('transform', `rotate(0 ${this.originX} ${this.originY})`)
+
+                stamp
+                    .attr('x', centerX)
+                    .attr('y', centerY)
+
+                stamp
+                    .attr('transform', `rotate(${currentShape.rotation} ${this.centerX} ${this.centerY})`)
+                break;
+            case Common.circle:
+                centerX = (width / 2);
+                centerY = (height / 2);
+
+                stamp
+                    .attr('cx', centerX)
+                    .attr('cy', centerY)
+                break;
+            case Common.line:
+                centerX = (width / 2);
+                centerY = (height / 2);
+
+                select(this.node)
+                    .selectAll('.line-stamp-circle')
+                    .attr('cx', centerX)
+                    .attr('cy', centerY);
+
+                select(this.node)
+                    .selectAll('.crosshair-vertical')
+                    .attr('x1', width/2)
+                    .attr('x2', width/2)
+                    .attr('y1', 0)
+                    .attr('y2', height)
+                    .attr('stroke', 'rgb(150,150,150)')
+
+                select(this.node)
+                    .selectAll('.crosshair-horizontal')
+                    .attr('x1', 0)
+                    .attr('x2', width)
+                    .attr('y1', height/2)
+                    .attr('y2', height/2)
+                    .attr('stroke', 'rgb(150,150,150)')
+
+                break;
+            default:
+                break;
+        }
+    }
+
+    moveStamp = () => {
+        const { currentShape, selectedShapeId } = this.props;
         const canvasElement = document.getElementById('canvas').getBoundingClientRect();
 
         const stamp = select(this.node)
@@ -207,10 +389,10 @@ class ShapeCanvas extends Component {
         let newX = 0;
         let newY = 0;
 
-        switch(currentShapeType){
+        switch(currentShape.type){
             case Common.square:
-                newX = (event.x - canvasElement.left) - (square.width/2);
-                newY = (event.y - canvasElement.top) - (square.height/2);
+                newX = (event.x - canvasElement.left) - (currentShape.width/2);
+                newY = (event.y - canvasElement.top) - (currentShape.height/2);
                 this.originX = event.x - canvasElement.left;
                 this.originY = event.y - canvasElement.top;
                 stamp
@@ -221,7 +403,7 @@ class ShapeCanvas extends Component {
                     .attr('y', () => (newY) * this.scalePosY)
 
                 stamp
-                    .attr('transform', `rotate(${square.rotation} ${this.originX} ${this.originY})`);
+                    .attr('transform', `rotate(${currentShape.rotation} ${this.originX} ${this.originY})`);
 
                 break;
             case Common.circle:
@@ -259,8 +441,8 @@ class ShapeCanvas extends Component {
                     } else {
                         this.closeShapeRange = false;
                         stamp
-                            .attr('fill', line.stroke)
-                            .attr('opacity', line.opacity)
+                            .attr('fill', currentShape.stroke)
+                            .attr('opacity', currentShape.opacity)
                             .attr('stroke', 'transparent')
                     }
     
@@ -278,7 +460,7 @@ class ShapeCanvas extends Component {
     
                     lineStamp
                         .attr('d', points)
-                        .attr('fill', line.fill);
+                        .attr('fill', currentShape.fill);
                 }
                 
                 break;
@@ -290,149 +472,8 @@ class ShapeCanvas extends Component {
         this.posY = newY;
     }
 
-    centerStamp = () => {
-        const { square } = this.props.currentShape;
-        const {canvasWidth, canvasHeight } = this.props.canvasData;
-        const { currentShapeType } = this.props;
-        const stamp = select(this.node)
-            .selectAll('.stamp');
-        const lineStamp = select(this.node)
-            .selectAll('.line-stamp');
-
-        let centerX = null;
-        let centerY = null;
-
-        switch(currentShapeType){
-            case Common.square:
-                centerX = (canvasWidth / 2) - (square.width/2);
-                centerY = (canvasHeight / 2) - (square.height/2);
-
-                stamp
-                    .attr('transform', `rotate(0 ${this.originX} ${this.originY})`)
-
-                stamp
-                    .attr('x', centerX)
-                    .attr('y', centerY)
-
-                stamp
-                    .attr('transform', `rotate(${square.rotation} ${this.centerX} ${this.centerY})`)
-                break;
-            case Common.circle:
-                centerX = (canvasWidth / 2);
-                centerY = (canvasHeight / 2);
-
-                stamp
-                    .attr('cx', centerX)
-                    .attr('cy', centerY)
-                break;
-            case Common.line:
-                centerX = (canvasWidth / 2);
-                centerY = (canvasHeight / 2);
-
-                select(this.node)
-                    .selectAll('.line-stamp-circle')
-                    .attr('cx', centerX)
-                    .attr('cy', centerY);
-
-                select(this.node)
-                    .selectAll('.crosshair-vertical')
-                    .attr('x1', canvasWidth/2)
-                    .attr('x2', canvasWidth/2)
-                    .attr('y1', 0)
-                    .attr('y2', canvasHeight)
-                    .attr('stroke', 'rgb(150,150,150)')
-
-                select(this.node)
-                    .selectAll('.crosshair-horizontal')
-                    .attr('x1', 0)
-                    .attr('x2', canvasWidth)
-                    .attr('y1', canvasHeight/2)
-                    .attr('y2', canvasHeight/2)
-                    .attr('stroke', 'rgb(150,150,150)')
-
-                break;
-            default:
-                break;
-        }
-    }
-
-    loadShapes = () => {
-        const { shapeList } = this.props.canvasData;
-        let shapeCopy = {}
-        
-        select(this.node)
-        .selectAll('.stamp')
-        .remove();
-
-        shapeList.map((shape) => {
-            switch(shape.type){
-                case Common.square:
-                    select(this.node)
-                    .selectAll('rect')
-                    .data([shape])
-                    .enter()
-                    .append('rect')
-                    .attr('class', 'stamp')
-                    .attr('fill', obj => obj.fill)
-                    .attr('stroke', obj => obj.stroke)
-                    .attr('stroke-width', obj => obj.strokeWidth)
-                    .attr('opacity', obj => obj.opacity)
-                    .attr('width', obj => obj.width)
-                    .attr('height', obj => obj.height)
-                    .attr('x', obj => obj.posX)
-                    .attr('y', obj => obj.posY)
-        
-                    break;
-                case Common.circle:
-                    shapeCopy = cloneDeep(shape);
-                    select(this.node)
-                        .selectAll('.shape')
-                        .data(this.shapeArr)
-                        .enter()
-                        .append('circle')
-                        .attr('class', 'shape')
-                        .attr('fill', obj => obj.fill)
-                        .attr('stroke', obj => obj.stroke)
-                        .attr('stroke-width', obj => obj.strokeWidth)
-                        .attr('opacity', obj => obj.opacity)
-                        .attr('r', obj => obj.radius)
-                        .attr('cx', this.posX)
-                        .attr('cy', this.posY)
-        
-                    break;
-                case Common.line:
-                    this.shapeArr.push(shape)
-                    select(this.node)
-                        .selectAll('.shape')
-                        .data(this.shapeArr)
-                        .enter()
-                        .append('path')
-                        .attr('class', 'shape')
-                        .attr('stroke', shape.stroke)
-                        .attr('fill', shape.fill)
-                        .attr('stroke-width', shape.strokeWidth)
-                        .attr('d', shape.points);
-        
-        
-    
-        
-                    break;
-                default:
-                    break;
-            }
-            if(shape.type === Common.line){
-                if(this.closeShapeRange){
-                    this.props.addShape(shapeCopy);
-                    this.closeShapeRange = false;
-                }
-            } else {
-                this.props.addShape(shapeCopy);
-            }
-        })
-        
-    }
-
     selectShape = (id) => {
+        const { shapeList } = this.props.canvasData;
         select(this.node)
             .selectAll('.shape-highlight')
             .remove();
@@ -441,15 +482,11 @@ class ShapeCanvas extends Component {
             .selectAll('.stamp')
             .attr('opacity', '0')
 
-        if(id !== ''){
-            const selectedShapeId = select(this.node)
-                .selectAll('.shape')
-                .filter(obj => obj.id === id)
-            const shapeData = selectedShapeId.data();
+        const shapeData = shapeList.find((shape) => shape.id === id)
 
-            switch(shapeData[0].type){
+        if(id !== '' && shapeData){
+            switch(shapeData.type){
                 case Common.square:
-                    const shapeTransform = selectedShapeId.attr('transform')
                     select(this.node)
                         .selectAll('.shape-highlight')
                         .data(shapeData)
@@ -463,7 +500,7 @@ class ShapeCanvas extends Component {
                         .attr('height', obj => obj.height)
                         .attr('x', obj => obj.posX)
                         .attr('y', obj => obj.posY)
-                        .attr('transform', shapeTransform);
+                        .attr('transform', obj => obj.transform);
 
                     break;
                 case Common.circle:
@@ -483,7 +520,7 @@ class ShapeCanvas extends Component {
                 case Common.line:
                     select(this.node)
                         .selectAll('.shape-highlight')
-                        .data(shapeData[0].pointData)
+                        .data(shapeData.pointData)
                         .enter()
                         .append('circle')
                         .attr('class', 'shape-highlight')
@@ -513,96 +550,169 @@ class ShapeCanvas extends Component {
             .remove();
     }
 
-    addShape = () => {
-        const { currentShape, currentShapeType, canvasData } = this.props;
-        const { square, circle, line } = currentShape;
+    addShapeToCanvas = () => {
+        const { shapeList, currentShape } = this.props;
+        
+        select(this.node)
+            .selectAll('.stamp')
+            .remove();
 
-        let shapeCopy = {}
+        select(this.node)
+            .selectAll('.shape')
+            .remove();
+
+        const shapeSelector = select(this.node)
+            .selectAll('.shape')
+
+        const stampSelector = select(this.node)
+            .selectAll('.stamp')
+
+        shapeList.map((shape) => {
+            switch(shape.type){
+                case Common.square:
+                    shapeSelector
+                        .data([shape])
+                        .enter()
+                        .append('rect')
+                        .attr('class', 'shape')
+                        .attr('fill', obj => obj.fill)
+                        .attr('stroke', obj => obj.stroke)
+                        .attr('stroke-width', obj => obj.strokeWidth)
+                        .attr('opacity', obj => obj.opacity)
+                        .attr('width', obj => obj.width)
+                        .attr('height', obj => obj.height)
+                        .attr('x', obj => obj.posX)
+                        .attr('y', obj => obj.posY)
+        
+                    break;
+                case Common.circle:
+                    shapeSelector
+                        .data([shape])
+                        .enter()
+                        .append('circle')
+                        .attr('class', 'shape')
+                        .attr('fill', obj => obj.fill)
+                        .attr('stroke', obj => obj.stroke)
+                        .attr('stroke-width', obj => obj.strokeWidth)
+                        .attr('opacity', obj => obj.opacity)
+                        .attr('r', obj => obj.radius)
+                        .attr('cx', obj => obj.posX)
+                        .attr('cy', obj => obj.posY)
+        
+                    break;
+                case Common.line:
+                    shapeSelector
+                        .data([shape])
+                        .enter()
+                        .append('path')
+                        .attr('class', 'shape')
+                        .attr('stroke', obj => obj.stroke)
+                        .attr('opacity', obj => obj.opacity)
+                        .attr('fill', obj => obj.fill)
+                        .attr('stroke-width', obj => obj.strokeWidth)
+                        .attr('d', obj => obj.points);
+        
+                    break;
+                default:
+                    break;
+            }
+            // if(shape.type === Common.line){
+            //     if(this.closeShapeRange){
+            //         this.props.addShape(shapeCopy);
+            //         this.closeShapeRange = false;
+            //     }
+            // } else {
+            //     this.props.addShape(shapeCopy);
+            // }
+        })
+
+        switch(currentShape.type){
+            case Common.square:
+                stampSelector
+                    .data([currentShape])
+                    .enter()
+                    .append('rect')
+                    .attr('class', 'stamp')
+                    .attr('fill', obj => obj.fill)
+                    .attr('stroke', obj => obj.stroke)
+                    .attr('stroke-width', obj => obj.strokeWidth)
+                    .attr('opacity', obj => obj.opacity)
+                    .attr('width', obj => obj.width)
+                    .attr('height', obj => obj.height)
+                    .attr('x', obj => obj.posX)
+                    .attr('y', obj => obj.posY)
+    
+                break;
+            case Common.circle:
+                stampSelector
+                    .data([currentShape])
+                    .enter()
+                    .append('circle')
+                    .attr('class', 'stamp')
+                    .attr('fill', obj => obj.fill)
+                    .attr('stroke', obj => obj.stroke)
+                    .attr('stroke-width', obj => obj.strokeWidth)
+                    .attr('opacity', obj => obj.opacity)
+                    .attr('r', obj => obj.radius)
+                    .attr('cx', obj => obj.posX)
+                    .attr('cy', obj => obj.posY)
+    
+                break;
+            case Common.line:
+                stampSelector
+                    .data([currentShape])
+                    .enter()
+                    .append('path')
+                    .attr('class', 'stamp')
+                    .attr('stroke', obj => obj.stroke)
+                    .attr('opacity', obj => obj.opacity)
+                    .attr('fill', obj => obj.fill)
+                    .attr('stroke-width', obj => obj.strokeWidth)
+                    .attr('d', obj => obj.points);
+    
+                break;
+            default:
+                break;
+        }
+         
+    }
+
+    addShape = () => {
+        const { currentShape, defaultShape } = this.props;
+        const { square, circle, line } = defaultShape;
+
+        let shapeCopy = {};
+        let stampCopy = {};
+
+        const shapeSelector = select(this.node)
+            .selectAll('.shape')
 
         select(this.node)
             .selectAll('.stamp')
             .remove();
 
-        switch(currentShapeType){
+        switch(currentShape.type){
             case Common.square:
-                shapeCopy = cloneDeep(square);
+                shapeCopy = cloneDeep(currentShape);
                 shapeCopy.posX = this.posX;
                 shapeCopy.posY = this.posY;
                 shapeCopy.originX = this.originX;
                 shapeCopy.originY = this.originY;
                 shapeCopy.id = uuid();
                 this.shapeArr.push(shapeCopy);
-                select(this.node)
-                    .selectAll('.shape')
-                    .data(this.shapeArr)
-                    .enter()
-                    .append('rect')
-                    .attr('class', 'shape')
-                    .attr('fill', obj => obj.fill)
-                    .attr('stroke', obj => obj.stroke)
-                    .attr('stroke-width', obj => obj.strokeWidth)
-                    .attr('opacity', obj => obj.opacity)
-                    .attr('width', obj => obj.width)
-                    .attr('height', obj => obj.height)
-                    .attr('x', obj => obj.posX)
-                    .attr('y', obj => obj.posY)
-                    .attr('transform', obj => `rotate(${obj.rotation} ${this.originX} ${this.originY})`)
-
-                select(this.node)
-                    .selectAll('.stamp')
-                    .data([shapeCopy])
-                    .enter()
-                    .append('rect')
-                    .attr('class', 'stamp')
-                    .attr('fill', obj => obj.fill)
-                    .attr('stroke', obj => obj.stroke)
-                    .attr('stroke-width', obj => obj.strokeWidth)
-                    .attr('opacity', obj => obj.opacity)
-                    .attr('width', obj => obj.width)
-                    .attr('height', obj => obj.height)
-                    .attr('x', obj => obj.posX)
-                    .attr('y', obj => obj.posY)
-                    .attr('transform', obj => `rotate(${obj.rotation} ${this.originX} ${this.originY})`);
                 break;
             case Common.circle:
-                shapeCopy = cloneDeep(circle);
+                shapeCopy = cloneDeep(currentShape);
                 shapeCopy.posX = this.posX;
                 shapeCopy.posY = this.posY;
                 shapeCopy.id = uuid();
                 this.shapeArr.push(shapeCopy);
-                select(this.node)
-                    .selectAll('.shape')
-                    .data(this.shapeArr)
-                    .enter()
-                    .append('circle')
-                    .attr('class', 'shape')
-                    .attr('fill', obj => obj.fill)
-                    .attr('stroke', obj => obj.stroke)
-                    .attr('stroke-width', obj => obj.strokeWidth)
-                    .attr('opacity', obj => obj.opacity)
-                    .attr('r', obj => obj.radius)
-                    .attr('cx', this.posX)
-                    .attr('cy', this.posY)
-
-                select(this.node)
-                    .selectAll('.stamp')
-                    .data([shapeCopy])
-                    .enter()
-                    .append('circle')
-                    .attr('class', 'stamp')
-                    .attr('fill', obj => obj.fill)
-                    .attr('stroke', obj => obj.stroke)
-                    .attr('stroke-width', obj => obj.strokeWidth)
-                    .attr('opacity', obj => obj.opacity)
-                    .attr('r', obj => obj.radius)
-                    .attr('cx', this.posX)
-                    .attr('cy', this.posY)
                 break;
             case Common.line:
                 if(this.closeShapeRange){
                     shapeCopy = cloneDeep(line);
                     shapeCopy.id = uuid();
-                    shapeCopy.points = this.createPointString();
+                    shapeCopy.points = this.createPointString(this.linePoints);
                     shapeCopy.pointData = this.linePoints;
                     this.shapeArr.push(shapeCopy);
                     this.linePoints = [];
@@ -654,7 +764,7 @@ class ShapeCanvas extends Component {
             default:
                 break;
         }
-        if(currentShapeType === Common.line){
+        if(currentShape.type === Common.line){
             if(this.closeShapeRange){
                 this.props.addShape(shapeCopy);
                 this.closeShapeRange = false;
@@ -664,18 +774,17 @@ class ShapeCanvas extends Component {
         }
     }
 
-    createPointString = () => {
-        const firstPoint = this.linePoints[0];
-        let points = '';
-        for(const point of this.linePoints){
-            if(points === ''){
-                points = points.concat(`M ${point.x} ${point.y}`);
+    createPointString = (pointList) => {
+        let pointString = '';
+        for(const point of pointList){
+            if(pointString === ''){
+                pointString = pointString.concat(`M ${point.x} ${point.y}`);
             } else {
-                points = points.concat(` L ${point.x} ${point.y}`)
+                pointString = pointString.concat(` L ${point.x} ${point.y}`)
             }
         }
-        points = points.concat(` Z`)
-        return points;
+        pointString = pointString.concat(` Z`)
+        return pointString;
     }
 
     createShape = () => {
@@ -804,12 +913,10 @@ class ShapeCanvas extends Component {
         select(this.node)
             .selectAll('.stamp')
             .attr('opacity', newOpacity)
-        this.currentShape.opacity = newOpacity;
     }
 
     changeShapeType = (newType) => {
-        const { currentShape, canvasData } = this.props;
-        const { square, circle, line} = currentShape;
+        const { currentShape } = this.props;
 
         select(this.node)
             .selectAll('.stamp')
@@ -819,7 +926,7 @@ class ShapeCanvas extends Component {
             case Common.square:    
                 select(this.node)
                     .selectAll('.stamp')
-                    .data([square])
+                    .data([currentShape])
                     .enter()
                     .append('rect')
                     .attr('class', 'stamp')
@@ -835,7 +942,7 @@ class ShapeCanvas extends Component {
             case Common.circle:
                 select(this.node)
                     .selectAll('.stamp')
-                    .data([circle])
+                    .data([currentShape])
                     .enter()
                     .append('circle')
                     .attr('class', 'stamp')
@@ -855,7 +962,7 @@ class ShapeCanvas extends Component {
 
                 select(this.node)
                     .selectAll('.stamp')
-                    .data([line])
+                    .data([currentShape])
                     .enter()
                     .append('circle')
                     .attr('class', 'line-stamp-circle')
@@ -867,21 +974,21 @@ class ShapeCanvas extends Component {
 
                 select(this.node)
                     .selectAll('.stamp')
-                    .data([line])
+                    .data([currentShape])
                     .enter()
                     .append('line')
                     .attr('class', 'crosshair-vertical')
 
                 select(this.node)
                     .selectAll('.stamp')
-                    .data([line])
+                    .data([currentShape])
                     .enter()
                     .append('line')
                     .attr('class', 'crosshair-horizontal')
 
                 select(this.node)
                     .selectAll('.line-stamp')
-                    .data([line])
+                    .data([currentShape])
                     .enter()
                     .append('path')
                     .attr('class', 'line-stamp')
@@ -898,12 +1005,12 @@ class ShapeCanvas extends Component {
     }
 
     render() {
-        const {canvasWidth, canvasHeight, backgroundColor} = this.props.canvasData,
+        const {width, height, fill} = this.props.canvasData,
             style = {
                 main: {
-                    width: `${canvasWidth}px`,
-                    height: `${canvasHeight}px`,
-                    backgroundColor: backgroundColor,
+                    width: `${width}px`,
+                    height: `${height}px`,
+                    backgroundColor: fill,
                 }
             };
             
@@ -914,15 +1021,19 @@ class ShapeCanvas extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const {canvasData, currentShapeType, currentShape} = state.canvas;
+    const { editor, shapeList, canvasData } = state.canvas;
+    const { currentShape, defaultShape, selectedShapeId } = editor;
     return { 
+        shapeList,
         canvasData,
-        currentShapeType,
+        defaultShape,
+        canvasId: state.canvas._id,
+        selectedShapeId,
         currentShape
     }
 } 
 
-export default connect(mapStateToProps)(ShapeCanvas);
+export default withRouter(connect(mapStateToProps)(ShapeCanvas));
 
 
 

@@ -6,7 +6,7 @@ import {BrowserRouter} from 'react-router-dom';
 import rootReducer from './reducers';
 import {createStore, applyMiddleware, compose} from 'redux';
 import { setCurrentUser } from './actions/userActions';
-import { setTokenHeader } from './actions/api'
+import { setTokenHeader } from './utils/apiUtils'
 import thunk from 'redux-thunk';
 import jwtDecode from 'jwt-decode';
 
@@ -14,15 +14,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './fontAwesome/css/all.css';
 
 import './index.css';
+import './css/index.css';
 import './css/base.css';
-import './css/loginPage.css';
 import './css/panelButton.css';
-import './css/homePage.css';
 import './css/canvas.css';
 import './css/rightPanel.css';
 import './css/leftPanel.css';
 import './css/topPanel.css';
-import './css/navbar.css';
 import './css/colorMenu.css';
 import './css/colorPicker.css';
 import './css/setupCanvas.css';
