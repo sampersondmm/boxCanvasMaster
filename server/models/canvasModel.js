@@ -1,15 +1,61 @@
 const mongoose = require('mongoose');
-const User = require('./userModel')
+const User = require('./userModel');
+
+const { ObjectId } = mongoose.Schema.Types;
 
 const canvasSchema = new mongoose.Schema({
-    canvasData: {
+    info: {
         type: Object,
-        required: true
+        default: {}
     },
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    }
+        type: ObjectId,
+        ref: 'User',
+        required: true
+    },
+    shapeList: {
+        type: Array,
+        required: true
+    },
+    canvasData: {
+        width: {
+            type: Number,
+            required: true
+        },
+        height: {
+            type: Number,
+            required: true
+        },
+        fill: {
+            type: String,
+            required: true
+        },
+        scale: {
+            type: Number,
+            required: true
+        }
+    },
+    editor: {
+        selectedShapeId: {
+            type: String,
+            default: ''
+        },
+        currentShape: {
+            type: Object,
+            required: true,
+        },
+        defaultShape: {
+            type: Object,
+        },
+        colorPalette: {
+            type: Array
+        }
+    },
+    deleted: {
+        type: Boolean,
+        default: false,
+        required: true
+    },
 }, {
     timestamps: true
 })
