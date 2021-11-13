@@ -1,22 +1,25 @@
 import Common from '../constants/common';
 import cloneDeep from 'lodash/cloneDeep';
 
-const updateCurrentShape = (currentShape, field, value) => {
-    const shapeCopy = cloneDeep(currentShape);
-    switch(shapeCopy.type){
-        case Common.square:
-          shapeCopy[field] = value;
-          break;
-        case Common.circle:
-          shapeCopy[field] = value;
-          break;
-        case Common.line:
-          shapeCopy[field] = value;
-          break;
-        default:
-          break;
+const updateCurrentShape = (state, field, value) => {
+    const copy = cloneDeep(state);
+    const { currentShape, editedShapes } = copy.editor;
+    currentShape[field] = value;
+    editedShapes[currentShape.type.toLowerCase()] = {...currentShape};
+    return {
+      ...copy,
+      editor: {
+        ...copy.editor,
+        currentShape,
+        editedShapes
       }
-    return shapeCopy;
+    }
 }
 
-export { updateCurrentShape };
+const createPointString = (pointData) => {
+  
+}
+
+export { 
+  updateCurrentShape
+};

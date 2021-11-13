@@ -10,7 +10,7 @@ class PointDisplayCard extends Component {
 
     returnNewShape = () => {
         const { currentShape, currentShapeType } = this.props;
-        const { square, circle, line } = currentShape;
+        // const { square, circle, line } = currentShape;
         switch(currentShapeType){
             case Common.square:
                 return (
@@ -19,20 +19,20 @@ class PointDisplayCard extends Component {
                         height='70' 
                         x={(120 / 2) - (70 / 2)}
                         y={(120 / 2) - (70 / 2)}
-                        fill={square.fill}
-                        fillOpacity={square.opacity}
-                        stroke={square.stroke}
-                        strokeWidth={square.strokeWidth}
+                        fill={currentShape.fill}
+                        fillOpacity={currentShape.opacity}
+                        stroke={currentShape.stroke}
+                        strokeWidth={currentShape.strokeWidth}
                     />
                 )
             case Common.circle:
                 return (
                     <circle
                         r='35'
-                        fill={circle.fill}
-                        fillOpacity={circle.opacity}
-                        stroke={circle.stroke}
-                        strokeWidth={circle.strokeWidth}
+                        fill={currentShape.fill}
+                        fillOpacity={currentShape.opacity}
+                        stroke={currentShape.stroke}
+                        strokeWidth={currentShape.strokeWidth}
                         cx={60}
                         cy={60}
                     />
@@ -40,9 +40,9 @@ class PointDisplayCard extends Component {
             case Common.line:
                 return (
                     <path
-                        stroke={line.stroke}
-                        fill={line.fill}
-                        strokeWidth={line.strokeWidth}
+                        stroke={currentShape.stroke}
+                        fill={currentShape.fill}
+                        strokeWidth={currentShape.strokeWidth}
                         d='M 0 40 L 40 80 L 80 40 L 120 80'
                     />
                 )
@@ -102,14 +102,13 @@ class PointDisplayCard extends Component {
     }
 
     cardContent = () => {
-        const { currentShape, currentShapeType, selectedShape } = this.props;
-        const { line } = currentShape;
+        const { currentShape, open } = this.props;
 
-        return line.pointData.map((point, index) => {
+        return currentShape.pointData ? currentShape.pointData.map((point, index) => {
             return (
                 <AccordionCard
-                    open={false}
-                    header={`${Common.point} ${index + 1}`}
+                    open={open}
+                    header={`${Common.point} ${index}`}
                     additionalText={`pos x: ${Math.floor(point.x)} pos y: ${Math.floor(point.y)}`}
                     selection={null}
                     handleSelect={this.handleSelectPoint}
@@ -118,7 +117,7 @@ class PointDisplayCard extends Component {
                     content={null}
                 />
             )
-        })
+        }) : []
     }
 
 
@@ -139,14 +138,14 @@ class PointDisplayCard extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { currentShape, canvasData, currentShapeType } = state.canvas;
+    const { editor, canvasData, currentShapeType } = state.canvas;
     const { selectedShape } = state.canvas.canvasData;
 
     return {
         canvasData,
         currentShapeType,
         selectedShape,
-        currentShape
+        currentShape: editor.currentShape
     }
 }
 

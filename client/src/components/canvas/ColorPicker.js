@@ -6,7 +6,7 @@ import Size from '../../constants/size';
 class ColorPicker extends Component {
     render(){
       return (
-        <div className='color-picker-wrap'>
+        <div className='color-picker-wrap' style={{width: '100%', height: '100%'}}>
             <div className='color-picker-saturation'>
               <Saturation 
                 {...this.props} 

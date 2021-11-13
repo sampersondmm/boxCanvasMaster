@@ -1,5 +1,6 @@
 .canvas-wrap {
     display: flex;
+    overflow: hidden;
     width: 100vw;
     flex-direction: column;
     justify-content: space-between;

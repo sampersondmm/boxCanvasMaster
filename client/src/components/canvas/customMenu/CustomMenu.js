@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { Menu, Tab, Icon } from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import { isEqual } from 'lodash'
-import { addShapeToCollection } from '../../../actions/canvasActions';
+import { addShapeToCollection } from '../../../actions/canvas/canvasActions';
 import Common from '../../../constants/common';
 import ShapeMenu from './ShapeMenu';
 import LayerMenu from './LayerMenu';
@@ -162,7 +162,7 @@ class CustomMenu extends Component {
                                 justifyContent: 'center', 
                                 alignItems: 'center'
                             }}>
-                            <Icon name={newIcon} color={color} size='large' style={{margin: '0'}}/>
+                            <Icon name={newIcon} className='font-color' color={color} size='large' style={{margin: '0'}}/>
                         </Menu.Item>
                     }
                 />   
@@ -198,7 +198,7 @@ class CustomMenu extends Component {
                             justifyContent: 'center', 
                             alignItems: 'center'
                         }}>
-                        <Icon name={newIcon} color={color} size='large' style={{margin: '0'}}/>
+                        <Icon name={newIcon} className='font-color' color={color} size='large' style={{margin: '0'}}/>
                     </Menu.Item>
                 }
             />   
@@ -242,14 +242,15 @@ class CustomMenu extends Component {
         const isInverted = modal ? false : true;
         return (
             <Menu
+                className='dark-1'
                 style={{ height: '100%', width: `${width}px`, margin: '0', borderRadius: '0'}}
-                inverted={isInverted}
+                // inverted={isInverted}
                 vertical
             >
                 <Menu.Item style={{height: '100%', padding: '0', paddingBottom: '20px'}}>
                     
                         <div style={{height: '100%'}}>
-                            <Menu inverted={isInverted} style={{ height: '50px'}} vertical={false}>
+                            <Menu className='dark-1' style={{ height: '50px', border: '0' }} vertical={false}>
                                 <Menu.Menu>
                                     {this.renderMenuPanes()}
                                 </Menu.Menu>

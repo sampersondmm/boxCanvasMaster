@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
-import { isEmpty } from 'lodash';
+import { isEmpty, cloneDeep } from 'lodash';
 import AccordionCard from '../../../AccordionCard';
 
 class ShapeDisplayCard extends Component {
@@ -11,7 +11,6 @@ class ShapeDisplayCard extends Component {
 
     returnNewShape = () => {
         const { currentShape, defaultShape } = this.props;
-        const { square, circle, line } = defaultShape;
         switch(currentShape.type){
             case Common.square:
                 return (
@@ -20,20 +19,20 @@ class ShapeDisplayCard extends Component {
                         height='70' 
                         x={(120 / 2) - (70 / 2)}
                         y={(120 / 2) - (70 / 2)}
-                        fill={square.fill}
-                        fillOpacity={square.opacity}
-                        stroke={square.stroke}
-                        strokeWidth={square.strokeWidth}
+                        fill={currentShape.fill}
+                        fillOpacity={currentShape.opacity}
+                        stroke={currentShape.stroke}
+                        strokeWidth={currentShape.strokeWidth}
                     />
                 )
             case Common.circle:
                 return (
                     <circle
                         r='35'
-                        fill={circle.fill}
-                        fillOpacity={circle.opacity}
-                        stroke={circle.stroke}
-                        strokeWidth={circle.strokeWidth}
+                        fill={currentShape.fill}
+                        fillOpacity={currentShape.opacity}
+                        stroke={currentShape.stroke}
+                        strokeWidth={currentShape.strokeWidth}
                         cx={60}
                         cy={60}
                     />
@@ -41,9 +40,10 @@ class ShapeDisplayCard extends Component {
             case Common.line:
                 return (
                     <path
-                        stroke={line.stroke}
-                        fill={line.fill}
-                        strokeWidth={line.strokeWidth}
+                        stroke={currentShape.stroke}
+                        fill={currentShape.fill}
+                        fillOpacity={currentShape.opacity}
+                        strokeWidth={currentShape.strokeWidth}
                         d='M 0 40 L 40 80 L 80 40 L 120 80'
                     />
                 )
@@ -53,45 +53,50 @@ class ShapeDisplayCard extends Component {
     }
 
     returnExistingShape = () => {
-        const { selectedShape } = this.props;
-        switch(selectedShape.type){
-            case Common.square:
-                return (
-                    <rect 
-                        width='70' 
-                        height='70' 
-                        x={(120 / 2) - (70 / 2)}
-                        y={(120 / 2) - (70 / 2)}
-                        fill={selectedShape.fill}
-                        fillOpacity={selectedShape.opacity}
-                        stroke={selectedShape.stroke}
-                        strokeWidth={selectedShape.strokeWidth}
-                    />
-                )
-            case Common.circle:
-                return (
-                    <circle
-                        r='35'
-                        fill={selectedShape.fill}
-                        fillOpacity={selectedShape.opacity}
-                        stroke={selectedShape.stroke}
-                        strokeWidth={selectedShape.strokeWidth}
-                        cx={60}
-                        cy={60}
-                    />
-                )
-            case Common.line:
-                return (
-                    <path
-                        stroke={selectedShape.stroke}
-                        fill={selectedShape.fill}
-                        strokeWidth={selectedShape.strokeWidth}
-                        d='M 0 40 L 40 80 L 80 40 L 120 80'
-                    />
-                )
-            default:
-                return;
+        const { selectedShapeId, shapeList } = this.props;
+        const listCopy = cloneDeep(shapeList)
+        const selectedShape = listCopy.find((x) => x.id === selectedShapeId)
+        if(selectedShape){
+            switch(selectedShape.type){
+                case Common.square:
+                    return (
+                        <rect 
+                            width='70' 
+                            height='70' 
+                            x={(120 / 2) - (70 / 2)}
+                            y={(120 / 2) - (70 / 2)}
+                            fill={selectedShape.fill}
+                            fillOpacity={selectedShape.opacity}
+                            stroke={selectedShape.stroke}
+                            strokeWidth={selectedShape.strokeWidth}
+                        />
+                    )
+                case Common.circle:
+                    return (
+                        <circle
+                            r='35'
+                            fill={selectedShape.fill}
+                            fillOpacity={selectedShape.opacity}
+                            stroke={selectedShape.stroke}
+                            strokeWidth={selectedShape.strokeWidth}
+                            cx={60}
+                            cy={60}
+                        />
+                    )
+                case Common.line:
+                    return (
+                        <path
+                            stroke={selectedShape.stroke}
+                            fill={selectedShape.fill}
+                            strokeWidth={selectedShape.strokeWidth}
+                            d='M 0 40 L 40 80 L 80 40 L 120 80'
+                        />
+                    )
+                default:
+                    return;
+            }
         }
+        return null;
     }
 
     cardContent = () => {
@@ -99,7 +104,7 @@ class ShapeDisplayCard extends Component {
         return (
             <div style={{
                 height: '120px', 
-                backgroundColor: canvasData.backgroundColor,
+                backgroundColor: canvasData.fill,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -133,6 +138,7 @@ const mapStateToProps = (state) => {
     const { currentShape, defaultShape, selectedShapeId } = state.canvas.editor;
     return {
         currentShape,
+        shapeList,
         defaultShape,
         selectedShapeId,
         canvasData

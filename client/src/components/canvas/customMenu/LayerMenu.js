@@ -3,7 +3,7 @@ import { Menu, Tab, Accordion, Header, Message, Label } from 'semantic-ui-react'
 import {connect} from 'react-redux'
 import Common from '../../../constants/common';
 import { without, indexOf, find } from 'lodash';
-import { selectShape, removeShape } from '../../../actions/canvasActions';
+import { selectShape, removeShape } from '../../../actions/canvas/canvasActions';
 import Aux from '../../../utils/AuxComponent';
 import AccordionIcon from '../../AccordionIcon';
 
@@ -45,11 +45,11 @@ class LayerMenu extends Component {
     handleSelect = (newSelection, index) => {
         const selection = newSelection === this.state.selection ? '' : newSelection
         this.props.dispatch(selectShape(selection));
-        this.setState(state => ({
-            ...state,
-            selection,
-            selectionIndex: index,
-        }));
+        // this.setState(state => ({
+        //     ...state,
+        //     selection,
+        //     selectionIndex: index,
+        // }));
     }
 
     handleRemove = async (selection) => {
@@ -75,23 +75,23 @@ class LayerMenu extends Component {
                 return (
                     <Aux>
                         <Menu.Item >
-                            <Label color='teal'>{shape.width}</Label>
+                            <Label >{shape.width}</Label>
                             {Common.width}
                         </Menu.Item>
                         <Menu.Item >
-                            <Label color='teal'>{shape.height}</Label>
+                            <Label >{shape.height}</Label>
                             {Common.height}
                         </Menu.Item>
                         <Menu.Item >
-                            <Label color='teal'>{shape.rotation}</Label>
+                            <Label >{shape.rotation}</Label>
                             {Common.rotation}
                         </Menu.Item>
                         <Menu.Item >
-                            <Label color='teal'>{Number(shape.posX).toFixed(0)}</Label>
+                            <Label >{Number(shape.posX).toFixed(0)}</Label>
                             {Common.positionX}
                         </Menu.Item>
                         <Menu.Item >
-                            <Label color='teal'>{Number(shape.posY).toFixed(0)}</Label>
+                            <Label >{Number(shape.posY).toFixed(0)}</Label>
                             {Common.positionY}
                         </Menu.Item>
                     </Aux>
@@ -140,18 +140,18 @@ class LayerMenu extends Component {
             case Common.square:
                 return (
                     <div style={{
-                        width: '20px', 
-                        height: '20px', 
-                        backgroundColor: shape.color, 
+                        width: '30px', 
+                        height: '30px', 
+                        backgroundColor: shape.fill, 
                         margin: '0 10px 0 5px'
                     }}></div>
                 )
             case Common.circle:
                 return (
                     <div style={{
-                        width: '20px', 
-                        height: '20px', 
-                        backgroundColor: shape.color, 
+                        width: '30px', 
+                        height: '30px', 
+                        backgroundColor: shape.fill, 
                         borderRadius: '50%',
                         margin: '0 10px 0 5px'
                     }}></div>
@@ -159,9 +159,9 @@ class LayerMenu extends Component {
             case Common.line:
                 return (
                     <div style={{
-                        width: '20px', 
+                        width: '30px', 
                         height: '2px', 
-                        backgroundColor: shape.stroke, 
+                        backgroundColor: shape.fill, 
                         margin: '0 10px 0 5px'
                     }}></div>
                 )

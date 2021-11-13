@@ -1,7 +1,7 @@
 import ActionTypes from "../actions/ActionTypes";
 import Common from '../constants/common';
 import uuid from 'react-uuid';
-import { cloneDeep, filter, indexOf } from 'lodash';
+import { cloneDeep, filter, isEmpty } from 'lodash';
 import { updateCurrentShape } from "../utils/canvasUtils";
 import { defaultCanvasData } from "../constants/data";
 
@@ -28,9 +28,9 @@ const DEFAULT_STATE = {
   },
   shapeList: [],
   canvasData: {
-    width: 600,
-    height: 700,
-    fill: 'rgba(50,50,55,1)',
+    width: 500,
+    height: 400,
+    fill: 'rgb(50,50,55)',
     opacity: 1,
     scale: 1,
   },
@@ -43,6 +43,7 @@ const DEFAULT_STATE = {
       {color: "#cd5b5b", uuid: "b24323-3bc0-1671-c67e-53823dac62"}
     ],
     selectedShapeId: '',
+    selectedShape: {},
     currentShape: {
       id: '',
       type: Common.square,
@@ -55,6 +56,45 @@ const DEFAULT_STATE = {
       width: 60,
       height: 60,
       rotation: 0,
+    },
+    editedShapes: {
+      square: {
+        id: '',
+        type: Common.square,
+        fill: 'rgb(106, 184, 197)',
+        stroke: 'rgba(0,0,0)',
+        strokeWidth: 0,
+        opacity: 0.7,
+        posX: 0,
+        posY: 0,
+        width: 60,
+        height: 60,
+        rotation: 0,
+      },
+      circle: {
+        id: '',
+        type: Common.circle,
+        fill: 'rgb(106, 184, 197)',
+        stroke: 'rgba(0,0,0)',
+        strokeWidth: 0,
+        opacity: 0.7,
+        posX: 0,
+        posY: 0,
+        radius: 30,
+      },
+      line: {
+        id: '',
+        type: Common.line,
+        stroke: 'rgb(106, 184, 197)',
+        strokeWidth: 2,
+        curve: true,
+        fill: 'rgb(106, 210, 180)',
+        // fill: 'rgba(106, 210, 180, 0.5)',
+        opacity: 0.5,
+        completed: false,
+        points: 'M 100 100',
+        pointData: []
+      },
     },
     defaultShape: {
       square: {
@@ -86,8 +126,9 @@ const DEFAULT_STATE = {
         type: Common.line,
         stroke: 'rgb(106, 184, 197)',
         strokeWidth: 2,
-        fill: 'rgba(0,0,0,0)',
-        opacity: 0.7,
+        fill: 'rgb(106, 210, 180)',
+        // fill: 'rgba(106, 210, 180, 0.5)',
+        opacity: 0.5,
         completed: false,
         points: 'M 100 100',
         pointData: []
@@ -147,7 +188,7 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
           canvasHeight: payload.canvasHeight 
         }
       }
-    case ActionTypes.ADD_SHAPE_TO_CANVAS:
+    case ActionTypes.ADD_SHAPE_TO_CANVAS: 
       const newShapeList = cloneDeep(state.shapeList);
       const copy = cloneDeep(payload.newShape);
       const currentCopy = cloneDeep(payload.newShape);
@@ -193,7 +234,31 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         ...state,
         canvasData: {
           ...state.canvasData,
-          backgroundColor: payload.backgroundColor
+          fill: payload.backgroundColor
+        }
+      }
+    case ActionTypes.CHANGE_BACKGROUND_OPACITY:
+      return {
+        ...state,
+        canvasData: {
+          ...state.canvasData,
+          opacity: payload.opacity
+        }
+      }
+    case ActionTypes.UPDATE_CANVAS_TITLE:
+      return {
+        ...state,
+        info: {
+          ...state.info,
+          title: payload.title
+        }
+      }
+    case ActionTypes.UPDATE_CANVAS_DESCRIPTION:
+      return {
+        ...state,
+        info: {
+          ...state.info,
+          description: payload.description
         }
       }
     case ActionTypes.ADD_TO_PALETTE:
@@ -213,13 +278,13 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
         }
       }
     case ActionTypes.SELECT_SHAPE:
-      const selectedShapeData = state.canvasData.shapeList.find((shape) => shape.id === payload)
+      const selectedShapeData = state.shapeList.find((shape) => shape.id === payload.id)
       return {
         ...state,
-        canvasData: {
-          ...state.canvasData,
-          selectedShapeId: payload,
-          selectedShape: selectedShapeData
+        editor: {
+          ...state.editor,
+          selectedShapeId: payload.id,
+          // selectedShape: selectedShapeData
         }
       }
     case ActionTypes.REMOVE_SHAPE:
@@ -238,118 +303,64 @@ const canvasReducer = (state = DEFAULT_STATE, action = {}) => {
 
     //Current shape data
     case ActionTypes.CHANGE_SHAPE_WIDTH: 
-      updatedShape = updateCurrentShape(
-        state.editor.currentShape, 
+      return updateCurrentShape(
+        state,
         'width',
         payload.width
       )
-      return {
-        ...state,
-        editor: {
-          ...state.editor,
-          currentShape: updatedShape,
-        }
-      }
     case ActionTypes.CHANGE_SHAPE_HEIGHT: 
-      updatedShape = updateCurrentShape(
-        state.editor.currentShape, 
+      return updateCurrentShape(
+        state, 
         'height',
         payload.height
       )
-      return {
-        ...state,
-        editor: {
-          ...state.editor,
-          currentShape: updatedShape,
-        }
-      }
     case ActionTypes.CHANGE_SHAPE_ROTATION: 
-      updatedShape = updateCurrentShape(
-        state.editor.currentShape, 
+      return updateCurrentShape(
+        state, 
         'rotation',
         payload.rotation
       )
-      return {
-        ...state,
-        editor: {
-          ...state.editor,
-          currentShape: updatedShape,
-        }
-      }
     case ActionTypes.CHANGE_SHAPE_RADIUS:
-      updatedShape = updateCurrentShape(
-        state.editor.currentShape, 
+      return updateCurrentShape(
+        state, 
         'radius',
         payload.radius
       )
-      return {
-        ...state,
-        editor: {
-          ...state.editor,
-          currentShape: updatedShape,
-        }
-      }
     case ActionTypes.CHANGE_SHAPE_TYPE: 
-      const newShape = { ...state.editor.defaultShape[payload.type.toLowerCase()]}
+      // const newShape = { ...state.editor.defaultShape[payload.type.toLowerCase()]}
+      const updatedShape = { ...state.editor.editedShapes[payload.type.toLowerCase()]};
+      const defaultShape = { ...state.editor.defaultShape[payload.type.toLowerCase()]};
       return {
         ...state,
         editor: {
           ...state.editor,
-          currentShape: newShape
+          currentShape: !isEmpty(updatedShape) ? updatedShape : defaultShape
         }
     }
     case ActionTypes.CHANGE_SHAPE_FILL:
-      updatedShape = updateCurrentShape(
-        state.editor.currentShape, 
+      return updateCurrentShape(
+        state, 
         'fill',
         payload.fill
       )
-      return {
-        ...state,
-        editor: {
-          ...state.editor,
-          currentShape: updatedShape,
-        }
-      }
     case ActionTypes.CHANGE_SHAPE_STROKE:
-      updatedShape = updateCurrentShape(
-        state.editor.currentShape, 
+      return updateCurrentShape(
+        state, 
         'stroke',
         payload.stroke
       )
-      return {
-        ...state,
-        editor: {
-          ...state.editor,
-          currentShape: updatedShape,
-        }
-      }
     case ActionTypes.CHANGE_SHAPE_STROKE_WIDTH:
-      updatedShape = updateCurrentShape(
-        state.editor.currentShape,
+      return updateCurrentShape(
+        state,
         'strokeWidth',
         payload.width
       )
-      return {
-        ...state,
-        editor: {
-          ...state.editor,
-          currentShape: updatedShape,
-        }
-      }
     case ActionTypes.CHANGE_SHAPE_OPACITY:
-      updatedShape = updateCurrentShape(
-        state.editor.currentShape, 
+      return updateCurrentShape(
+        state, 
         'opacity',
         payload.opacity
       )
-      return {
-        ...state,
-        editor: {
-          ...state.editor,
-          currentShape: updatedShape,
-        }
-      }
     default:
       return state;
   }

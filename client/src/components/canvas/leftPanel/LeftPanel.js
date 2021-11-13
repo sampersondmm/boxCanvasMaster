@@ -5,7 +5,7 @@ import PanelButton from '../PanelButton';
 import CreateCollection from './CreateCollection';
 import SetupCanvas from '../SetupCanvas';
 import { Menu, Icon } from 'semantic-ui-react';
-import {setCanvasSize} from '../../../actions/canvasActions';
+import {setCanvasSize} from '../../../actions/canvas/canvasActions';
 import TooltipPositions from '../../../constants/tooltips';
 
 class LeftPanel extends Component {

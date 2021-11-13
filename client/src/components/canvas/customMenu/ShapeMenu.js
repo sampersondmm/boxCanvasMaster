@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Common from '../../../constants/common';
 import {connect} from 'react-redux';
-import { Tab, Accordion, Menu, Header } from 'semantic-ui-react';
+import { Tab, Accordion, Menu, Icon, Header } from 'semantic-ui-react';
 import ShapeDisplayCard from './shapeCards/ShapeDisplayCard';
 import ShapeSizeCard from './shapeCards/ShapeSizeCard';
 import ShapeColorCard from './shapeCards/ShapeColorCard';
@@ -18,6 +18,7 @@ class ShapeMenu extends Component {
         this.state = {
             activeIndex: 1,
             selection: '',
+            shapeEditorOpen: true,
             cardOrder: [
                 Common.display,
                 Common.type,
@@ -56,6 +57,7 @@ class ShapeMenu extends Component {
                     break;
                 case Common.stroke:
                     stroke = !stroke;
+                    break;
                 case Common.points:
                     points = !points;
                     break;
@@ -115,7 +117,7 @@ class ShapeMenu extends Component {
     }
     createAccordianList = () => {
         const { modal } = this.props;
-        const { currentShapeType } = this.props;
+        const { currentShape } = this.props;
         const { tabOpen, selection, cardOrder } = this.state;
         const isInverted = modal ? false : true;
         let listArr = [];
@@ -141,13 +143,13 @@ class ShapeMenu extends Component {
                             />
                         )
                 case Common.points:
-                    if(currentShapeType === Common.line){
+                    if(currentShape.type === Common.line){
                         return (
                             <ShapePointCard
                                 open={tabOpen.type}
                                 selection={selection}
-                                handleSelect={() => this.handleSelect(Common.type)}
-                                handleOpen={() => this.toggleAccordian(Common.type)}
+                                handleSelect={() => this.handleSelect(Common.points)}
+                                handleOpen={() => this.toggleAccordian(Common.points)}
                                 inverted={isInverted}
                             />
                         )
@@ -185,7 +187,7 @@ class ShapeMenu extends Component {
                         />
                     )
                 case Common.rotation:
-                    if(currentShapeType === Common.square){
+                    if(currentShape.type === Common.square){
                         return (
                             <ShapeRotationCard
                                 open={tabOpen.rotation}
@@ -203,9 +205,12 @@ class ShapeMenu extends Component {
         })
         return listArr;
     }
+    openShapeEditor = () => {
+
+    }
     render(){
         const { modal, inverted, selectedShapeId } = this.props;
-        const { selection } = this.state;
+        const { selection, shapeEditorOpen } = this.state;
         const wrapHeight = modal ? '433px' : 'calc(100vh - 100px)';
         const scrollHeight = 'calc(100vh - 190px)';
         const scrollClass = modal ? 'scrollbar' : 'scrollbar-inverted'
@@ -213,12 +218,20 @@ class ShapeMenu extends Component {
     
         return (
             <div style={{height: wrapHeight, overflow: 'hidden'}}>
-                <div style={{height: '40px', display: 'flex', alignItems: 'center', paddingLeft: '10px'}}>
-                    <Header style={{ color: 'white', margin: '0'}}>{title}</Header>
+                <div style={{height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px'}}>
+                    <Header className='font-color' style={{ margin: '0'}}>{title}</Header>
+                    <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
+                        <Icon 
+                            className='font-color' 
+                            onClick={this.openShapeEditor}
+                            style={{margin: '0', padding: '0'}} 
+                            name='edit'
+                        />
+                    </div>
                 </div>
                 <div className={`${scrollClass} tab-pane-wrap`} style={{height: scrollHeight, overflowY: 'scroll'}}>
-                    <Tab.Pane inverted={inverted} style={{padding: '0', border: '0', display: 'flex', justifyContent: 'center', margin: '0'}}>
-                        <Accordion inverted={inverted} as={Menu} vertical style={{border: '0', paddingTop: '0'}} fluid >
+                    <Tab.Pane className='dark-1' style={{padding: '0', border: '0', display: 'flex', justifyContent: 'center', margin: '0'}}>
+                        <Accordion as={Menu} className='dark-1' vertical style={{border: '0', paddingTop: '0'}} fluid >
                             {this.createAccordianList()}
                         </Accordion>
                     </Tab.Pane>
@@ -248,9 +261,9 @@ class ShapeMenu extends Component {
 }
 
 const mapStateToProps = state => {
-    const { currentShapeType } = state.canvas;
+    const { currentShape } = state.canvas.editor;
     return {
-        canvas: state.canvas
+        currentShape: currentShape
     }
 }
 

@@ -33,10 +33,10 @@ const AccordionCard = ({
                             onClick={handleOpen}
                             icon={open ? 'plus' : 'minus'}
                         />
-                        <div>
+                        <div className='font-color'>
                             {header}
                         </div>
-                        <div style={{marginLeft: '15px'}}>
+                        <div className='font-color' style={{marginLeft: '15px'}}>
                             {additionalText}
                         </div>
                     </div>

@@ -1,25 +1,22 @@
 import React, {Component} from 'react';
-// import {Navbar, Nav, NavDropdown,Form, FormControl, Button} from 'react-bootstrap';
-import {Menu} from 'semantic-ui-react'
+import {Menu, Dropdown, Header} from 'semantic-ui-react'
 import {Link} from 'react-router-dom';
 import logo from '../images/newLogo.png';
 import {connect} from 'react-redux';
-import {Redirect} from 'react-router-dom';
 import {logoutUser} from '../actions/userActions';
-import { clearCanvasData } from '../actions/canvasActions';
+import { clearCanvasData } from '../actions/canvas/canvasActions';
 import { Icon } from 'semantic-ui-react'
 
 class NavBar extends Component {
     constructor(props){
         super(props);
     }
-    logout = () => {
-        const { props } = this;
-        logoutUser();
-    }
     newCanvasRoute = () => {
         this.props.dispatch(clearCanvasData())
         this.props.history.push('/canvas/new')
+    }
+    signOut = () => {
+        this.props.dispatch(logoutUser())
     }
     leftMenu = () => {
         return (
@@ -37,29 +34,55 @@ class NavBar extends Component {
                     className='navbar-link'
                     onClick={this.newCanvasRoute}
                 >
-                    New Canvas
+                    <div className='navbar-text'>New Canvas</div>
                 </Menu.Item>
             </Menu.Menu>
         )
     }
     rightMenu = () => {
+        const { username } = this.props.userProfile;
         return (
-            <Menu.Menu position='right'>
-                <Link to='/signin'>
-                    <Menu.Item 
-                        className='navbar-link' 
-                        onClick={this.logout}
+            <Menu.Menu position='right' inverted>
+                <Dropdown
+                    item
+                    icon='user'
+                >
+                    <Dropdown.Menu
+                        style={{
+                            width: '200px',
+                            backgroundColor: '#1b1c1d',
+                        }}
                     >
-                            <Icon name="sign-out"/>
-                    </Menu.Item>
-                </Link>
+                        <Dropdown.Item
+                            style={{
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                display: 'flex'
+                            }}
+                            >
+                            <Icon name='user' inverted/>
+                            <Header style={{color: 'white', margin: '0'}}>{username}</Header>
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            onClick={this.signOut}
+                            style={{
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                display: 'flex'
+                            }}
+                        >
+                            <Icon name='sign-out' inverted/>
+                            <div style={{color: 'white', margin: '0'}}>Sign Out</div>
+                        </Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
             </Menu.Menu>
         )
     }
     render(){
         return (
             <Menu
-                inverted
+                className='navbar-main'
                 style={{height: '50px', margin: '0', borderRadius: '0'}}
             >
                 {this.leftMenu()}
@@ -71,7 +94,8 @@ class NavBar extends Component {
 
 const mapStateToProps = state => {
     return {
-        currentUser: state.currentUser
+        currentUser: state.currentUser,
+        userProfile: state.user.userProfile
     }
 }
 

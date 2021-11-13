@@ -29,6 +29,7 @@ class CanvasList extends Component {
             return (
                 <CanvasItem 
                     {...this.props}
+                    addNotification={this.props.addNotification}
                     fetchCanvasList={this.props.fetchCanvasList}
                     canvas={canvasItem}
                 />
@@ -45,7 +46,7 @@ class CanvasList extends Component {
 }
 const mapStateToProps = state => {
     return {
-        canvasList: state.canvas.canvasList,
+        // canvasList: state.canvas.canvasList,
     }
 }
 

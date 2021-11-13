@@ -7,14 +7,57 @@ import {removeError} from '../actions/errorActions';
 import {connect} from 'react-redux';
 import WithAuth from '../hocs/WithAuth';
 import { Message } from 'semantic-ui-react';
+import uuid from 'react-uuid'
 import store from '..';
+
+class Notifification extends Component {
+  constructor(props){
+    super(props)
+  }
+  componentDidMount(){
+    const { notification } = this.props
+    this.props.autoDismiss(notification.id);
+  }
+  render(){
+    const { notification } = this.props;
+    let color = ''
+    switch(notification.type){
+      case 'success':
+        color = 'rgb(154, 214, 195)'
+        break;
+      default: 
+        break;
+    }
+    return (
+      <Message 
+        style={{
+          // backgroundColor: color,
+          // border: '2px solid rgb(87, 122, 111)',
+          width: '100%',
+        }}
+        header='Success'
+        success
+        onDismiss={() => this.handleDismiss(notification.id)}
+        content={notification.message}
+      />
+    )
+  }
+}
 
 class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      notifications: [ ]
+      notifications: []
     }
+  }
+  autoDismiss = (id) => {
+    setTimeout(() => {
+      this.setState((state) => ({
+        ...state,
+        notifications: state.notifications.filter((x) => x.id !== id)
+      }))
+    }, 2000)
   }
   renderNotifications = () => {
     const { notifications } = this.state;
@@ -25,28 +68,13 @@ class App extends Component {
         bottom: '20px',
         width: '300px'
       }}>
-      {notifications.map((notification, index) => {
-          let color = ''
-          switch(notification.type){
-            case 'success':
-              color = 'rgb(154, 214, 195)'
-              break;
-            default: 
-              break;
-          }
-          return (
-            <Message 
-              style={{
-                // backgroundColor: color,
-                // border: '2px solid rgb(87, 122, 111)',
-                width: '100%',
-              }}
-              header='Success'
-              success
-              onDismiss={() => this.handleDismiss(notification.id)}
-              content={notification.message}
-            />
-          )
+      {notifications.map((notification) => {
+        return (
+          <Notifification
+            notification={notification}
+            autoDismiss={this.autoDismiss}
+          />
+        )
         })}
       </div>
     )
@@ -59,6 +87,7 @@ class App extends Component {
     }))
   }
   addNotification = (notification) => {
+    notification.id = uuid();
     this.setState((state) => ({
       ...state,
       notifications: [...state.notifications, notification]
@@ -76,6 +105,7 @@ class App extends Component {
               return (
                 <WithAuth {...props} userProfile={userProfile}>
                   <HomePage
+                    addNotification={this.addNotification}
                     {...props}
                   />
                 </WithAuth>
@@ -142,7 +172,7 @@ class App extends Component {
             }}
           />
         </Switch>
-        {this.renderNotifications()}
+        {/* {this.renderNotifications()} */}
       </div>
     );
   }

@@ -5,7 +5,7 @@ import {
     changeShapeWidth, 
     changeShapeHeight,
     changeShapeStrokeWidth
-} from '../../../../actions/canvasActions';
+} from '../../../../actions/canvas/editorActions';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
 import AccordionCard from '../../../AccordionCard';
@@ -34,15 +34,15 @@ class ShapeSizeCard extends Component {
         }
     }
     incrementWidth = (value) => {
-        const { square } = this.props.currentShape;
+        const { currentShape } = this.props;
         const { sizeIncrement } = this.state;
-        const newValue = value === 'down' ? (square.width - sizeIncrement <= 0 ? 0 : square.width - sizeIncrement) : square.width + sizeIncrement;
+        const newValue = value === 'down' ? (currentShape.width - sizeIncrement <= 0 ? 0 : currentShape.width - sizeIncrement) : currentShape.width + sizeIncrement;
         this.props.dispatch(changeShapeWidth(newValue))
     }
     incrementHeight = (value) => {
-        const { square } = this.props.currentShape;
+        const { currentShape } = this.props;
         const { sizeIncrement } = this.state;
-        const newValue = value === 'down' ? (square.height - sizeIncrement <= 0 ? 0 : square.height - sizeIncrement) : square.height + sizeIncrement;
+        const newValue = value === 'down' ? (currentShape.height - sizeIncrement <= 0 ? 0 : currentShape.height - sizeIncrement) : currentShape.height + sizeIncrement;
         this.props.dispatch(changeShapeHeight(newValue))
     }
     incrementStrokeWidth = (value) => {
@@ -58,9 +58,9 @@ class ShapeSizeCard extends Component {
         this.props.dispatch(changeShapeStrokeWidth(newValue))
     }
     incrementRadius = (value) => {
-        const { circle } = this.props.currentShape;
+        const { currentShape } = this.props;
         const { sizeIncrement } = this.state;
-        const newValue = value === 'down' ? (circle.radius - sizeIncrement <= 0 ? 0 : circle.radius - sizeIncrement) : circle.radius + sizeIncrement;
+        const newValue = value === 'down' ? (currentShape.radius - sizeIncrement <= 0 ? 0 : currentShape.radius - sizeIncrement) : currentShape.radius + sizeIncrement;
         this.props.dispatch(changeShapeRadius(newValue))
     }
     handleChangeRadiusIncrement = (data) => {
@@ -86,9 +86,9 @@ class ShapeSizeCard extends Component {
                 return (
                     <Menu.Menu inverted={inverted} vertical >
                         <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
-                            <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('down')}/>
-                            <Menu.Header style={{margin: '0'}}>{Common.width}</Menu.Header>
-                            <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('up')}/>
+                            <Icon className='font-color' name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('down')}/>
+                            <Menu.Header className='font-color' style={{margin: '0'}}>{Common.width}</Menu.Header>
+                            <Icon className='font-color' name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementWidth('up')}/>
                         </Menu.Item>
                         <Menu.Item>
                             <Input
@@ -100,13 +100,14 @@ class ShapeSizeCard extends Component {
                             />
                         </Menu.Item>
                         <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
-                            <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementHeight('down')}/>
-                            <Menu.Header style={{margin: '0'}}>{Common.height}</Menu.Header>
-                            <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementHeight('up')}/>
+                            <Icon className='font-color' name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementHeight('down')}/>
+                            <Menu.Header className='font-color' style={{margin: '0'}}>{Common.height}</Menu.Header>
+                            <Icon className='font-color' name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementHeight('up')}/>
                         </Menu.Item>
                         <Menu.Item>
                             <Input
-                                inverted={inverted}
+                                // inverted={inverted}
+                                className='font-color'
                                 type='number'
                                 value={square.height}
                                 onChange={(e, data) => this.handleSizeChange(data, Common.height)}
@@ -114,7 +115,7 @@ class ShapeSizeCard extends Component {
                             />
                         </Menu.Item>
                         <Menu.Item>
-                            <Menu.Header>Increment</Menu.Header>
+                            <Menu.Header className='font-color'>Increment</Menu.Header>
                                 <Input
                                     inverted={inverted}
                                     type='number'

@@ -6,7 +6,10 @@ import store from '../';
 const logoutUser = () => {
     sessionStorage.clear();
     setTokenHeader(false);
-    store.dispatch(setCurrentUser({}))
+    return {
+        type: ActionTypes.SET_CURRENT_USER,
+        payload: {}
+    }
 }
 
 const setCurrentUser = user => {

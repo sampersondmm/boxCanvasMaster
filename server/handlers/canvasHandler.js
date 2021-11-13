@@ -7,6 +7,7 @@ const createCanvas = async (req, res, next) => {
     copy.user = body.user
     try {
         let canvas = await db.Canvas.create(copy);
+        console.log('============= ' + JSON.stringify(canvas.editor, null, 2))
         let foundUser = await db.User.findById(body.user);
         foundUser.canvas.push(canvas._id);
         await foundUser.save();

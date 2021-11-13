@@ -4,6 +4,22 @@ import { Popup, Button } from 'semantic-ui-react'
 class CustomPopupConfirm extends Component {
     constructor(props){
         super(props)
+        this.state = {
+            open: false
+        }
+    }
+    onOpen = () => {
+        this.setState((state) => ({
+            ...state,
+            open: true
+        }))
+    }
+    close = async () => {
+        await this.props.onConfirm()
+        this.setState((state) => ({
+            ...state,
+            open: false
+        }))
     }
     render(){
         const { 
@@ -14,13 +30,20 @@ class CustomPopupConfirm extends Component {
         return (
             <Popup
                 on='click'
+                open={this.state.open}
+                onOpen={this.onOpen}
                 info
                 trigger={trigger}
                 content={
                     <div>
                         {content}
                         <div style={{display: 'flex', justifyContent: 'center'}}>
-                            <Button primary>Confirm</Button>
+                            <Button
+                                primary
+                                onClick={this.props.onConfirm}
+                            >
+                                Confirm
+                            </Button>
                         </div>
                     </div>
                 }

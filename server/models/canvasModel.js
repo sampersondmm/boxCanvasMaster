@@ -44,6 +44,11 @@ const canvasSchema = new mongoose.Schema({
             type: Object,
             required: true,
         },
+        editedShapes: {
+            type: Object,
+            required:true,
+            default: {}
+        },
         defaultShape: {
             type: Object,
         },

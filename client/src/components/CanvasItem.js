@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {select} from 'd3-selection';
-import {Icon} from 'semantic-ui-react'
+import {Icon, Header} from 'semantic-ui-react'
 import Carousel, { consts } from 'react-elastic-carousel'
-import { setCanvasData } from '../actions/canvasActions';
+import { setCanvasData } from '../actions/canvas/canvasActions';
 import CustomPopupConfirm from './CustomPopupConfirm';
 import {connect} from 'react-redux';
 import CanvasAPI from '../api/canvasApi';
@@ -12,7 +12,7 @@ const canvasApi = new CanvasAPI();
 
 class CanvasItem extends Component {
     constructor(props){
-        super(props)
+        super(props);
     }
     componentDidMount(){
         // this.setupCanvas();
@@ -20,6 +20,9 @@ class CanvasItem extends Component {
     }
     componentDidUpdate(prevProps){
         if(prevProps.chamberId !== this.props.chamberId){
+            this.loadShapes();
+        }
+        if(prevProps.canvas !== this.props.canvas){
             this.loadShapes();
         }
     }
@@ -37,6 +40,10 @@ class CanvasItem extends Component {
     }
     loadShapes = () => {
         const { shapeList } = this.props.canvas;
+
+        select(this.node)
+            .selectAll('.shape')
+            .remove();
         const shapeSelector = select(this.node)
             .selectAll('.shape');
 
@@ -50,6 +57,7 @@ class CanvasItem extends Component {
                         .attr('class', 'shape')
                         .attr('fill', shape => shape.fill)
                         .attr('fill-opacity', shape => shape.opacity)
+                        .attr('stroke', shape => shape.stroke)
                         .attr('stroke-width', shape => shape.strokeWidth)
                         .attr('width', shape => shape.width)
                         .attr('height', shape => shape.height)
@@ -64,6 +72,7 @@ class CanvasItem extends Component {
                         .attr('class', 'shape')
                         .attr('fill', shape => shape.fill)
                         .attr('fill-opacity', shape => shape.opacity)
+                        .attr('stroke', shape => shape.stroke)
                         .attr('stroke-width', shape => shape.strokeWidth)
                         .attr('r', shape => shape.radius)
                         .attr('cx', shape => shape.posX)
@@ -79,18 +88,13 @@ class CanvasItem extends Component {
                         .attr('opacity', obj => obj.opacity)
                         .attr('fill', obj => obj.fill)
                         .attr('stroke-width', obj => obj.strokeWidth)
-                        .attr('d', obj => this.createPointString(obj.pointData))
+                        .attr('d', obj => obj.points)
                     break;    
                 default:
                     break;
             }
         })
         
-    }
-    topMenu = () => {
-        return (
-            <div style={{height: '40px', width: '100%'}}></div>
-        )
     }
     editCanvas = async () => {
         const { canvas } = this.props;
@@ -100,23 +104,46 @@ class CanvasItem extends Component {
     }
     deleteCanvas = async () => {
         const { canvas } = this.props;
-        await canvasApi.deleteCanvas(canvas._id)
-        this.props.fetchCanvasList();
+        try {
+            await canvasApi.deleteCanvas(canvas._id)
+            this.props.fetchCanvasList();
+            this.props.addNotification({
+                type: 'success',
+                message: 'Successfully deleted canvas!'
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    topMenu = () => {
+        const title = this.props.canvas.info ? this.props.canvas.info.title : ''
+        return (
+            <div style={{
+                height: '50px', 
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                paddingLeft: '20px',
+                color: 'white'
+            }}>
+                <Header style={{color: 'white'}}>{title}</Header>
+            </div>
+        )
     }
     bottomMenu = () => {
         return (
             <div 
                 style={{
                     width: '100%', 
-                    height: '40px', 
+                    height: '50px', 
                     display: 'flex',
+                    padding: '0 20px',
                     alignItems: 'center',
                     justifyContent: 'flex-end'
                 }}>
                     <CustomPopupConfirm
                         trigger={
                             <div 
-                                onClick={this.deleteCanvas}
                                 style={{
                                     height: '100%', 
                                     width: '40px', 
@@ -128,9 +155,9 @@ class CanvasItem extends Component {
                             >
                                 <Icon name='trash' size='large' color='teal'style={{padding: '0', margin: '0'}}/>
                             </div>
-                            
                         }
                         position='top center'
+                        onConfirm={this.deleteCanvas}
                         content='Are you sure you want to delete canvas?'
                     />
                     <div 
@@ -149,31 +176,32 @@ class CanvasItem extends Component {
             </div>
         )
     }
-    leftMenu = () => {
-        return (
-            <div style={{height: '100%', width: '40px'}}></div>
-        )
-    }
-    rightMenu = () => {
-        return (
-            <div style={{height: '100%', width: '40px'}}></div>
-        )
-    }
+    // leftMenu = () => {
+    //     return (
+    //         <div style={{height: '100%', width: '40px'}}></div>
+    //     )
+    // }
+    // rightMenu = () => {
+    //     return (
+    //         <div style={{height: '100%', width: '40px'}}></div>
+    //     )
+    // }
     render(){
         const { canvasData } = this.props.canvas;
-        const { width, height, fill } = canvasData;
+        const { width, height, fill, opacity } = canvasData;
+        const fillArr = fill.split(',')
+        // ['rgb(0','0','0',')']
         const style = {
-            backgroundColor: fill,
-            width: `${width}px`,
-            height: `${height}px`,
-            margin: '0',
+            backgroundColor: 'rgba(0,0,0,0)',
+            height: `400px`,
+            margin: '0 50px',
             padding: '0'
         }
+        const viewBox = [ 0, 0, width, height ]
         return (
             <div 
                 style={{
-                    width: `${width + 80}px`, 
-                    height: `${height + 80}px`,
+                    height: '500px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'flex-start',
@@ -185,9 +213,9 @@ class CanvasItem extends Component {
                 }}>
                 {this.topMenu()}
                 <div style={{height: `calc(100% - 70px)`, display: 'flex'}}>
-                    {this.leftMenu()}
-                    <svg className='canvas-item' style={style} ref={node => (this.node = node)}/>
-                    {this.rightMenu()}
+                    {/* {this.leftMenu()} */}
+                    <svg className='canvas-item' viewBox={viewBox} style={style} ref={node => (this.node = node)}/>
+                    {/* {this.rightMenu()} */}
                 </div>
                 {this.bottomMenu()}
             </div>

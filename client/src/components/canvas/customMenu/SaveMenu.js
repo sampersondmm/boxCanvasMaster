@@ -1,11 +1,7 @@
 import React, {Component} from 'react';
 import { Menu, Tab, Input, Header, Label, Button } from 'semantic-ui-react';
+import { updateCanvasTitle, updateCanvasDescription } from '../../../actions/canvas/canvasActions';
 import {connect} from 'react-redux'
-import Common from '../../../constants/common';
-import { without, indexOf, find } from 'lodash';
-import { selectShape, removeShape } from '../../../actions/canvasActions';
-import Aux from '../../../utils/AuxComponent';
-import AccordionIcon from '../../AccordionIcon';
 
 class SaveMenu extends Component {
     constructor(props){
@@ -14,15 +10,21 @@ class SaveMenu extends Component {
             openList: [],
             selection: '',
             selectionIndex: null,
+            title: '',
+            description: ''
         }
+    }
 
+    updateTitle = (value) => {
+        this.props.dispatch(updateCanvasTitle(value))
+    }
+    
+    updateDescription = (value) => {
+        this.props.dispatch(updateCanvasTitle(value))
     }
 
     renderContents = () => {
-        const { 
-            shapeList,
-            inverted
-         } = this.props;
+         const { title, description } = this.props.info;
         return (
             <div style={{width: '100%', padding: '0 2px'}}>
                 <Menu inverted={true} vertical style={{width: '100%'}}>
@@ -32,9 +34,9 @@ class SaveMenu extends Component {
                         <Menu.Item>
                             <Input
                                 inverted={true}
-                                type='number'
                                 value={''}
-                                // onChange={(e, data) => this.handleSizeChange(data, Common.width)}
+                                onChange={(e, data) => this.updateTitle(data.value)}
+                                value={title}
                                 placeholder='Name'
                             />
                         </Menu.Item>
@@ -44,9 +46,9 @@ class SaveMenu extends Component {
                         <Menu.Item>
                             <Input
                                 inverted={true}
-                                type='number'
                                 value={''}
-                                // onChange={(e, data) => this.handleSizeChange(data, Common.width)}
+                                onChange={(e, data) => this.updateDescription(data.value)}
+                                value={description}
                                 placeholder='Description'
                             />
                         </Menu.Item>
@@ -64,45 +66,26 @@ class SaveMenu extends Component {
 
     render(){
         const { inverted, modal, canvasId } = this.props;
+        const { description, title } = this.props.info;
         const wrapHeight = modal ? '433px' : 'calc(100vh - 100px)';
         const { selection } = this.state;
-        const scrollHeight = 'calc(100vh - 190px)';
+        const scrollHeight = 'calc(100vh - 140px)';
         const scrollClass = !true ? 'scrollbar' : 'scrollbar-inverted';
         return (
             <div style={{height: wrapHeight, overflow: 'hidden'}}>
                 <div style={{height: '40px', display: 'flex', alignItems: 'center', paddingLeft: '10px'}}>
                     <Header style={{ color: 'white', margin: '0'}}>Save</Header>
                 </div>
-                <div className={`${scrollClass} tab-pane-wrap`} style={{height: scrollHeight, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', overflowY: 'scroll', width: '100%'}}>
-                    {/* <Tab.Pane inverted={inverted} style={{padding: '0', border: '0', display: 'flex', justifyContent: 'center', margin: '0'}}> */}
+                <div className={`${scrollClass} tab-pane-wrap`} style={{height: scrollHeight, display: 'flex', paddingBottom: '10px', flexDirection: 'column', alignItems: 'center', overflowY: 'scroll', width: '100%'}}>
                         {this.renderContents()}
-
                         <Button
                             primary
+                            style={{marginTop: '20px'}}
+                            disabled={!title}
                             content={canvasId ? 'Edit' : 'Create'}
                             onClick={this.props.saveCanvas}
                         />
 
-                    {/* </Tab.Pane> */}
-                </div>
-                <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '10px'}}>
-                    {/* <AccordionIcon
-                        icon='trash'
-                        width='20px'
-                        height='20px'
-                        onClick={() => this.handleRemove(selection)}
-                        disabled={selection === ''}
-                    />
-                    <AccordionIcon
-                        icon='angle down'
-                        width='20px'
-                        height='20px'
-                        style={{
-                            marginLeft: '7px'
-                        }}
-                        onClick={() => this.handleMove('down')}
-                        disabled={selection === ''}
-                    /> */}
                 </div>
             </div> 
         )
@@ -111,12 +94,13 @@ class SaveMenu extends Component {
 }
 
 const mapStateToProps = state => {
-    const { editor, _id } = state.canvas;
+    const { editor, _id, info } = state.canvas;
     const { currentShape, selectedShapeId } = editor;
     return {
         selectedShapeId,
         currentShape,
-        canvasId: _id
+        canvasId: _id,
+        info
     }
 }
 

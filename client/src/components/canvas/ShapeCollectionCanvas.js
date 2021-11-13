@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {event, select} from 'd3-selection';
 import Common from '../../constants/common';
 import uuid from 'react-uuid';
-import {clearCanvasData} from '../../actions/canvasActions';
+import {clearCanvasData} from '../../actions/canvas/canvasActions';
 import {connect} from 'react-redux';
 
 class ShapeCanvas extends Component {

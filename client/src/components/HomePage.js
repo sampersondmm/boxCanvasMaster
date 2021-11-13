@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import NavBar from './NavBar';
-import {fetchCanvasList} from '../actions/canvasActions';
 import { Header } from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {apiCall} from '../utils/apiUtils';
@@ -23,7 +22,8 @@ class HomePage extends Component {
         const { userProfile } = this.props;
         let { canvasList } = this.state;
         try {
-            canvasList = await canvasApi.fetchCanvasList(userProfile._id);
+            const response = await canvasApi.fetchCanvasList(userProfile._id);
+            canvasList = response
         } catch (error) {
             console.log(error)
         }
@@ -45,6 +45,7 @@ class HomePage extends Component {
                         </div>
                         <CanvasList 
                             {...this.props}
+                            addNotification={this.props.addNotification}
                             fetchCanvasList={this.fetchUserCanvas}
                             list={canvasList}
                         />

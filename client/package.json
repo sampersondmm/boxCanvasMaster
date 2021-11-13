@@ -11,8 +11,9 @@
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
+    "d3": "^7.1.1",
     "d3-selection": "^1.4.1",
-    "d3-transition": "^2.0.0",
+    "d3-transition": "^3.0.1",
     "eslint-plugin-react": "^7.20.0",
     "font-awesome": "^4.7.0",
     "jwt-decode": "^2.2.0",
@@ -56,6 +57,8 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "react-test-renderer": "^16.13.1"
+    "node-sass": "^6.0.1",
+    "react-test-renderer": "^16.13.1",
+    "sass-loader": "^8.0.2"
   }
 }

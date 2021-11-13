@@ -40,7 +40,7 @@
 }
 
 .shape-accordian-option {
-    border: 1px solid rgba(200,200,200,.5) !important;
+    border: 0.7px solid rgba(200,200,200,.3) !important;
     padding: 10px !important;
 }
 

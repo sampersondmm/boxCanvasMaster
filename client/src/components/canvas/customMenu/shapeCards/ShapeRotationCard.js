@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
-import { Icon, Menu, Input, Accordion} from 'semantic-ui-react';
-import { changeShapeRotation } from '../../../../actions/canvasActions';
+import { Icon, Menu, Input } from 'semantic-ui-react';
+import { changeShapeRotation } from '../../../../actions/canvas/editorActions';
 import Common from '../../../../constants/common';
-import AccordianCard from '../../../AccordionCard';
 import {connect} from 'react-redux';
 import AccordionCard from '../../../AccordionCard';
 
@@ -25,11 +24,11 @@ class ShapeRotationCard extends Component {
     }
 
     incrementRotation = (value) => {
-        const { square } = this.props.currentShape;
+        const { currentShape } = this.props;
         const { rotationIncrement } = this.state;
         let newRotation = 0;
         if(value === 'down'){
-            let updatedRotation = square.rotation - rotationIncrement;
+            let updatedRotation = currentShape.rotation - rotationIncrement;
             //goes below 0
             if(updatedRotation < 0) {
                 newRotation = 360 - Math.abs(updatedRotation);
@@ -37,7 +36,7 @@ class ShapeRotationCard extends Component {
                 newRotation = updatedRotation;
             }
         } else {
-            let updatedRotation = square.rotation + rotationIncrement;
+            let updatedRotation = currentShape.rotation + rotationIncrement;
             //goes below 0
             if(updatedRotation >= 360) {
                 newRotation = updatedRotation - 360;
@@ -50,8 +49,7 @@ class ShapeRotationCard extends Component {
 
     cardContent = () => {
         const { rotationIncrement } = this.state;
-        const { inverted } = this.props;
-        const { square } = this.props.currentShape;
+        const { inverted, currentShape } = this.props;
         return (
             <Menu.Menu inverted={inverted} vertical >
                 <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
@@ -65,7 +63,7 @@ class ShapeRotationCard extends Component {
                         type='number'
                         min={0}
                         max={360}
-                        value={square.rotation}
+                        value={currentShape.rotation}
                         onChange={(e, data) => this.handleRotationChange(data, Common.rotation)}
                         placeholder='Rotation...'
                     />
@@ -101,10 +99,10 @@ class ShapeRotationCard extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { currentShape, canvasData } = state.canvas;
+    const { editor, canvasData } = state.canvas;
     return {
         canvasData,
-        currentShape
+        currentShape: editor.currentShape
     }
 }
 

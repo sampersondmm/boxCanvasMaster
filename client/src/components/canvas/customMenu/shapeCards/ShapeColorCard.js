@@ -3,10 +3,13 @@ import { Menu } from 'semantic-ui-react';
 import ColorPicker from '../../ColorPicker';
 import AccordionCard from '../../../AccordionCard';
 import { 
-    changeShapeFill,
     changeBackgroundColor,
+    changeBackgroundOpacity
+} from '../../../../actions/canvas/canvasActions'
+import { 
+    changeShapeFill,
     changeShapeOpacity
-} from '../../../../actions/canvasActions';
+} from '../../../../actions/canvas/editorActions';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
 
@@ -38,6 +41,7 @@ class ShapeColorCard extends Component {
             this.props.dispatch(changeShapeOpacity(color.a))
         } else {
             this.props.dispatch(changeBackgroundColor(rgbString));
+            this.props.dispatch(changeBackgroundOpacity(color.a))
         }
         this.setState(state => ({
             ...state, 
@@ -82,15 +86,15 @@ class ShapeColorCard extends Component {
         const { currentShape, canvasData } = this.props;
         const fill = type === Common.background ? canvasData.fill : currentShape.fill;
         return (
-            <Menu.Item style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                <Menu.Header>{type}</Menu.Header>
-                <div 
+            <Menu.Item style={{display: 'flex', alignItems: 'center', position: 'relative', justifyContent: 'space-between'}}>
+                <Menu.Header className='font-color'>{type}</Menu.Header>
+                <div   
                     style={{...this.style.colorIcon, backgroundColor: colorString, opacity: colorOpacity}}
                     onClick={() => this.toggleColorPicker(type, true)}
                 >
                 </div>
                 {open && (
-                    <div style={{position: 'absolute', top: '0', right: '40px', width: '200px', zIndex: '2'}}>
+                    <div style={{position: 'absolute', top: '30px', left: 'calc(100% - 200px)', zIndex: '10', width: '200px', height: '155px'}}>
                         <div style={{position: 'fixed', top: '0', right: '0', bottom: '0', left: '0'}}
                             onClick={() => this.toggleColorPicker(type, false)}
                         ></div>
@@ -112,12 +116,12 @@ class ShapeColorCard extends Component {
 
     cardShapeContent = () => {
         const { shapeFillOpen, backgroundColorOpen, shapeFillValue, backgroundColorValue } = this.state;
-        const { inverted, currentShape, selectedShapeId } = this.props;
-        const { backgroundColor } = this.props.canvasData;
+        const { inverted, currentShape } = this.props;
+        const { fill, opacity } = this.props.canvasData;
         return (
             <Menu.Menu inverted={inverted} vertical>
                 {this.contentRow(Common.shapeFill, currentShape.fill, shapeFillValue, currentShape.opacity, shapeFillOpen)}
-                {this.contentRow(Common.background, backgroundColor, backgroundColorValue,1 ,backgroundColorOpen)}
+                {this.contentRow(Common.background, fill, backgroundColorValue, opacity ,backgroundColorOpen)}
             </Menu.Menu>
         )
     }

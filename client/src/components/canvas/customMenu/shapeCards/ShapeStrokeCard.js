@@ -5,7 +5,7 @@ import AccordionCard from '../../../AccordionCard';
 import { 
     changeShapeStroke,
     changeShapeStrokeWidth
-} from '../../../../actions/canvasActions';
+} from '../../../../actions/canvas/editorActions';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
 

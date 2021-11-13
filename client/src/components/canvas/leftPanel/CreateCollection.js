@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Common from '../../../constants/common';
 import { Modal, Button} from 'semantic-ui-react';
-import {addShapeToCollection, createCollection} from '../../../actions/canvasActions';
+import {addShapeToCollection, createCollection} from '../../../actions/canvas/canvasActions';
 import ShapeMenu from '../customMenu/CustomMenu';
 import ShapeCollectionCanvas from '../ShapeCollectionCanvas';
 
