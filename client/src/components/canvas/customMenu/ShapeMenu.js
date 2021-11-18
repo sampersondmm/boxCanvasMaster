@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Common from '../../../constants/common';
 import {connect} from 'react-redux';
-import { Tab, Accordion, Menu, Icon, Header } from 'semantic-ui-react';
+import { Tab, Accordion, Menu, Icon, Modal, Header } from 'semantic-ui-react';
 import ShapeDisplayCard from './shapeCards/ShapeDisplayCard';
 import ShapeSizeCard from './shapeCards/ShapeSizeCard';
 import ShapeColorCard from './shapeCards/ShapeColorCard';
@@ -11,6 +11,7 @@ import ShapeStrokeCard from './shapeCards/ShapeStrokeCard';
 import AccordionIcon from '../../AccordionIcon';
 import findIndex from 'lodash/findIndex';
 import ShapePointCard from './shapeCards/ShapePointCard';
+import ShapeEditor from '../shapeEditor/ShapeEditor'
 
 class ShapeMenu extends Component {
     constructor(props){
@@ -206,7 +207,16 @@ class ShapeMenu extends Component {
         return listArr;
     }
     openShapeEditor = () => {
-
+        this.setState((state) => ({
+            ...state,
+            shapeEditorOpen: true
+        }))
+    }
+    closeShapeEditor = () => {
+        this.setState((state) => ({
+            ...state,
+            shapeEditorOpen: false
+        }))
     }
     render(){
         const { modal, inverted, selectedShapeId } = this.props;
@@ -221,11 +231,10 @@ class ShapeMenu extends Component {
                 <div style={{height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 10px'}}>
                     <Header className='font-color' style={{ margin: '0'}}>{title}</Header>
                     <div style={{height: '100%', display: 'flex', alignItems: 'center'}}>
-                        <Icon 
-                            className='font-color' 
-                            onClick={this.openShapeEditor}
-                            style={{margin: '0', padding: '0'}} 
-                            name='edit'
+                        <ShapeEditor
+                            open={shapeEditorOpen}
+                            openShapeEditor={this.openShapeEditor}
+                            closeShapeEditor={this.closeShapeEditor}
                         />
                     </div>
                 </div>

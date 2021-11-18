@@ -35,7 +35,8 @@ const AccordianIcon = ({
             {!hideIcon && (
                 <Icon 
                     name={icon} 
-                    className='font-color'
+                    className={color ? '' : 'font-color'}
+                    color={color ? color : null}
                     disabled={disabled}
                     size={size || 'small'}
                     style={{ margin: '0', padding: '0'}}

@@ -378,7 +378,7 @@ class ShapeCanvas extends Component {
             // this.props.dispatch(selectShape(''))
         } else {
             this.removeElement('.shape-highlight')
-            
+
             stamp
                 .attr('opacity', currentShape.opacity)
         }
@@ -535,7 +535,7 @@ class ShapeCanvas extends Component {
                     break;
                 case Common.line:
                     const shapeHighlight = select(this.node)
-                        .selectAll('.shape-hightlight');
+                        .selectAll('.shape-highlight');
 
                     if(shapeData.curve){
                         shapeHighlight
@@ -773,6 +773,8 @@ class ShapeCanvas extends Component {
         const { currentShape, defaultShape } = this.props;
         const { square, circle, line } = defaultShape;
 
+        console.log('CLICKED MAIN CANVAS')
+
         let shapeCopy = {};
         let stampCopy = {};
 
@@ -850,16 +852,16 @@ class ShapeCanvas extends Component {
     }
 
     createPointString = (pointList, curve = true) => {
-        if(curve){
-            const path = d3.path();
-            const curve = d3.curveBasis(path);
-            for(const point of pointList){
-                curve.lineStart();
-                for(const {x, y} of pointList) curve.point(x, y);
-                curve.lineEnd();
-            }
-            return path;
-        } else {
+        // if(curve){
+        //     const path = d3.path();
+        //     const curve = d3.curveBasis(path);
+        //     for(const point of pointList){
+        //         curve.lineStart();
+        //         for(const {x, y} of pointList) curve.point(x, y);
+        //         curve.lineEnd();
+        //     }
+        //     return path;
+        // } else {
             let string = '';
             pointList.map((point, index) => {
                 if(index === 0){
@@ -870,7 +872,7 @@ class ShapeCanvas extends Component {
             })
             string = string.concat(` Z`)
             return string;
-        }
+        // }
     }
 
      changeCanvasScale = (newScale) => {

@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import Size from '../../constants/size';
-import ShapeCanvas from './ShapeCanvas'
+import ShapeCanvas from './ShapeCanvas';
 import CustomMenu from './customMenu/CustomMenu';
+import { Modal } from 'semantic-ui-react';
 import NavBar from '../NavBar';
 import { addShapeToCanvas } from '../../actions/canvas/canvasActions';
 import CanvasAPI from '../../api/canvasApi';

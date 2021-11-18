@@ -12,6 +12,7 @@
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
     "d3": "^7.1.1",
+    "d3-drag": "^3.0.0",
     "d3-selection": "^1.4.1",
     "d3-transition": "^3.0.1",
     "eslint-plugin-react": "^7.20.0",
