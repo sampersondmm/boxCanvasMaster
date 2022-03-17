@@ -13,6 +13,11 @@ const canvasSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    action: {
+        type: String,
+        required: true,
+        default: 'add'
+    },
     shapeList: {
         type: Array,
         required: true
@@ -43,6 +48,9 @@ const canvasSchema = new mongoose.Schema({
         currentShape: {
             type: Object,
             required: true,
+        },
+        currentShapeType: {
+            type: String
         },
         editedShapes: {
             type: Object,

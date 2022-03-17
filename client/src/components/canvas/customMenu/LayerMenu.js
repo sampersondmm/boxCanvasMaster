@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import { Menu, Tab, Accordion, Header, Message, Label } from 'semantic-ui-react';
 import {connect} from 'react-redux'
 import Common from '../../../constants/common';
-import { without, indexOf, find } from 'lodash';
-import { selectShape, removeShape } from '../../../actions/canvas/canvasActions';
+import { without, reverse, cloneDeep } from 'lodash';
+import { selectShape, removeShape, hoverShape } from '../../../actions/canvas/canvasActions';
 import Aux from '../../../utils/AuxComponent';
 import AccordionIcon from '../../AccordionIcon';
 
@@ -199,12 +199,30 @@ class LayerMenu extends Component {
         }
     }
 
+    hoverOn = (shape) => {
+        this.props.dispatch(hoverShape(shape.id))
+    }
+    
+    hoverOff = () => {
+        this.props.dispatch(hoverShape(''))
+    }
+
     createShapeList = () => {
         const { shapeList, inverted } = this.props;
         const { openList, selection } = this.state;
-        const newList = shapeList.map((shape, index) => {
+        const reversed = reverse(cloneDeep(shapeList))
+        const newList = reversed.map((shape, index) => {
             return (
-                <Menu.Item className='shape-accordian-option' style={{margin: '0 2px', marginBottom: '5px', borderRadius: '4px'}}>
+                <Menu.Item 
+                    className='shape-accordian-option' 
+                    onMouseEnter={() => this.hoverOn(shape)}
+                    onMouseLeave={this.hoverOff}
+                    style={{
+                        margin: '0 2px', 
+                        marginBottom: '5px', 
+                        borderRadius: '4px'
+                    }}
+                >
                         <Accordion.Title
                             index={0}
                             style={{
@@ -248,9 +266,9 @@ class LayerMenu extends Component {
 
     render(){
         const { inverted, modal, shapeList } = this.props;
-        const wrapHeight = modal ? '433px' : 'calc(100vh - 100px)';
+        const wrapHeight = modal ? '433px' : 'calc(100vh - 140px)';
         const { selection } = this.state;
-        const scrollHeight = 'calc(100vh - 190px)';
+        const scrollHeight = 'calc(100vh - 230px)';
         const scrollClass = !inverted ? 'scrollbar' : 'scrollbar-inverted';
         return (
             <div style={{height: wrapHeight, overflow: 'hidden'}}>

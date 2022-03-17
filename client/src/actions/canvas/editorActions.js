@@ -81,6 +81,15 @@ const changeShapeStrokeWidth = width => {
     }
 }
 
+const selectPoint = selectedPoints => {
+    return {
+        type: ActionTypes.SELECT_POINT,
+        payload: {
+            selectedPoints
+        }
+    }
+}
+
 export {
     changeShapeType, 
     changeShapeFill,
@@ -91,4 +100,5 @@ export {
     changeShapeStrokeWidth,
     changeShapeHeight, 
     changeShapeRadius, 
+    selectPoint
 }

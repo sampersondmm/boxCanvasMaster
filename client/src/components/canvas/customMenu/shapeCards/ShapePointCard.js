@@ -1,11 +1,18 @@
 import React, {Component} from 'react';
 import Common from '../../../../constants/common';
+import { Message } from 'semantic-ui-react';
 import {connect} from 'react-redux';
+import { selectPoint } from '../../../../actions/canvas/editorActions'
 import AccordionCard from '../../../AccordionCard';
+import { cloneDeep, without } from 'lodash';
 
 class PointDisplayCard extends Component {
     constructor(props){
         super(props);
+        this.state = {
+            openList: [],
+            selectedList: []
+        }
     }
 
     returnNewShape = () => {
@@ -93,41 +100,80 @@ class PointDisplayCard extends Component {
         }
     }
 
-    handleSelectPoint = () => {
+    handleSelectPoint = (id) => {
+        let { selectedList } = this.state;
+        const alreadySelected = selectedList.includes(id);
 
+        if(alreadySelected){
+            selectedList = [''];
+        } else {
+            selectedList = [id]
+        }
+        this.props.dispatch(selectPoint(selectedList))
+        this.setState((state) => ({
+            ...state,
+            selectedList
+        }))
     }
 
-    handleOpenPoint = () => {
-
+    handleOpen = (id) => {
+        let openList = cloneDeep(this.state.openList);
+        const alreadyOpen = openList.includes(id);
+        if(alreadyOpen){
+            openList = openList.filter(x => x.id === id);
+        } else {
+            openList.push(id)
+        }
+        this.setState(state => ({
+            ...state,
+            openList
+        }))
     }
 
     cardContent = () => {
-        const { currentShape, open } = this.props;
+        const { currentShape, selectedShapeId } = this.props;
+        const { openList, selectedList } = this.state;
 
-        return currentShape.pointData ? currentShape.pointData.map((point, index) => {
-            return (
-                <AccordionCard
-                    open={open}
-                    header={`${Common.point} ${index}`}
-                    additionalText={`pos x: ${Math.floor(point.x)} pos y: ${Math.floor(point.y)}`}
-                    selection={null}
-                    handleSelect={this.handleSelectPoint}
-                    handleOpen={this.handleOpenPoint}
-                    index={index}
-                    content={null}
+        if(selectedShapeId){
+            return currentShape.pointData.length ? currentShape.pointData.map((point, index) => {
+                const open = openList.includes(point.id);
+                const selected = selectedList.includes(point.id);
+                return (
+                    <AccordionCard
+                        open={open}
+                        header={`${Common.point} ${index}`}
+                        additionalText={`[${Math.floor(point.x)}, ${Math.floor(point.y)}]`}
+                        selected={selected}
+                        handleSelect={() => this.handleSelectPoint(point.id)}
+                        handleOpen={() => this.handleOpen(point.id)}
+                        index={index}
+                        content={null}
+                    />
+                )
+            }) : (
+                <Message
+                    style={{
+                        backgroundColor: '#1b1c1d',
+                        color: 'rgba(255,255,255,.9)',
+                        margin: '0',
+                        border: '1px solid rgb(120, 120, 120)'
+                    }}
+                    content='No Points'
                 />
             )
-        }) : []
+        } else {
+            return null
+        }
     }
 
 
     render() {
-        const { open, selection, handleSelect } = this.props;
+        const { open, selected, handleSelect } = this.props;
         return (
             <AccordionCard
                 open={open}
                 header={Common.points}
-                selection={selection}
+                selected={selected === Common.points}
                 handleSelect={handleSelect}
                 handleOpen={this.props.handleOpen}
                 index={0}
@@ -138,13 +184,13 @@ class PointDisplayCard extends Component {
 }
 
 const mapStateToProps = (state) => {
-    const { editor, canvasData, currentShapeType } = state.canvas;
+    const { editor, canvasData } = state.canvas;
     const { selectedShape } = state.canvas.canvasData;
 
     return {
         canvasData,
-        currentShapeType,
         selectedShape,
+        selectedShapeId: editor.selectedShapeId ,
         currentShape: editor.currentShape
     }
 }

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { Menu, Input, Icon } from 'semantic-ui-react';
 import ColorPicker from '../../ColorPicker';
 import AccordionCard from '../../../AccordionCard';
+import CustomInput from './CustomInput';
 import { 
     changeShapeStroke,
     changeShapeStrokeWidth
@@ -77,7 +78,7 @@ class ShapeColorCard extends Component {
         const { backgroundColor } = this.props.canvasData;
         return (
             <Menu.Item style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                <Menu.Header>{type}</Menu.Header>
+                <Menu.Header className='font-color'>{type}</Menu.Header>
                 <div 
                     style={{...this.style.colorIcon, backgroundColor: colorString}}
                     onClick={() => this.toggleColorPicker(type, true)}
@@ -112,30 +113,25 @@ class ShapeColorCard extends Component {
         return (
             <Menu.Menu inverted={inverted} vertical>
                 {this.contentRow(Common.strokeColor, strokeColor, strokeColorValue, strokeColorOpen)}
-                <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
-                    <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementStrokeWidth('down')}/>
-                    <Menu.Header style={{margin: '0'}}>{Common.strokeWidth}</Menu.Header>
-                    <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementStrokeWidth('up')}/>
-                </Menu.Item>
-                <Menu.Item>
-                    <Input
-                        inverted={inverted}
-                        type='number'
-                        value={strokeWidth}
-                        onChange={(e, data) => this.handleStrokeWidthChange(data)}
-                        placeholder='Stoke Width'
-                    />
-                </Menu.Item>
+                <CustomInput
+                    value={strokeWidth}
+                    type='number'
+                    label={Common.strokeWidth}
+                    placeholder={`${Common.strokeWidth}...`}
+                    onChange={this.handleStrokeWidthChange}
+                    onIncrement={this.incrementStrokeWidth}
+                    useIncrement={true}
+                />
             </Menu.Menu>
         )
     }
 
     render(){
-        const { open, selection, handleSelect } = this.props;
+        const { open, selected, handleSelect } = this.props;
         return (
             <AccordionCard
                 open={open}
-                selection={selection}
+                selected={selected === Common.stroke}
                 handleSelect={handleSelect}
                 handleOpen={this.props.handleOpen}
                 index={2}

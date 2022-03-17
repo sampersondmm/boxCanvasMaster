@@ -82,13 +82,13 @@ class ShapeTypeCard extends Component {
     }
 
     render(){
-        const { open, selection, handleSelect } = this.props;
+        const { open, selected, handleSelect } = this.props;
         return (
             <AccordionCard
                 open={open}
                 index={1}
                 header={Common.type}
-                selection={selection}
+                selected={selected === Common.type}
                 handleSelect={handleSelect}
                 handleOpen={this.props.handleOpen}
                 content={this.cardContent()}

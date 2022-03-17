@@ -18,6 +18,14 @@ class Notifification extends Component {
     const { notification } = this.props
     this.props.autoDismiss(notification.id);
   }
+  handleDismiss = (id) => {
+    let { notifications } = this.state;
+    notifications = notifications.filter((x) => x.id !== id)
+    this.setState((state) => ({
+      ...state,
+      notifications
+    }))
+  }
   render(){
     const { notification } = this.props;
     let color = ''
@@ -78,13 +86,6 @@ class App extends Component {
         })}
       </div>
     )
-  }
-  handleDismiss = (id) => {
-    let { notifications } = this.state;
-    notifications = notifications.filter((x) => x.id !== id)
-    this.setState((state) => ({
-      notifications
-    }))
   }
   addNotification = (notification) => {
     notification.id = uuid();
@@ -172,7 +173,7 @@ class App extends Component {
             }}
           />
         </Switch>
-        {/* {this.renderNotifications()} */}
+        {this.renderNotifications()}
       </div>
     );
   }

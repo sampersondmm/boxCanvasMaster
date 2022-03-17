@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Menu } from 'semantic-ui-react';
+import { Menu, Popup } from 'semantic-ui-react';
 import ColorPicker from '../../ColorPicker';
 import AccordionCard from '../../../AccordionCard';
 import { 
@@ -87,25 +87,38 @@ class ShapeColorCard extends Component {
         const fill = type === Common.background ? canvasData.fill : currentShape.fill;
         return (
             <Menu.Item style={{display: 'flex', alignItems: 'center', position: 'relative', justifyContent: 'space-between'}}>
-                <Menu.Header className='font-color'>{type}</Menu.Header>
-                <div   
-                    style={{...this.style.colorIcon, backgroundColor: colorString, opacity: colorOpacity}}
-                    onClick={() => this.toggleColorPicker(type, true)}
-                >
-                </div>
-                {open && (
-                    <div style={{position: 'absolute', top: '30px', left: 'calc(100% - 200px)', zIndex: '10', width: '200px', height: '155px'}}>
-                        <div style={{position: 'fixed', top: '0', right: '0', bottom: '0', left: '0'}}
-                            onClick={() => this.toggleColorPicker(type, false)}
+                <Menu.Header className='font-color' style={{display: 'flex', alignItems: 'center'}}>{type}</Menu.Header>
+                <Popup
+                    inverted
+                    onOpen={() => this.toggleColorPicker(type, true)}
+                    onClose={() => this.toggleColorPicker(type, false)}
+                    on='click'
+                    style={{
+                        width: '250px'
+                    }}
+                    trigger={
+                        <div   
+                            style={{...this.style.colorIcon, backgroundColor: colorString, opacity: colorOpacity}}
+                            // onClick={() => this.toggleColorPicker(type, true)}
                         ></div>
+                    }
+                    content={
                         <ColorPicker 
                             color={color} 
                             colorChange={this.handleColorChange}
                             shapeColor={fill}
                             backgroundColor={fill}
                         />
+                    }
+                />
+                {/* </div> */}
+                {/* {open && (
+                    <div style={{position: 'absolute', top: '30px', left: 'calc(100% - 200px)', zIndex: '10', width: '200px', height: '155px'}}>
+                        <div style={{position: 'fixed', top: '0', right: '0', bottom: '0', left: '0'}}
+                            onClick={() => this.toggleColorPicker(type, false)}
+                        ></div>
                     </div>
-                )}
+                )} */}
             </Menu.Item>
         )
     }
@@ -127,11 +140,11 @@ class ShapeColorCard extends Component {
     }
 
     render(){
-        const { open, selection, handleSelect } = this.props;
+        const { open, selected, handleSelect } = this.props;
         return (
             <AccordionCard
                 open={open}
-                selection={selection}
+                selected={selected === Common.color}
                 handleSelect={handleSelect}
                 handleOpen={this.props.handleOpen}
                 index={2}

@@ -24,6 +24,7 @@ const Common = {
     border: 'Border',
     square: 'Square',
     circle: 'Circle',
+    increment: 'Increment',
     width: 'Width',
     height: 'Height',
     radius: 'Radius',

@@ -8,7 +8,7 @@ const AccordionCard = ({
     handleOpen,
     header,
     index,
-    selection,
+    selected,
     content,
     handleSelect,
     additionalText
@@ -46,7 +46,7 @@ const AccordionCard = ({
                         disabled={false}
                         onClick={handleSelect}
                         color='teal'
-                        hideIcon={selection !== header}
+                        hideIcon={!selected}
                         icon='check'
                     />
                 </Accordion.Title>

@@ -192,7 +192,7 @@ class CanvasItem extends Component {
         const fillArr = fill.split(',')
         // ['rgb(0','0','0',')']
         const style = {
-            backgroundColor: 'rgba(0,0,0,0)',
+            backgroundColor: fill,
             height: `400px`,
             margin: '0 50px',
             padding: '0'

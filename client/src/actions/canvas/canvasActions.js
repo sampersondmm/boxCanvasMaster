@@ -87,6 +87,22 @@ const selectShape = (id) => {
     }
 }
 
+const hoverShape = (id) => {
+    return {
+        type: ActionTypes.HOVER_SHAPE,
+        payload: { id }
+    }
+}
+
+const updateSelectedShape = (selectedShape) => {
+    return {
+        type: ActionTypes.UPDATE_SELECTED_SHAPE,
+        payload: {
+            selectedShape
+        }
+    }
+}
+
 const removeShape = (id) => {
     return {
         type: ActionTypes.REMOVE_SHAPE,
@@ -140,6 +156,15 @@ const updateCanvasDescription = (description) => {
     }
 }
 
+const toggleCanvasAction = (action) => {
+    return {
+        type: ActionTypes.TOGGLE_CANVAS_ACTION,
+        payload: {
+            action
+        }
+    }
+}
+
 export {
     setCanvasSize, 
     addShapeToCanvas, 
@@ -149,6 +174,8 @@ export {
     changeCanvasScale, 
     setCanvasData,
     selectShape, 
+    hoverShape,
+    updateSelectedShape,
     removeShape,
     changeBackgroundColor,
     changeBackgroundOpacity,
@@ -156,5 +183,6 @@ export {
     clearCanvasData,
     updateCanvasTitle,
     updateCanvasDescription,
-    removeColorFromPalette
+    removeColorFromPalette,
+    toggleCanvasAction
 };

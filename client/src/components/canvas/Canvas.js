@@ -3,12 +3,13 @@ import {connect} from 'react-redux';
 import Size from '../../constants/size';
 import ShapeCanvas from './ShapeCanvas';
 import CustomMenu from './customMenu/CustomMenu';
-import { Modal } from 'semantic-ui-react';
+import { Modal, Icon } from 'semantic-ui-react';
 import NavBar from '../NavBar';
+import CanvasNavbar from './CanvasToolbar';
 import { addShapeToCanvas } from '../../actions/canvas/canvasActions';
 import CanvasAPI from '../../api/canvasApi';
 
-const canvasApi = new CanvasAPI();
+const canvasAPI = new CanvasAPI();
 
 class Canvas extends Component {
     constructor(props){
@@ -38,9 +39,39 @@ class Canvas extends Component {
             ],
         }
     }
-    componentDidUpdate(prevProps){
-        if(prevProps.canvasId !== this.props.canvasId){
-            this.fetchCanvasData();
+    createCanvas = async () => {
+        let response = {};
+        const { userProfile, canvas } = this.props;
+        try {
+            response = await canvasAPI.createCanvas(canvas, userProfile._id);
+                this.props.addNotification({
+                    type: 'success',
+                    message: 'Successfully created a new canvas!'
+                })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    updateCanvas = async () => {
+        let response = {};
+        const { userProfile, canvas } = this.props;
+        try {
+            response = await canvasAPI.updateCanvas(canvas, userProfile._id);
+                this.props.addNotification({
+                    type: 'success',
+                    message: 'Successfully edited canvas!'
+                })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    saveCanvas = async () => {
+        const { canvasId } = this.props;
+        if(canvasId){
+            this.updateCanvas();
+        } else {
+            this.createCanvas();
         }
     }
     handleRightMenu = () => {
@@ -84,7 +115,10 @@ class Canvas extends Component {
         return(
             <div className='canvas-wrap'>
                 <NavBar {...this.props}/>
-                <div className='canvas-display' style={{height: 'calc(100vh - 50px)'}}>
+                <CanvasNavbar
+                    saveCanvas={this.saveCanvas}
+                />
+                <div className='canvas-display' style={{height: 'calc(100vh - 90px)'}}>
                     <CustomMenu
                         location='main'
                         panes={leftPanes}
@@ -103,7 +137,6 @@ class Canvas extends Component {
                     <CustomMenu
                         location='main'
                         panes={rightPanes}
-                        actions={[{type: 'save', icon:'save'}]}
                         newCanvas={newCanvas}
                         width={width}
                         addNotification={this.props.addNotification}
@@ -117,9 +150,11 @@ class Canvas extends Component {
 }
 
 const mapStateToProps = state => {
-    const {canvas} = state;
+    const {canvas, user } = state;
     return {
         ...state,
+        userProfile: user.userProfile,
+        canvasId: canvas._id,
         canvas,
     }
 }

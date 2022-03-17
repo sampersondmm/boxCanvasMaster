@@ -133,6 +133,7 @@ class ShapePointsPane extends Component {
         if(copy.length){
             copy.push({x: 250, y: 200, id: ''})
         }
+        
 
         select(this.node)
             .append('circle')

@@ -118,12 +118,12 @@ class ShapeDisplayCard extends Component {
 
 
     render() {
-        const { open, selection, handleSelect } = this.props;
+        const { open, selected, handleSelect } = this.props;
         return (
             <AccordionCard
                 open={open}
                 header={Common.display}
-                selection={selection}
+                selected={selected === Common.display}
                 handleSelect={handleSelect}
                 handleOpen={this.props.handleOpen}
                 index={0}

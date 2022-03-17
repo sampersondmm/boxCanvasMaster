@@ -9,9 +9,9 @@ class CustomTooltip extends Component {
         const { icon, fa, onClick, position } = this.props;
         return (
             <Popup
-                inverted
+                className='custom-tooltip'
                 trigger={this.props.trigger}
-                content={<div>{this.props.content}</div>}
+                content={<div className='font-color'>{this.props.content}</div>}
                 position={position ? position : 'bottom center'}
             />
         )

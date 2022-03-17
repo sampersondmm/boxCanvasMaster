@@ -4,6 +4,7 @@ import { changeShapeRotation } from '../../../../actions/canvas/editorActions';
 import Common from '../../../../constants/common';
 import {connect} from 'react-redux';
 import AccordionCard from '../../../AccordionCard';
+import CustomInput from './CustomInput';
 
 class ShapeRotationCard extends Component {
     constructor(props){
@@ -52,42 +53,33 @@ class ShapeRotationCard extends Component {
         const { inverted, currentShape } = this.props;
         return (
             <Menu.Menu inverted={inverted} vertical >
-                <Menu.Item style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', paddingBottom: '0'}}>
-                    <Icon name='minus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementRotation('down')}/>
-                    <Menu.Header style={{margin: '0'}}>{Common.rotation}</Menu.Header>
-                    <Icon name='plus' style={{cursor: 'pointer', margin: '0'}} onClick={() => this.incrementRotation('up')}/>
-                </Menu.Item>
-                <Menu.Item>
-                    <Input
-                        inverted={inverted}
-                        type='number'
-                        min={0}
-                        max={360}
-                        value={currentShape.rotation}
-                        onChange={(e, data) => this.handleRotationChange(data, Common.rotation)}
-                        placeholder='Rotation...'
-                    />
-                </Menu.Item>
-                <Menu.Item>
-                    <Menu.Header>Increment</Menu.Header>
-                        <Input
-                            inverted={inverted}
-                            type='number'
-                            value={rotationIncrement}
-                            onChange={(e, data) => this.handleChangeRotationIncrement(data)}
-                            placeholder='Increment...'
-                        />
-                </Menu.Item>
+                <CustomInput
+                    value={currentShape.rotation}
+                    type='number'
+                    label={Common.rotation}
+                    placeholder={`${Common.rotation}...`}
+                    onChange={this.handleRotationChange}
+                    onIncrement={this.incrementRotation}
+                    useIncrement={true}
+                />
+                <CustomInput
+                    value={rotationIncrement}
+                    type='number'
+                    label={Common.increment}
+                    placeholder={`${Common.increment}...`}
+                    onChange={this.handleChangeRotationIncrement}
+                    useIncrement={false}
+                />
             </Menu.Menu>
         )
     }
 
     render(){
-        const { open, selection, handleSelect } = this.props;
+        const { open, selected, handleSelect } = this.props;
         return (
             <AccordionCard
                 open={open}
-                selection={selection}
+                selected={selected === Common.rotaion}
                 handleSelect={handleSelect}
                 handleOpen={this.props.handleOpen}
                 header={Common.rotation}

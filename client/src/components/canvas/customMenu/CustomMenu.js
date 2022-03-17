@@ -6,7 +6,6 @@ import { addShapeToCollection } from '../../../actions/canvas/canvasActions';
 import Common from '../../../constants/common';
 import ShapeMenu from './ShapeMenu';
 import LayerMenu from './LayerMenu';
-import SaveMenu from './SaveMenu';
 import { defaultCanvasData } from '../../../constants/data';
 import CanvasAPI from '../../../api/canvasApi';
 import CustomTooltip from '../../CustomTooltip';
@@ -68,42 +67,6 @@ class CustomMenu extends Component {
         })
     }
 
-    createCanvas = async () => {
-        let response = {};
-        const { userProfile, canvas } = this.props;
-        try {
-            response = await canvasAPI.createCanvas(canvas, userProfile._id);
-                this.props.addNotification({
-                    type: 'success',
-                    message: 'Successfully created a new canvas!'
-                })
-        } catch (error) {
-            console.log(error)
-        }
-    }
-    updateCanvas = async () => {
-        let response = {};
-        const { userProfile, canvas } = this.props;
-        try {
-            response = await canvasAPI.updateCanvas(canvas, userProfile._id);
-                this.props.addNotification({
-                    type: 'success',
-                    message: 'Successfully edited canvas!'
-                })
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    saveChanges = async () => {
-        const { canvasId } = this.props;
-        if(canvasId){
-            this.updateCanvas();
-        } else {
-            this.createCanvas();
-        }
-    }
-
     clickMenuItem = (type) => {
         const { changes } = this.state;
         let { activeMenu } = this.state;
@@ -111,9 +74,6 @@ class CustomMenu extends Component {
             case 'shape':
             case 'layers':
             case 'settings':
-                activeMenu = type;
-                break;
-            case 'save':
                 activeMenu = type;
                 break;
             default:
@@ -134,19 +94,9 @@ class CustomMenu extends Component {
 
     renderMenuActions = () => {
         const { actions } = this.props;
-        const { changes } = this.state;
-        const { canvasId } = this.props;
         return actions && actions.length ? actions.map((action) => {
             let color = '';
             let newIcon = action.icon
-            if(action.type === 'save'){
-                if(!canvasId){
-                    newIcon = 'add'
-                }
-                if(changes){
-                    color = 'yellow';
-                }
-            }
             if(action.type === 'shape'){
                 color = 'teal';
             }
@@ -171,18 +121,8 @@ class CustomMenu extends Component {
     }
 
     renderMenuTab = (icon, type) => {
-        const { changes } = this.state;
-        const { canvasId } = this.props;
         let color = '';
         let newIcon = icon
-        if(type === 'save'){
-            if(!canvasId){
-                newIcon = 'add'
-            }
-            if(changes){
-                color = 'yellow';
-            }
-        }
         if(type === 'shape'){
             color = 'teal';
         }
@@ -215,9 +155,6 @@ class CustomMenu extends Component {
                     <ShapeMenu 
                         inverted={isInverted} 
                         modal={modal}
-                        canvasData={canvasData}
-                        currentShape={this.props.currentShape}
-                        shapeType={this.props.currentShapeType}
                     />
                 );
             case 'layers':
@@ -228,12 +165,8 @@ class CustomMenu extends Component {
                         modal={modal}
                     />
                 )
-            case 'save':
-                return (
-                    <SaveMenu
-                        saveCanvas={this.saveChanges}
-                    />
-                )
+            default:
+                return null;
         }
     }
 
